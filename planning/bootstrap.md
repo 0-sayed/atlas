@@ -40,8 +40,8 @@ Color every task node to match the `Done` column: unchecked `[ ]` tasks are gray
 
 ### Step 3 — Repository settings
 
-- [ ] When GitHub is used, protect `main`: block deletion and force pushes; require a pull request, passing checks that actually exist, and resolved review conversations. Zero approvals is acceptable for a solo project.
-- [ ] Enable automatic deletion of merged head branches if desired.
+- [x] Protect `main`: block deletion and force pushes; require a pull request, the passing `verify` check, and resolved review conversations. Zero approvals are required for this solo project.
+- [x] Enable automatic deletion of merged head branches.
 
 ## Phase 1 — Frontend foundation
 
@@ -96,9 +96,9 @@ Atlas V1 is one static, client-rendered React application. Maintained product fa
 
 ### Step 10 — First pull request
 
-- [ ] Open one bootstrap PR from `chore/t000-project-bootstrap` once the GitHub repository exists. Use title `chore: bootstrap Atlas frontend`.
-- [ ] Describe the repository foundation, frontend tooling, verification, and known gaps. Keep illustrated feature behavior out of this PR.
-- [ ] Verify configured CI checks pass before merging.
+- [x] Open one bootstrap PR from `chore/t000-project-bootstrap` once the GitHub repository exists. Use title `chore: bootstrap Atlas frontend`.
+- [x] Describe the repository foundation, frontend tooling, verification, and known gaps. Keep illustrated feature behavior out of this PR.
+- [x] Verify the configured `verify` CI check passes before merging.
 
 ## First feature after bootstrap
 
