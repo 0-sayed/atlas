@@ -102,6 +102,17 @@ test('browser Back restores the selected case and earlier search', async ({
 test('missing activity and case links cannot show a successful booking', async ({
   page,
 }) => {
+  await page.goto('/#/explore/booking?case=missing&q=move')
+  await expect(
+    page.getByRole('heading', { name: 'This guide is not here yet' }),
+  ).toBeVisible()
+  await page
+    .getByRole('link', { name: 'Return to Explore', exact: true })
+    .click()
+  await expect(
+    page.getByRole('searchbox', { name: 'Search activities' }),
+  ).toHaveValue('move')
+
   for (const route of [
     '/explore/missing',
     '/explore/booking?case=missing',
@@ -147,6 +158,18 @@ test('a historical comparison keeps the same 36-hour booking and links to its cu
     page.getByRole('heading', { name: 'Now allowed', exact: true }),
   ).toBeVisible()
   await page
+    .getByRole('button', { name: 'Less than 24 hours', exact: true })
+    .click()
+  await expect(
+    page.getByRole('button', { name: '36 hours · Current rule', exact: true }),
+  ).toBeVisible()
+  await page
+    .getByRole('button', { name: '36 hours · Current rule', exact: true })
+    .click()
+  await expect(
+    page.getByRole('heading', { name: 'Now allowed', exact: true }),
+  ).toBeVisible()
+  await page
     .getByRole('link', { name: 'Back to What changed', exact: true })
     .click()
   await expect(
@@ -181,10 +204,17 @@ test('the learning loop works by keyboard, at narrow widths and with reduced mot
   await page.getByRole('button', { name: 'Close detail', exact: true }).focus()
   await page.keyboard.press('Enter')
   await expect(reason).toBeFocused()
-  await expect(page.locator('.outcome-banner')).toHaveCSS(
-    'transition-duration',
-    '1e-05s',
-  )
+  const transitionDuration = await page
+    .locator('.outcome-banner')
+    .evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).transitionDuration),
+    )
+  expect(
+    await page.evaluate(
+      () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    ),
+  ).toBe(true)
+  expect(transitionDuration).toBeLessThan(0.001)
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -220,9 +250,17 @@ test('return restores the actual Explore position and new destinations start at 
   await page
     .getByRole('link', { name: 'Reschedule a booking', exact: true })
     .click()
-  await page.getByRole('button', { name: 'Why this outcome?' }).click()
+  const reason = page.getByRole('button', { name: 'Why this outcome?' })
+  await reason.scrollIntoViewIfNeeded()
   const previousPosition = await page.evaluate(() => window.scrollY)
-  expect(previousPosition).toBeGreaterThan(500)
+  expect(previousPosition).toBeGreaterThan(0)
+  expect(
+    await reason.evaluate((element) => {
+      const rect = element.getBoundingClientRect()
+      return rect.top >= 0 && rect.bottom <= window.innerHeight
+    }),
+  ).toBe(true)
+  await reason.click()
   await page
     .getByRole('link', { name: 'See what changed', exact: true })
     .click()

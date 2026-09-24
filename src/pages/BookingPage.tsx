@@ -30,10 +30,7 @@ export function BookingPage() {
       : origin === 'changes'
         ? 'Back to What changed'
         : 'Back to Explore'
-  const cases =
-    example.id === 'change-now'
-      ? [...bookingCases, bookingChange.after.example]
-      : bookingCases
+  const cases = [...bookingCases, bookingChange.after.example]
   return (
     <section className="booking-page" aria-labelledby="page-title">
       <Link

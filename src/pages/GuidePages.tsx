@@ -183,6 +183,12 @@ export function ChangesPage() {
 }
 
 export function MissingPage() {
+  const [params] = useSearchParams()
+  const query = params.get('q')
+  const returnPath = query
+    ? `/explore?${new URLSearchParams({ q: query })}`
+    : '/explore'
+
   return (
     <section className="missing-page" aria-labelledby="page-title">
       <p className="eyebrow">Atlas / Unavailable</p>
@@ -190,7 +196,7 @@ export function MissingPage() {
       <p className="intro">
         This link does not point to an available activity or saved case.
       </p>
-      <Link className="primary-link" to="/explore">
+      <Link className="primary-link" to={returnPath}>
         Return to Explore <span aria-hidden="true">↗</span>
       </Link>
     </section>

@@ -120,6 +120,12 @@ export function getBookingCase(id: string): BookingCase | undefined {
   )
 }
 
+export function isBelowNoticeRequirement(
+  item: Pick<BookingCase, 'hours'>,
+): boolean {
+  return item.hours < booking.noticeHours
+}
+
 export function matchesBooking(query: string): boolean {
   const searchable =
     `${booking.title} ${booking.purpose} ${booking.actor}`.toLowerCase()

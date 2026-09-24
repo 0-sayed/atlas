@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import { useLocation, useNavigationType } from 'react-router'
+import { rememberPosition } from './navigationScrollMemory'
 
 // HashRouter leaves document scrolling to the app. Retain history positions,
 // and allow an explicit return link to restore its originating destination.
@@ -31,8 +32,13 @@ export function NavigationScroll() {
     window.scrollTo(0, target)
     previousPath.current = location.pathname
     const remember = () => {
-      historyPositions.current.set(location.key, window.scrollY)
-      destinationPositions.current.set(destination, window.scrollY)
+      rememberPosition({
+        historyPositions: historyPositions.current,
+        destinationPositions: destinationPositions.current,
+        historyKey: location.key,
+        destination,
+        scrollY: window.scrollY,
+      })
     }
     remember()
     window.addEventListener('scroll', remember, { passive: true })

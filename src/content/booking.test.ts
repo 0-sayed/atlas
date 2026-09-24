@@ -4,6 +4,7 @@ import {
   bookingCases,
   bookingChange,
   getBookingCase,
+  isBelowNoticeRequirement,
   matchesBooking,
 } from './booking'
 
@@ -69,6 +70,13 @@ describe('recorded booking explanations', () => {
       outcome: 'allowed',
     })
     expect(getBookingCase('change-now')).toEqual(bookingChange.after.example)
+  })
+  it('derives notice-blocked cases from hours instead of saved case ids', () => {
+    const futureBelowNotice = { ...bookingCases[0], id: 'future', hours: 23 }
+    const futureAtNotice = { ...bookingCases[1], id: 'future', hours: 24 }
+
+    expect(isBelowNoticeRequirement(futureBelowNotice)).toBe(true)
+    expect(isBelowNoticeRequirement(futureAtNotice)).toBe(false)
   })
   it.each([
     ['', true],

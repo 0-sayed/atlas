@@ -1,4 +1,4 @@
-import type { BookingCase } from '../content/booking'
+import { isBelowNoticeRequirement, type BookingCase } from '../content/booking'
 
 // Original Atlas artwork. Decorative shapes; all meaning is also rendered as HTML.
 export function CalendarArt({
@@ -181,7 +181,10 @@ export function BookingScene({ example }: { example: BookingCase }) {
         </span>
         <div className="scene-step">
           <span className="step-number">02 / THE NOTICE</span>
-          <ClockArt hours={example.hours} blocked={example.id === 'too-late'} />
+          <ClockArt
+            hours={example.hours}
+            blocked={isBelowNoticeRequirement(example)}
+          />
           <h2>{example.hours} hours remaining</h2>
           <p>Before the original start</p>
         </div>
