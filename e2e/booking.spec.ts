@@ -271,6 +271,32 @@ test('return restores the actual Explore position and new destinations start at 
     .toBe(previousPosition)
 })
 
+test('unavailable guide return restores the actual Explore position', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 600 })
+  await page.goto('/#/explore?q=move')
+  await page.evaluate(() => window.scrollTo(0, 220))
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
+  await page.evaluate(() => {
+    const link = document.createElement('a')
+    link.href = '#/explore/booking?case=missing&q=move'
+    link.textContent = 'Open unavailable guide'
+    document.body.append(link)
+    link.click()
+  })
+  await expect(
+    page.getByRole('heading', { name: 'This guide is not here yet' }),
+  ).toBeVisible()
+  await page
+    .getByRole('link', { name: 'Return to Explore', exact: true })
+    .click()
+  await expect(
+    page.getByRole('searchbox', { name: 'Search activities' }),
+  ).toHaveValue('move')
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
+})
+
 test('changing a saved case preserves the viewport position', async ({
   page,
 }) => {

@@ -196,7 +196,11 @@ export function MissingPage() {
       <p className="intro">
         This link does not point to an available activity or saved case.
       </p>
-      <Link className="primary-link" to={returnPath}>
+      <Link
+        className="primary-link"
+        to={returnPath}
+        state={{ restorePosition: true }}
+      >
         Return to Explore <span aria-hidden="true">↗</span>
       </Link>
     </section>
