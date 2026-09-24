@@ -9,8 +9,8 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    files: ['src/**/*.{ts,tsx}'],
+    languageOptions: { globals: globals.browser },
     plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -18,6 +18,21 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      'no-restricted-globals': [
+        'error',
+        'process',
+        'Buffer',
+        'require',
+        'module',
+        'exports',
+        '__dirname',
+        '__filename',
+        'global',
+      ],
     },
+  },
+  {
+    files: ['vite.config.ts', 'playwright.config.ts', 'e2e/**/*.{ts,tsx}'],
+    languageOptions: { globals: globals.node },
   },
 )
