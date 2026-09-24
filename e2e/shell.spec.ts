@@ -35,12 +35,16 @@ test('navigation stays usable by keyboard and at narrow widths', async ({
   page,
 }) => {
   await page.goto('/#/')
+  await expect(
+    page.getByRole('link', { name: 'Skip to content' }),
+  ).toBeVisible()
   await page.keyboard.press('Tab')
   await expect(
     page.getByRole('link', { name: 'Skip to content' }),
   ).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(page.locator('main')).toBeFocused()
+  await expect(page.locator('main')).toHaveCSS('outline-style', 'solid')
   await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
   await page.setViewportSize({ width: 375, height: 800 })
   await expect(
@@ -55,6 +59,9 @@ test('keyboard navigation reaches the home link after the skip link', async ({
   page,
 }) => {
   await page.goto('/#/')
+  await expect(
+    page.getByRole('link', { name: 'Skip to content' }),
+  ).toBeVisible()
   await page.keyboard.press('Tab')
   await expect(
     page.getByRole('link', { name: 'Skip to content' }),

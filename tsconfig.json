@@ -6,11 +6,12 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "strict": true,
+    "isolatedModules": true,
     "noEmit": true,
     "skipLibCheck": true,
     "noUnusedLocals": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vite/client", "node"]
+    "types": ["vite/client"]
   },
-  "include": ["src", "e2e", "vite.config.ts", "playwright.config.ts"]
+  "include": ["src"]
 }

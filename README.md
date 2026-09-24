@@ -8,7 +8,7 @@ Use Node 22.23.2 and npm. Run `npm ci`, then `npm run dev`. The dev server liste
 
 ## Verify
 
-Run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:e2e`, and `npm run build`. Install the Chromium test browser with `npx playwright install chromium` if needed. `npm run preview` serves the production build on loopback. Browser tests cover the shell; T001 will add the booking learning-loop checks.
+Run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, and `npm run test:e2e`. Install the Chromium test browser with `npx playwright install chromium` if needed. The browser suite builds the app and tests a fresh production preview on loopback; `npm run build` also verifies the build by itself. Browser tests cover the shell; T001 will add the booking learning-loop checks.
 
 The static app uses hash URLs, such as `/#/explore`, so direct links work without server rewrites. `src/content/` holds maintained guide content; `src/App.tsx` presents it. Development evidence and planning references stay outside the browser build.
 
