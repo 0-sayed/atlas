@@ -1,59 +1,18 @@
 import { Link, NavLink, Route, Routes } from 'react-router'
+import { NavigationScroll } from './components/NavigationScroll'
 import { destinations } from './content/project'
-
-function FoundationPage({ id }: { id: (typeof destinations)[number]['id'] }) {
-  const destination = destinations.find((item) => item.id === id)!
-
-  return (
-    <section className="page-panel" aria-labelledby="page-title">
-      <div className="page-copy">
-        <p className="eyebrow">Atlas / Foundation</p>
-        <h1 id="page-title">{destination.label}</h1>
-        <p className="intro">{destination.description}</p>
-        <p className="status-note">
-          This section is a foundation view. No live product data or verified
-          source rules are shown yet.
-        </p>
-        {id === 'start' && (
-          <Link className="primary-link" to="/explore">
-            See what is planned <span aria-hidden="true">↗</span>
-          </Link>
-        )}
-      </div>
-      <div className="scene-placeholder" aria-hidden="true">
-        <div className="orbit orbit-outer" />
-        <div className="orbit orbit-inner" />
-        <div className="scene-center">
-          <span>✦</span>
-        </div>
-        <div className="scene-dot dot-one" />
-        <div className="scene-dot dot-two" />
-      </div>
-    </section>
-  )
-}
-
-function MissingPage() {
-  return (
-    <section className="page-panel missing-panel" aria-labelledby="page-title">
-      <div className="page-copy">
-        <p className="eyebrow">Atlas / Unavailable</p>
-        <h1 id="page-title">This guide is not here yet</h1>
-        <p className="intro">
-          This link does not point to an available Atlas guide. Activities and
-          cases will be added as they are reviewed and built.
-        </p>
-        <Link className="primary-link" to="/explore">
-          Return to Explore <span aria-hidden="true">↗</span>
-        </Link>
-      </div>
-    </section>
-  )
-}
+import { BookingPage } from './pages/BookingPage'
+import {
+  ChangesPage,
+  ExplorePage,
+  MissingPage,
+  StartPage,
+} from './pages/GuidePages'
 
 export default function App() {
   return (
     <div className="site-shell">
+      <NavigationScroll />
       <a
         className="skip-link"
         href="#main"
@@ -82,22 +41,26 @@ export default function App() {
             </NavLink>
           ))}
         </nav>
+        <Link
+          className="header-search"
+          to="/explore"
+          aria-label="Search activities"
+        >
+          <span aria-hidden="true">⌕</span> Search
+        </Link>
       </header>
       <main id="main" tabIndex={-1}>
         <Routes>
-          {destinations.map((destination) => (
-            <Route
-              key={destination.id}
-              path={destination.path}
-              element={<FoundationPage id={destination.id} />}
-            />
-          ))}
+          <Route path="/" element={<StartPage />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/explore/booking" element={<BookingPage />} />
+          <Route path="/changes" element={<ChangesPage />} />
           <Route path="*" element={<MissingPage />} />
         </Routes>
       </main>
       <footer className="site-footer">
-        <span>Atlas is taking shape.</span>
-        <span>Illustrated guides will be added in the next task.</span>
+        <span>Atlas · A visual guide to how things work</span>
+        <span>Illustrative content. No live product connection.</span>
       </footer>
     </div>
   )
