@@ -3,7 +3,7 @@ export type Destination = {
   path: '/' | '/explore' | '/changes'
   label: string
   description: string
-  state: 'foundation'
+  state: 'fixture'
 }
 
 export const destinations: readonly Destination[] = [
@@ -12,21 +12,21 @@ export const destinations: readonly Destination[] = [
     path: '/',
     label: 'Start here',
     description: 'A place to begin exploring a product through visual stories.',
-    state: 'foundation',
+    state: 'fixture',
   },
   {
     id: 'explore',
     path: '/explore',
     label: 'Explore',
     description:
-      'Illustrated activities and cases will appear here as they are built.',
-    state: 'foundation',
+      'Explore the illustrative booking activity and its saved cases.',
+    state: 'fixture',
   },
   {
     id: 'changes',
     path: '/changes',
     label: 'What changed',
-    description: 'Reviewed before-and-after explanations will appear here.',
-    state: 'foundation',
+    description: 'Compare historical and current booking fixture behavior.',
+    state: 'fixture',
   },
 ]
