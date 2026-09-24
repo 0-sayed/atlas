@@ -33,10 +33,10 @@ Color every task node to match the `Done` column: unchecked `[ ]` tasks are gray
 
 > First commit: `chore: initialize repository foundation`
 
-- [ ] Initialize Git and create a root `README.md` with the Atlas purpose and pointers to the planning context.
-- [ ] Add `.gitignore` (including `.env`, build output, and dependencies), `.editorconfig`, and a license decision.
-- [ ] Keep `planning/` in the repository root. Commit the foundation and planning files without application behavior.
-- [ ] If using a remote repository, push `main`, confirm it matches the remote, register the planning folder with the chosen automation system, and run a dry run in which only bootstrap is runnable.
+- [x] Initialize Git and create a root `README.md` with the Atlas purpose and pointers to the planning context.
+- [x] Add `.gitignore` (including `.env`, build output, and dependencies), `.editorconfig`, and a license decision. No license is granted yet.
+- [x] Keep `planning/` in the repository root. Commit the foundation and planning files without application behavior.
+- [x] Push `main`, confirm it matches the remote, and verify only bootstrap is unblocked in the task graph. No automation system has been selected for registration.
 
 ### Step 3 — Repository settings
 
@@ -49,50 +49,50 @@ Color every task node to match the `Done` column: unchecked `[ ]` tasks are gray
 
 Atlas V1 is one static, client-rendered React application. Maintained product facts live in small TypeScript content modules; scenes present those facts. A later, separate `fill-atlas` skill will produce standalone source-context Markdown and stop. The browser does not import that file, scan repositories, call an LLM, or require a backend.
 
-- [ ] Select mutually compatible supported Node and package versions; pin Node, use npm with one lockfile, and record the versions used.
-- [ ] Scaffold React, TypeScript, and Vite at the repository root alongside `planning/`. Do not create a monorepo or nested Atlas app.
-- [ ] Enable TypeScript strict checking. Add extra compiler flags only where useful to this app.
-- [ ] Install Tailwind through its current Vite integration and define Atlas visual theme tokens. Use CSS where clearer for illustration.
-- [ ] Add a simple app shell with Start here, Explore, and What changed. Empty or fixture states must be honest; do not imply live synchronization.
-- [ ] Add only the content and scene boundaries needed for the first feature task. Keep facts separate from presentation without a generic content engine.
-- [ ] Set up direct activity/case links and browser back for static hosting. Verify the chosen routing mode on the intended host.
+- [x] Select mutually compatible supported Node and package versions; pin Node 22.23.2, use npm with one lockfile, and record the versions used.
+- [x] Scaffold React, TypeScript, and Vite at the repository root alongside `planning/`. Do not create a monorepo or nested Atlas app.
+- [x] Enable TypeScript strict checking. Add extra compiler flags only where useful to this app.
+- [x] Install Tailwind through its current Vite integration and define Atlas visual theme tokens. Use CSS where clearer for illustration.
+- [x] Add a simple app shell with Start here, Explore, and What changed. Empty or fixture states must be honest; do not imply live synchronization.
+- [x] Add only the content boundaries needed now. Keep facts separate from presentation without a generic content engine; T001 adds its scene.
+- [x] Set up direct hash links and browser back for static hosting. T001 adds activity/case routes. Verify the chosen routing mode through a static HTTP preview.
 
 ### Step 5 — Quality gates
 
-- [ ] Configure Prettier and ESLint for this TypeScript/React app. Start with useful rules and project patterns; avoid broad test-file exemptions.
-- [ ] Add scripts for development, format checking, linting, type checking, unit testing, browser testing, and production build.
-- [ ] Add CI for format, lint, type check, tests that exist, and build. Give workflows minimum permissions, timeouts, and branch concurrency control.
-- [ ] Review shipped dependency and asset licenses. Do not add a blanket license ban without a product decision.
+- [x] Configure Prettier and ESLint for this TypeScript/React app. Start with useful rules and project patterns; avoid broad test-file exemptions.
+- [x] Add scripts for development, format checking, linting, type checking, unit testing, browser testing, and production build.
+- [x] Add CI for format, lint, type check, tests that exist, and build. Give workflows minimum permissions, timeouts, and branch concurrency control.
+- [x] Review shipped dependency and asset licenses. The current runtime dependencies are MIT licensed; no third-party art is shipped.
 
 ### Step 6 — Test foundation
 
-- [ ] Configure Vitest for content and helper behavior. As those structures exist, verify stable activity/case IDs, resolved links, and explicit fixture/current/historical states.
-- [ ] Configure Playwright for the real browser loop: Start here → feature → select a case → inspect its reason → compare a change → return.
-- [ ] Cover keyboard operation, visible focus, narrow layouts, and reduced motion as those controls are implemented.
-- [ ] Do not use a coverage threshold as a substitute for verifying the visual explanation. The first feature task supplies its behavior assertions.
+- [x] Configure Vitest for content and helper behavior. Foundation tests verify stable destination IDs, paths, and honest state; T001 adds activity/case and fixture/history assertions.
+- [x] Configure Playwright and cover the available shell routes, direct links, Back, and unavailable state. T001 adds the real browser learning loop.
+- [x] Cover keyboard operation, visible focus, narrow layouts, and reduced motion as those controls are implemented.
+- [x] Do not use a coverage threshold as a substitute for verifying the visual explanation. The first feature task supplies its behavior assertions.
 
 ### Step 7 — Local development and security
 
-- [ ] Start the dev server on loopback by default. Keep raw source briefs, private project material, and secrets out of browser-served files and build output.
-- [ ] Treat Vite client environment variables as public. Add `.env.example` only for variables the app actually needs, with fake values and clear comments.
-- [ ] Use accessible controls and real text for labels and rules. Use reviewed SVG/React art and licensed assets rather than full-screen mockup images.
-- [ ] Check provenance and rights for artwork, fonts, and other assets before shipping. The retained images are design references.
+- [x] Start the dev server on loopback by default. Keep raw source briefs, private project material, and secrets out of browser-served files and build output.
+- [x] Treat Vite client environment variables as public. The app needs none, so no `.env.example` is added.
+- [x] Use accessible controls and real text for labels and rules. The foundation uses authored CSS shapes rather than full-screen mockup images.
+- [x] Check provenance and rights for artwork, fonts, and other assets before shipping. The retained images are design references and are not bundled.
 
 ### Step 8 — Developer experience
 
-- [ ] Create concise `AGENTS.md` after scripts and app shape exist. Include the architecture boundary, verified commands, test conventions, source-evidence rules, and distinction between the skill and app.
-- [ ] If Claude Code is used, `CLAUDE.md` may import `AGENTS.md` to avoid duplicate instructions. Add a Makefile only if it simplifies real workflows.
-- [ ] Expand the root `README.md` with verified setup, development, testing, and build steps.
+- [x] Create concise `AGENTS.md` after scripts and app shape exist. Include the architecture boundary, verified commands, test conventions, source-evidence rules, and distinction between the skill and app.
+- [x] Keep one agent guidance file and npm scripts; neither `CLAUDE.md` nor a Makefile is needed for this build.
+- [x] Expand the root `README.md` with verified setup, development, testing, and build steps.
 
 ## Phase 2 — Verify the bootstrap
 
 ### Step 9 — Validation and smoke test
 
-- [ ] On a clean install, run format check, lint, type check, Vitest, and the production build. Browser behavior tests run when the first feature task provides an interaction to test.
-- [ ] Start the dev server and confirm the app loads, its three destinations are reachable, and direct links/back work where implemented.
-- [ ] Preview the production build through HTTP and confirm it renders with the selected static-host routing setup.
-- [ ] Check build output for raw source briefs, private reference material, secrets, and other unintended files.
-- [ ] Stop the local server and report the checks that passed or failed.
+- [x] On a clean `npm ci`, run format check, lint, type check, Vitest, Playwright shell tests, and the production build.
+- [x] Start the dev server and confirm the app loads, its three destinations are reachable, and direct links/back work.
+- [x] Preview the production build through HTTP and confirm it renders with hash routing.
+- [x] Check build output for raw source briefs, private reference material, secrets, and other unintended files.
+- [x] Stop the local server and report the checks that passed or failed.
 
 ### Step 10 — First pull request
 
