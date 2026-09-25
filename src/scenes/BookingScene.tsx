@@ -1,4 +1,4 @@
-import { isBelowNoticeRequirement, type BookingCase } from '../content/booking'
+import { type BookingCase } from '../content/booking'
 
 // Original Atlas artwork. Decorative shapes; all meaning is also rendered as HTML.
 export function CalendarArt({
@@ -101,7 +101,7 @@ export function CalendarArt({
   )
 }
 
-function ClockArt({ hours, blocked }: { hours: number; blocked: boolean }) {
+function ClockArt({ blocked }: { blocked: boolean }) {
   return (
     <svg
       viewBox="0 0 260 200"
@@ -132,7 +132,7 @@ function ClockArt({ hours, blocked }: { hours: number; blocked: boolean }) {
         strokeWidth="3"
       />
       <path
-        d={hours < 24 ? 'M131 68 L131 97 L107 119' : 'M131 68 L131 97 L156 82'}
+        d={blocked ? 'M131 68 L131 97 L107 119' : 'M131 68 L131 97 L156 82'}
         stroke="#354638"
         strokeWidth="5"
         fill="none"
@@ -149,7 +149,15 @@ function ClockArt({ hours, blocked }: { hours: number; blocked: boolean }) {
   )
 }
 
-export function BookingScene({ example }: { example: BookingCase }) {
+export function BookingScene({
+  example,
+  noticeHours,
+  actor,
+}: {
+  example: BookingCase
+  noticeHours: number
+  actor: string
+}) {
   const blocked = example.outcome === 'blocked'
   const slotLabel =
     example.slot === 'free'
@@ -167,13 +175,17 @@ export function BookingScene({ example }: { example: BookingCase }) {
           />
           <h2>
             {example.owner === 'you'
-              ? 'Your confirmed booking'
+              ? example.confirmed
+                ? 'Your confirmed booking'
+                : 'Your unconfirmed booking'
               : 'Someone else’s booking'}
           </h2>
           <p>
             {example.owner === 'you'
-              ? 'You are the customer'
-              : 'Confirmed, but not owned by you'}
+              ? `Actor: ${actor}`
+              : example.confirmed
+                ? 'Confirmed, but not owned by you'
+                : 'Unconfirmed and not owned by you'}
           </p>
         </div>
         <span className="scene-arrow" aria-hidden="true">
@@ -181,10 +193,7 @@ export function BookingScene({ example }: { example: BookingCase }) {
         </span>
         <div className="scene-step">
           <span className="step-number">02 / THE NOTICE</span>
-          <ClockArt
-            hours={example.hours}
-            blocked={isBelowNoticeRequirement(example)}
-          />
+          <ClockArt blocked={example.hours < noticeHours} />
           <h2>{example.hours} hours remaining</h2>
           <p>Before the original start</p>
         </div>

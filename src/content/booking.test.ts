@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import {
+import { bookingView } from './booking'
+import { seed } from '../../fixtures/booking'
+const {
   booking,
   bookingCases,
   bookingChange,
   getBookingCase,
   isBelowNoticeRequirement,
   matchesBooking,
-} from './booking'
+} = bookingView(seed.features[0])
 
 describe('recorded booking explanations', () => {
   it('preserves the inclusive notice boundary and the isolated time exception', () => {

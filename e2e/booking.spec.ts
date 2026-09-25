@@ -236,6 +236,9 @@ test('return restores the actual Explore position and new destinations start at 
 }) => {
   await page.setViewportSize({ width: 375, height: 600 })
   await page.goto('/#/explore?q=move')
+  await expect(
+    page.getByRole('heading', { name: 'Explore', exact: true }),
+  ).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 220))
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
   await page
@@ -276,6 +279,9 @@ test('unavailable guide return restores the actual Explore position', async ({
 }) => {
   await page.setViewportSize({ width: 375, height: 600 })
   await page.goto('/#/explore?q=move')
+  await expect(
+    page.getByRole('heading', { name: 'Explore', exact: true }),
+  ).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 220))
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
   await page.evaluate(() => {
@@ -302,6 +308,9 @@ test('changing a saved case preserves the viewport position', async ({
 }) => {
   await page.setViewportSize({ width: 375, height: 600 })
   await page.goto('/#/explore/booking?case=at-limit')
+  await expect(
+    page.getByRole('heading', { name: 'Booking moved', exact: true }),
+  ).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 450))
   const previousPosition = await page.evaluate(() => window.scrollY)
   await page

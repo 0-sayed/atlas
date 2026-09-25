@@ -1,17 +1,24 @@
 import { Link, useSearchParams } from 'react-router'
-import { booking, bookingChange, matchesBooking } from '../content/booking'
+import { useBooking } from '../content/knowledge'
 import { CalendarArt } from '../scenes/BookingScene'
 
 export function FixtureLabel() {
+  const { booking } = useBooking()
   return (
     <p className="fixture-label">
-      <span aria-hidden="true">◇</span> Illustrative fixture ·{' '}
-      {booking.revision} · Not a live booking app
+      <span aria-hidden="true">◇</span>{' '}
+      {booking.status === 'demo'
+        ? 'Illustrative fixture'
+        : booking.status === 'uncertain'
+          ? 'Uncertain evidence'
+          : 'Source-supported guide'}{' '}
+      · {booking.revision} · Not a live booking app
     </p>
   )
 }
 
 export function StartPage() {
+  const { booking, defaultCaseId } = useBooking()
   return (
     <section className="start-page" aria-labelledby="page-title">
       <FixtureLabel />
@@ -26,7 +33,7 @@ export function StartPage() {
       </div>
       <Link
         className="activity-hero"
-        to="/explore/booking?case=at-limit&from=start"
+        to={`/explore/booking?${new URLSearchParams({ case: defaultCaseId, from: 'start' })}`}
       >
         <div className="hero-art">
           <CalendarArt />
@@ -52,9 +59,10 @@ export function StartPage() {
 }
 
 export function ExplorePage() {
+  const { booking, matchesBooking, defaultCaseId } = useBooking()
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
-  const destination = `/explore/booking?${new URLSearchParams({ case: 'at-limit', from: 'explore', q: query })}`
+  const destination = `/explore/booking?${new URLSearchParams({ case: defaultCaseId, from: 'explore', q: query })}`
   return (
     <section className="explore-page" aria-labelledby="page-title">
       <FixtureLabel />
@@ -121,6 +129,7 @@ export function ExplorePage() {
 }
 
 export function ChangesPage() {
+  const { bookingChange } = useBooking()
   return (
     <section className="changes-page" aria-labelledby="page-title">
       <FixtureLabel />

@@ -12,3 +12,6 @@ test-results/
 .DS_Store
 .vscode/
 .idea/
+
+.local/
+dist-server/
