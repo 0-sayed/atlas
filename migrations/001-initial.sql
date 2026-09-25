@@ -1,0 +1,6 @@
+CREATE TABLE projects (id TEXT PRIMARY KEY, title TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision >= 1));
+CREATE TABLE features (project_id TEXT NOT NULL REFERENCES projects(id), id TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY(project_id,id));
+CREATE TABLE cases (project_id TEXT NOT NULL, feature_id TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY(project_id,feature_id,id), FOREIGN KEY(project_id,feature_id) REFERENCES features(project_id,id) ON DELETE CASCADE);
+CREATE TABLE relations (project_id TEXT NOT NULL, id TEXT NOT NULL, source_id TEXT NOT NULL, target_id TEXT NOT NULL, kind TEXT NOT NULL, PRIMARY KEY(project_id,id), FOREIGN KEY(project_id,source_id) REFERENCES features(project_id,id), FOREIGN KEY(project_id,target_id) REFERENCES features(project_id,id));
+CREATE TABLE assets (project_id TEXT NOT NULL REFERENCES projects(id), id TEXT NOT NULL, storage_key TEXT NOT NULL UNIQUE, media_type TEXT NOT NULL, provenance TEXT NOT NULL, PRIMARY KEY(project_id,id));
+CREATE TABLE feature_assets (project_id TEXT NOT NULL, feature_id TEXT NOT NULL, asset_id TEXT NOT NULL, PRIMARY KEY(project_id,feature_id,asset_id), FOREIGN KEY(project_id,feature_id) REFERENCES features(project_id,id) ON DELETE CASCADE, FOREIGN KEY(project_id,asset_id) REFERENCES assets(project_id,id));

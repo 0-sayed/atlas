@@ -8,3 +8,5 @@ coverage/
 playwright-report/
 test-results/
 package-lock.json
+.archon/
+pr.md

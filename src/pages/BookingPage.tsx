@@ -1,19 +1,22 @@
 import { useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
-import {
-  booking,
-  bookingCases,
-  bookingChange,
-  bookingRestrictions,
-  getBookingCase,
-} from '../content/booking'
+import { useBooking } from '../content/knowledge'
+import { RegisteredArt } from '../components/RegisteredArt'
 import { BookingScene } from '../scenes/BookingScene'
 import { FixtureLabel, MissingPage } from './GuidePages'
 
 export function BookingPage() {
+  const {
+    booking,
+    bookingCases,
+    bookingChange,
+    bookingRestrictions,
+    getBookingCase,
+    defaultCaseId,
+  } = useBooking()
   const [params, setParams] = useSearchParams()
   const location = useLocation()
-  const example = getBookingCase(params.get('case') ?? 'at-limit')
+  const example = getBookingCase(params.get('case') ?? defaultCaseId)
   const [detailOpen, setDetailOpen] = useState(false)
   const detailTrigger = useRef<HTMLButtonElement>(null)
   if (!example) return <MissingPage />
@@ -44,7 +47,7 @@ export function BookingPage() {
       <FixtureLabel />
       <div className="feature-heading">
         <div>
-          <p className="eyebrow">Booking / Customer</p>
+          <p className="eyebrow">Booking / {booking.actor}</p>
           <h1 id="page-title">{booking.title}</h1>
           <p className="intro">{booking.purpose}</p>
         </div>
@@ -78,7 +81,19 @@ export function BookingPage() {
           ))}
         </div>
       </div>
-      <BookingScene example={example} />
+      {booking.assetIds.map((id) => (
+        <RegisteredArt
+          key={id}
+          projectId="booking-demo"
+          assetId={id}
+          title={booking.title}
+        />
+      ))}
+      <BookingScene
+        example={example}
+        noticeHours={booking.noticeHours}
+        actor={booking.actor}
+      />
       <div className="scene-actions">
         <button
           className="reason-trigger"

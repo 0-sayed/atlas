@@ -1,6 +1,6 @@
 # Atlas Project Bootstrap Checklist
 
-This checklist records the delivered T000 static frontend foundation. T001 later delivered the labelled booking experience (merged PR #2). The v0.10 database-backed platform is the unchecked T002 transition below; checked bootstrap items are historical evidence, not claims that the new backend exists.
+This checklist records the delivered T000 static frontend foundation. T001 later delivered the labelled booking experience (merged PR #2). T002 now implements the v0.10 local data platform; the original T000 checkboxes remain historical frontend evidence. T002 verification is recorded separately below.
 
 ## Phase 0 — Planning and repository foundation
 
@@ -42,6 +42,13 @@ Color every task node to match the `Done` column: unchecked `[ ]` tasks are gray
 
 - [x] Protect `main`: block deletion and force pushes; require a pull request, the passing `verify` check, and resolved review conversations. Zero approvals are required for this solo project.
 - [x] Enable automatic deletion of merged head branches.
+- [x] Verify source repository visibility: GitHub reports Atlas as public; no open-source license is selected. Local SQLite knowledge, assets, credentials and backups remain private.
+- [x] Add `pr-title` and `dependency-review` checks, plus a metadata-only PR-author assignment workflow. Bot authors are skipped; the assignment workflow never checks out PR code.
+- [x] Push the branch and verify `verify`, `pr-title`, `dependency-review`, `dependencies`, and `secrets` pass on GitHub. First GitHub runs passed on PR #4; fixes must pass again on their own head.
+- [x] After their first successful runs, add `pr-title`, `dependency-review`, `dependencies`, and `secrets` to the existing required checks alongside `verify`. Keep the current protection rules; downloaded rulesets use different check names and must not be imported unchanged.
+- [ ] After merge, verify a new human-authored PR is assigned to its author. The `pull_request_target` workflow must exist on the base branch before it can handle new PRs.
+
+Monthly Dependabot updates are grouped per ecosystem, including major updates; security updates are grouped separately without a monthly delay. Existing protection requires an up-to-date branch, so GitHub's mergeability checks already prevent merging conflicts; a separate conflict-detection job is unnecessary.
 
 ## Phase 1 — Frontend foundation
 
@@ -104,37 +111,39 @@ T000 delivered one static, client-rendered React application. Its first content 
 
 T001 delivered one illustrated, clearly labelled booking fixture from the design context: Start here → feature → select a case → inspect its reason → compare the 48-hour and 24-hour versions → return. The app performs no real booking. The fixture and browser checks establish the implemented learning loop, not real-source accuracy or the v0.10 data platform. Evaluate comprehension and enjoyment against real use later. Create and test the independent `fill-atlas` skill on authorized real source evidence separately.
 
-## T002 — pending platform transition
+## T002 — verified platform transition
 
-The existing root `AGENTS.md`, `README.md`, and `.gitignore` describe the delivered static baseline. At the start of T002, align them with the authorized migration and ignore `.local/` before creating private data; verify their final wording against the implemented backend. This planning update does not change their runtime instructions or claim that the backend is installed. See [the T002 outcome](roadmap/tasks.md#outcome-boundaries) and [technical acceptance checks](context/technical/TECHNICAL.md#9-first-build-tests-and-acceptance).
+Root guidance and ignore rules now describe the implemented NestJS/SQLite architecture. `.local/` was ignored before runtime data creation. See [the T002 outcome](roadmap/tasks.md#outcome-boundaries) and [technical acceptance checks](context/technical/TECHNICAL.md#9-first-build-tests-and-acceptance).
 
-- [ ] Align root guidance and ignore rules, then add one small local NestJS backend, shared strict versioned Zod contracts, tracked SQL migrations, and SQLite under ignored `.local/`; keep source interpretation outside the backend.
-- [ ] Seed the labelled booking fixture through the same validated API used for later updates; migrate current UI reads without losing the T001 learning loop.
-- [ ] Enforce scoped IDs and references, foreign keys on every connection, supported scenes/assets, revision conflicts, parameterized SQL, bounded requests, and all-or-nothing writes.
-- [ ] Serve only registered assets through controlled routes; keep the database/private files out of static output. Restrict local API access and reject unrelated-site writes with an explicit local write credential.
-- [ ] Verify persistence after restart, data migrations, backup and restore of the database plus assets, history/current consistency, partial-update preservation, and rejected-write rollback.
-- [ ] Add backend unit/integration and browser tests, extend CI and build/runtime checks, and update root `README.md`, `AGENTS.md`, and `.gitignore` to describe the implemented architecture.
+Verified on 2026-09-25: `npm run validate` passed 31 unit/integration tests, 16 browser tests, frontend/backend builds, artifact checks, and production restart/shutdown. A separate fresh copy passed `npm ci`, builds and production smoke. Independent review findings for dynamic case/art/actor reads, failed-start cleanup and maintenance beyond 100 projects were reproduced and fixed with regression tests. Dependency audit reported zero vulnerabilities; remote CI jobs are configured but have not been run on a pushed branch.
+
+- [x] Align root guidance and ignore rules, then add one small local NestJS backend, shared strict versioned Zod contracts, tracked SQL migrations, and SQLite under ignored `.local/`; keep source interpretation outside the backend.
+- [x] Seed the labelled booking fixture through the same validated API used for later updates; migrate current UI reads without losing the T001 learning loop.
+- [x] Enforce scoped IDs and references, foreign keys on every connection, supported scenes/assets, revision conflicts, parameterized SQL, bounded requests, and all-or-nothing writes.
+- [x] Serve only registered assets through controlled routes; keep the database/private files out of static output. Restrict local API access and reject unrelated-site writes with an explicit local write credential.
+- [x] Verify persistence after restart, data migrations, backup and restore of the database plus assets, history/current consistency, partial-update preservation, and rejected-write rollback.
+- [x] Add backend unit/integration and browser tests, extend CI and build/runtime checks, and update root `README.md`, `AGENTS.md`, and `.gitignore` to describe the implemented architecture.
 
 ### Configuration, API contract, and runtime
 
-- [ ] Document local configuration in `.env.example` with safe defaults and fake placeholders. Keep app, migration, test, and CI settings consistent; document local write-credential setup without committing or exposing the credential to the frontend bundle.
-- [ ] Give each checkout/worktree its own `.local/atlas.sqlite`, assets, and configurable frontend/backend ports. Keep proxy settings aligned and prevent tests or parallel checkouts from sharing a live database.
-- [ ] Document versioned request/response schemas, error responses, revision-conflict behavior, and working read/write examples for agents. Keep examples checked against the shared contracts; a separate Swagger installation is not required.
-- [ ] Add a readiness endpoint that checks database availability and schema compatibility without exposing private details. Add useful structured logs with private content and credentials redacted, enable Nest shutdown hooks, and close database handles and listeners cleanly.
-- [ ] Test upgrades from a nonempty earlier schema: preserve saved projects, reject incompatible database versions with a clear error, and document backup/restore recovery before applying migrations.
+- [x] Document local configuration in `.env.example` with safe defaults and fake placeholders. Keep app, migration, test, and CI settings consistent; document local write-credential setup without committing or exposing the credential to the frontend bundle.
+- [x] Give each checkout/worktree its own `.local/atlas.sqlite`, assets, and configurable frontend/backend ports. Keep proxy settings aligned and prevent tests or parallel checkouts from sharing a live database.
+- [x] Document versioned request/response schemas, error responses, revision-conflict behavior, and working read/write examples for agents. Keep examples checked against the shared contracts; a separate Swagger installation is not required.
+- [x] Add a readiness endpoint that checks database availability and schema compatibility without exposing private details. Add useful structured logs with private content and credentials redacted, enable Nest shutdown hooks, and close database handles and listeners cleanly.
+- [x] Test upgrades from a nonempty earlier schema: preserve saved projects, reject incompatible database versions with a clear error, and document backup/restore recovery before applying migrations.
 
 ### Testing and clean-start verification
 
-- [ ] Use Vitest for validation, rule, and helper contracts. Run integration tests against isolated temporary SQLite files using the production database binding and migrations; cover project isolation, transactions, rollback, partial updates, history, restart persistence, and database-plus-assets backup/restore.
-- [ ] Add Supertest coverage against an initialized Nest HTTP application backed by real temporary SQLite storage. Exercise reads, valid updates, invalid/scoped references, stale revisions, access restrictions, and rejected writes without replacing persistence with mocks.
-- [ ] Extend Playwright through the frontend → backend → SQLite path while preserving navigation, keyboard, focus, narrow-layout, and reduced-motion checks. Establish the test setup in T002; T003 must prove two different saved projects and an updated rule in one unchanged frontend/backend build.
-- [ ] Provide one npm validation command covering formatting, linting, type checking, unit/integration/API tests, browser tests, and frontend/backend builds. Keep security audits and any future container-image verification in separate CI jobs; do not add arbitrary coverage thresholds or broad lint exemptions.
-- [ ] From a fresh checkout, follow documented setup, initialize/migrate storage, build and start both production applications, verify readiness and real API/browser behavior, then stop them. Confirm no stale listeners or background processes remain and no private data appears in build output.
+- [x] Use Vitest for validation, rule, and helper contracts. Run integration tests against isolated temporary SQLite files using the production database binding and migrations; cover project isolation, transactions, rollback, partial updates, history, restart persistence, and database-plus-assets backup/restore.
+- [x] Add Supertest coverage against an initialized Nest HTTP application backed by real temporary SQLite storage. Exercise reads, valid updates, invalid/scoped references, stale revisions, access restrictions, and rejected writes without replacing persistence with mocks.
+- [x] Extend Playwright through the frontend → backend → SQLite path while preserving navigation, keyboard, focus, narrow-layout, and reduced-motion checks. Establish the test setup in T002; T003 must prove two different saved projects and an updated rule in one unchanged frontend/backend build.
+- [x] Provide one npm validation command covering formatting, linting, type checking, unit/integration/API tests, browser tests, and frontend/backend builds. Keep security audits and any future container-image verification in separate CI jobs; do not add arbitrary coverage thresholds or broad lint exemptions.
+- [x] From a fresh checkout, follow documented setup, initialize/migrate storage, build and start both production applications, verify readiness and real API/browser behavior, then stop them. Confirm no stale listeners or background processes remain and no private data appears in build output.
 
 ### Maintenance and open-source readiness
 
-- [ ] Add automated secret scanning and a separate dependency-vulnerability CI check. Configure scheduled dependency and GitHub Actions updates with a manageable cadence; review compatibility instead of blindly upgrading every package to latest.
-- [ ] Choose and record the Atlas source license before presenting the platform as open source. Verify redistribution rights and required notices for bundled dependencies, artwork, and fonts; keep private project data and design-only references out of distributed artifacts.
+- [x] Add automated secret scanning and a separate dependency-vulnerability CI check. Configure scheduled dependency and GitHub Actions updates with a manageable cadence; review compatibility instead of blindly upgrading every package to latest.
+- [x] Recorded the public source repository, all-rights-reserved status and runtime dependency license review; original artwork and system fonts are documented, and private data/design references are excluded from frontend artifacts. The owner must decide licensing before an open-source release or artifact distribution; T002 does not grant a license.
 
 ### Deferred Docker packaging
 

@@ -1,5 +1,6 @@
 import { Link, NavLink, Route, Routes } from 'react-router'
 import { NavigationScroll } from './components/NavigationScroll'
+import { KnowledgeProvider } from './content/KnowledgeProvider'
 import { destinations } from './content/project'
 import { BookingPage } from './pages/BookingPage'
 import {
@@ -50,13 +51,15 @@ export default function App() {
         </Link>
       </header>
       <main id="main" tabIndex={-1}>
-        <Routes>
-          <Route path="/" element={<StartPage />} />
-          <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/explore/booking" element={<BookingPage />} />
-          <Route path="/changes" element={<ChangesPage />} />
-          <Route path="*" element={<MissingPage />} />
-        </Routes>
+        <KnowledgeProvider>
+          <Routes>
+            <Route path="/" element={<StartPage />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/explore/booking" element={<BookingPage />} />
+            <Route path="/changes" element={<ChangesPage />} />
+            <Route path="*" element={<MissingPage />} />
+          </Routes>
+        </KnowledgeProvider>
       </main>
       <footer className="site-footer">
         <span>Atlas · A visual guide to how things work</span>

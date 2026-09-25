@@ -742,3 +742,23 @@ h3 {
     align-items: flex-start;
   }
 }
+
+.knowledge-status {
+  padding: 0.5rem 0;
+  font-size: 0.85rem;
+}
+.knowledge-status button {
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.6rem;
+}
+.registered-art {
+  margin: 1rem 0;
+}
+.registered-art img {
+  max-width: 100%;
+  max-height: 20rem;
+  object-fit: contain;
+}
