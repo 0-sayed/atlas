@@ -111,6 +111,10 @@ test('navigation snapshots preserve authored outcomes and handle empty or missin
             {
               ...navigationFeature,
               rules: ['A new saved destination is used.'],
+              evidence: {
+                ...navigationFeature.evidence,
+                sourceRevision: 'fixture-' + 'a'.repeat(64),
+              },
               cases: [
                 { ...navigationFeature.cases[0], result: 'New guide opens' },
               ],
@@ -120,7 +124,11 @@ test('navigation snapshots preserve authored outcomes and handle empty or missin
       })
     ).ok(),
   ).toBe(true)
+  await page.setViewportSize({ width: 375, height: 800 })
   await page.goto(`/#/projects/${id}/changes`)
+  await expect(page.getByText('Source-supported', { exact: true })).toHaveCount(
+    0,
+  )
   const history = page.locator('.saved-change').filter({
     has: page.getByRole('heading', {
       name: navigationFeature.title,
@@ -131,6 +139,11 @@ test('navigation snapshots preserve authored outcomes and handle empty or missin
     exact: true,
   })
   await expect(disclosures).toHaveCount(2)
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true)
   for (const disclosure of await disclosures.all()) await disclosure.click()
   await expect(history.getByText('Guide opens', { exact: true })).toBeVisible()
   await expect(
