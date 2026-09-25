@@ -18,8 +18,13 @@ jobs:
       - uses: actions/github-script@v9
         with:
           script: |
-            await github.rest.issues.addAssignees({
-              ...context.repo,
-              issue_number: context.payload.pull_request.number,
-              assignees: [context.payload.pull_request.user.login],
-            });
+            try {
+              await github.rest.issues.addAssignees({
+                ...context.repo,
+                issue_number: context.payload.pull_request.number,
+                assignees: [context.payload.pull_request.user.login],
+              });
+            } catch (error) {
+              if (error.status !== 422) throw error;
+              core.notice('GitHub could not assign this PR author; leaving the PR unassigned.');
+            }

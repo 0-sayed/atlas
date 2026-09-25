@@ -14,7 +14,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'npm run build && node dist-server/scripts/e2e-server.js',
-    url: `http://127.0.0.1:${process.env.ATLAS_E2E_PORT ?? 4174}/api/v1/ready`,
+    url: `http://127.0.0.1:${process.env.ATLAS_E2E_PORT ?? 4174}/api/v1/projects/booking-demo`,
     reuseExistingServer: false,
     timeout: 30_000,
   },

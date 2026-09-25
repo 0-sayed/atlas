@@ -1,5 +1,6 @@
 import { seed } from '../fixtures/booking.js'
 import { config } from '../server/config.js'
+import { basename } from 'node:path'
 export async function seedApi(port: number, token: string) {
   const response = await fetch(`http://127.0.0.1:${port}/api/v1/projects`, {
     method: 'POST',
@@ -14,10 +15,7 @@ export async function seedApi(port: number, token: string) {
       `Seed rejected (${response.status}); existing projects are never overwritten`,
     )
 }
-if (
-  process.argv[1]?.endsWith('/seed.js') ||
-  process.argv[1]?.endsWith('/seed.ts')
-) {
+if (['seed.js', 'seed.ts'].includes(basename(process.argv[1] ?? ''))) {
   const c = config()
   await seedApi(c.port, c.token)
   console.log('Illustrative booking fixture saved through API')

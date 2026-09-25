@@ -3,7 +3,7 @@ import { join } from 'node:path'
 function scan(dir: string) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name)
-    if (/\.sqlite|^\.env|^\.local$/.test(entry.name))
+    if (/\.sqlite|^\.env|^\.local$|^planning$/.test(entry.name))
       throw new Error(`Private artifact: ${path}`)
     if (entry.isDirectory()) scan(path)
     else if (

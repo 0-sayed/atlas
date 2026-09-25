@@ -44,8 +44,8 @@ Color every task node to match the `Done` column: unchecked `[ ]` tasks are gray
 - [x] Enable automatic deletion of merged head branches.
 - [x] Verify source repository visibility: GitHub reports Atlas as public; no open-source license is selected. Local SQLite knowledge, assets, credentials and backups remain private.
 - [x] Add `pr-title` and `dependency-review` checks, plus a metadata-only PR-author assignment workflow. Bot authors are skipped; the assignment workflow never checks out PR code.
-- [ ] Push the branch and verify `verify`, `pr-title`, `dependency-review`, `dependencies`, and `secrets` pass on GitHub. Local validation does not establish remote workflow success.
-- [ ] After their first successful runs, add `pr-title`, `dependency-review`, `dependencies`, and `secrets` to the existing required checks alongside `verify`. Keep the current protection rules; downloaded rulesets use different check names and must not be imported unchanged.
+- [x] Push the branch and verify `verify`, `pr-title`, `dependency-review`, `dependencies`, and `secrets` pass on GitHub. First GitHub runs passed on PR #4; fixes must pass again on their own head.
+- [x] After their first successful runs, add `pr-title`, `dependency-review`, `dependencies`, and `secrets` to the existing required checks alongside `verify`. Keep the current protection rules; downloaded rulesets use different check names and must not be imported unchanged.
 - [ ] After merge, verify a new human-authored PR is assigned to its author. The `pull_request_target` workflow must exist on the base branch before it can handle new PRs.
 
 Monthly Dependabot updates are grouped per ecosystem, including major updates; security updates are grouped separately without a monthly delay. Existing protection requires an up-to-date branch, so GitHub's mergeability checks already prevent merging conflicts; a separate conflict-detection job is unnecessary.
