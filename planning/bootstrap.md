@@ -1,6 +1,6 @@
 # Atlas Project Bootstrap Checklist
 
-Bootstrap establishes the repository, planning workflow, and runnable frontend foundation. It does not implement Atlas's first illustrated feature. That belongs in the first feature task.
+This checklist records the delivered T000 static frontend foundation. T001 later delivered the labelled booking experience (merged PR #2). The v0.10 database-backed platform is the unchecked T002 transition below; checked bootstrap items are historical evidence, not claims that the new backend exists.
 
 ## Phase 0 — Planning and repository foundation
 
@@ -21,7 +21,7 @@ planning/
 
 The Atlas context pack belongs under `planning/context/`. Keep its files together so relative links work. Do not maintain a second copy of the pack.
 
-`roadmap/tasks.md` has one `Task Graph` table with a row per task: status, priority, task ID/title, size (`S`, `M`, or `L`), branch, dependencies, and context references. Lower priority numbers break ties among unblocked tasks; dependencies determine what is blocked. `roadmap/dependencies.mmd` is the Mermaid task DAG. Do not add fixed execution waves.
+`roadmap/tasks.md` has one `Task Graph` table with a row per task: status, priority, task ID/title, size (`L` for every current task), branch, dependencies, and context references. Lower priority numbers break ties among unblocked tasks; dependencies determine what is blocked. `roadmap/dependencies.mmd` is the Mermaid task DAG. Do not add fixed execution waves.
 
 Color every task node to match the `Done` column: unchecked `[ ]` tasks are gray (`pending`); checked `[x]` tasks are green (`done`). Use `classDef pending fill:#E5E7EB,stroke:#6B7280,color:#111827` and `classDef done fill:#DCFCE7,stroke:#16A34A,color:#14532D`. Assign every node exactly one class and update it when the task status changes.
 
@@ -47,7 +47,7 @@ Color every task node to match the `Done` column: unchecked `[ ]` tasks are gray
 
 ### Step 4 — Runtime and project shape
 
-Atlas V1 is one static, client-rendered React application. Maintained product facts live in small TypeScript content modules; scenes present those facts. A later, separate `fill-atlas` skill will produce standalone source-context Markdown and stop. The browser does not import that file, scan repositories, call an LLM, or require a backend.
+T000 delivered one static, client-rendered React application. Its first content boundary used TypeScript modules. T001 delivered booking fixture behavior on that baseline. The v0.10 target supersedes compiled project facts: T002 will retain the React canvas while moving saved knowledge to one SQLite database through a local validated API. The independent `fill-atlas` skill remains a later, outside-repository deliverable that writes standalone Markdown and stops; the browser will not import that file, scan repositories, or call an LLM.
 
 - [x] Select mutually compatible supported Node and package versions; pin Node 22.23.2, use npm with one lockfile, and record the versions used.
 - [x] Scaffold React, TypeScript, and Vite at the repository root alongside `planning/`. Do not create a monorepo or nested Atlas app.
@@ -100,6 +100,46 @@ Atlas V1 is one static, client-rendered React application. Maintained product fa
 - [x] Describe the repository foundation, frontend tooling, verification, and known gaps. Keep illustrated feature behavior out of this PR.
 - [x] Verify the configured `verify` CI check passes before merging.
 
-## First feature after bootstrap
+## T001 — delivered first feature after bootstrap
 
-Build one illustrated, clearly labelled booking fixture from the design context: Start here → feature → select a case → inspect its reason → compare the 48-hour and 24-hour versions → return. The app performs no real booking. Evaluate whether the explanation is clear and enjoyable before expanding the guide. Create and test the independent `fill-atlas` skill on authorized real source evidence separately; a successful fixture does not establish source accuracy.
+T001 delivered one illustrated, clearly labelled booking fixture from the design context: Start here → feature → select a case → inspect its reason → compare the 48-hour and 24-hour versions → return. The app performs no real booking. The fixture and browser checks establish the implemented learning loop, not real-source accuracy or the v0.10 data platform. Evaluate comprehension and enjoyment against real use later. Create and test the independent `fill-atlas` skill on authorized real source evidence separately.
+
+## T002 — pending platform transition
+
+The existing root `AGENTS.md`, `README.md`, and `.gitignore` describe the delivered static baseline. At the start of T002, align them with the authorized migration and ignore `.local/` before creating private data; verify their final wording against the implemented backend. This planning update does not change their runtime instructions or claim that the backend is installed. See [the T002 outcome](roadmap/tasks.md#outcome-boundaries) and [technical acceptance checks](context/technical/TECHNICAL.md#9-first-build-tests-and-acceptance).
+
+- [ ] Align root guidance and ignore rules, then add one small local NestJS backend, shared strict versioned Zod contracts, tracked SQL migrations, and SQLite under ignored `.local/`; keep source interpretation outside the backend.
+- [ ] Seed the labelled booking fixture through the same validated API used for later updates; migrate current UI reads without losing the T001 learning loop.
+- [ ] Enforce scoped IDs and references, foreign keys on every connection, supported scenes/assets, revision conflicts, parameterized SQL, bounded requests, and all-or-nothing writes.
+- [ ] Serve only registered assets through controlled routes; keep the database/private files out of static output. Restrict local API access and reject unrelated-site writes with an explicit local write credential.
+- [ ] Verify persistence after restart, data migrations, backup and restore of the database plus assets, history/current consistency, partial-update preservation, and rejected-write rollback.
+- [ ] Add backend unit/integration and browser tests, extend CI and build/runtime checks, and update root `README.md`, `AGENTS.md`, and `.gitignore` to describe the implemented architecture.
+
+### Configuration, API contract, and runtime
+
+- [ ] Document local configuration in `.env.example` with safe defaults and fake placeholders. Keep app, migration, test, and CI settings consistent; document local write-credential setup without committing or exposing the credential to the frontend bundle.
+- [ ] Give each checkout/worktree its own `.local/atlas.sqlite`, assets, and configurable frontend/backend ports. Keep proxy settings aligned and prevent tests or parallel checkouts from sharing a live database.
+- [ ] Document versioned request/response schemas, error responses, revision-conflict behavior, and working read/write examples for agents. Keep examples checked against the shared contracts; a separate Swagger installation is not required.
+- [ ] Add a readiness endpoint that checks database availability and schema compatibility without exposing private details. Add useful structured logs with private content and credentials redacted, enable Nest shutdown hooks, and close database handles and listeners cleanly.
+- [ ] Test upgrades from a nonempty earlier schema: preserve saved projects, reject incompatible database versions with a clear error, and document backup/restore recovery before applying migrations.
+
+### Testing and clean-start verification
+
+- [ ] Use Vitest for validation, rule, and helper contracts. Run integration tests against isolated temporary SQLite files using the production database binding and migrations; cover project isolation, transactions, rollback, partial updates, history, restart persistence, and database-plus-assets backup/restore.
+- [ ] Add Supertest coverage against an initialized Nest HTTP application backed by real temporary SQLite storage. Exercise reads, valid updates, invalid/scoped references, stale revisions, access restrictions, and rejected writes without replacing persistence with mocks.
+- [ ] Extend Playwright through the frontend → backend → SQLite path while preserving navigation, keyboard, focus, narrow-layout, and reduced-motion checks. Establish the test setup in T002; T003 must prove two different saved projects and an updated rule in one unchanged frontend/backend build.
+- [ ] Provide one npm validation command covering formatting, linting, type checking, unit/integration/API tests, browser tests, and frontend/backend builds. Keep security audits and any future container-image verification in separate CI jobs; do not add arbitrary coverage thresholds or broad lint exemptions.
+- [ ] From a fresh checkout, follow documented setup, initialize/migrate storage, build and start both production applications, verify readiness and real API/browser behavior, then stop them. Confirm no stale listeners or background processes remain and no private data appears in build output.
+
+### Maintenance and open-source readiness
+
+- [ ] Add automated secret scanning and a separate dependency-vulnerability CI check. Configure scheduled dependency and GitHub Actions updates with a manageable cadence; review compatibility instead of blindly upgrading every package to latest.
+- [ ] Choose and record the Atlas source license before presenting the platform as open source. Verify redistribution rights and required notices for bundled dependencies, artwork, and fonts; keep private project data and design-only references out of distributed artifacts.
+
+### Deferred Docker packaging
+
+SQLite runs inside the backend process, so the initial integration suite uses real temporary database files without Docker or Testcontainers. Do not add PostgreSQL, Redis, queues, monorepo tooling, or container infrastructure solely to match the generic bootstrap.
+
+If container distribution is selected later, add a dedicated packaging checklist and CI job covering image build, production startup/readiness, persistent database-and-asset storage, restart persistence, writable-volume permissions, and clean shutdown. Keep images free of private `.local/` data and secrets. Keep image verification separate from routine npm validation; registry publishing requires an explicit distribution decision. Use Testcontainers when a real containerized dependency or container-runtime test needs it.
+
+T003 then proves a second project and changed rule in the same unchanged build. T004 validates the independent skill outside this repository, and T005 evaluates verified source knowledge through the API.

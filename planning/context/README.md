@@ -1,52 +1,25 @@
-# Atlas
+# Atlas planning context
 
-**Planning context** · **Updated:** 2026-09-24  
-Documentation and visual references for the first frontend prototype. This is not a running application.
+**Updated:** 2026-09-24\
+**Current state:** The static React app and labelled booking learning loop from T000/T001 are delivered. The reusable database-backed Atlas canvas in v0.10 is the next implementation target, not a current runtime capability.
 
 ## Start here
 
-For the scope at a glance, read **[MVP features](business/PROJECT.md#mvp-features)**. The list already belongs in PROJECT.md; a separate FEATURES.md would duplicate it. **[V1 defaults and prototype checks](business/PROJECT.md#16-v1-defaults-and-prototype-checks)** now replaces the old open-question list: use the settled starting decisions and test them in the prototype.
+Read [MVP features](business/PROJECT.md#mvp-features) for the product scope, [V1 defaults](business/PROJECT.md#16-v1-defaults-and-prototype-checks) for settled choices, and the [task graph](../roadmap/tasks.md) for implementation status.
 
-| File                                                                    | Use it for                                                                              |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [PROJECT.md](business/PROJECT.md)                                       | What Atlas does, the MVP features, boundaries, and the reasoning to preserve.           |
-| [DESIGN.md](business/DESIGN.md)                                         | Layout, interactions, visual style, and the first illustrated walkthrough.              |
-| [TECHNICAL.md](technical/TECHNICAL.md)                                  | The frontend stack, repository-backed facts, artwork, and tests.                        |
-| [Visual-reference guide](business/PROJECT.md#15-visual-reference-guide) | How to use the 13 retained reference images without copying unapproved mockup behavior. |
+| File | Purpose |
+|---|---|
+| [PROJECT.md](business/PROJECT.md) | Product requirements, source-preparation boundary, and decision history. |
+| [DESIGN.md](business/DESIGN.md) | Navigation, cases, visual style, and the booking experience. |
+| [TECHNICAL.md](technical/TECHNICAL.md) | Target local API, SQLite store, validation, assets, and acceptance checks. |
+| [Visual references](business/PROJECT.md#15-visual-reference-guide) | Guide to the 13 retained design images in `business/references/`. |
 
-## Structure
+## Boundary
 
-```text
-context/
-  README.md
-  business/
-    PROJECT.md
-    DESIGN.md
-    references/
-      inspiration/
-      concepts/
-  technical/
-    TECHNICAL.md
-```
+The independent `fill-atlas` skill is a later deliverable **outside this repository**. It reads authorized source evidence, produces standalone source-context Markdown, and stops. Separately, an agent may interpret that context and submit data through Atlas's future validated local API. The app renders prepared project knowledge; it does not interpret raw source context or run an agent at browse time.
 
-Keep the folder together so links work. Add the future app source and build configuration at the repository root, alongside `planning/`, not inside this context folder.
+One local SQLite database will hold all projects, with registered image assets in a private local directory. Ordinary project additions and fact updates must render in the same application build. New reusable renderer behavior still requires reviewed application code.
 
-## The boundary
+The existing booking app is a labelled fixture experience. Its current TypeScript content and static deployment are historical T001 implementation, not evidence that the v0.10 backend exists. T002 migrates it; T003 proves dynamic reuse with a second distinct project. Source-skill validation and real-source evaluation follow separately.
 
-The planned source-side workflow is `source project / PR → fill-atlas → standalone context Markdown → stop`.
-
-Separately, use that context during an Atlas development update. The running guide shows maintained product facts through interactive illustrations. It has no backend, database, runtime model, source scanner, or context importer in V1. A new context file alone does not update the application. The planned skill has no downstream tool or implementation dependency.
-
-## First build
-
-Build one attractive loop: **Start here → feature → choose a case → inspect its reason → compare a change → back**. Use the labelled booking fixture in [DESIGN.md](business/DESIGN.md#1-the-first-interaction-to-prototype), keep facts separate from their presentation, and reuse a small art kit.
-
-Then check whether the explanation is clear and enjoyable. Create and test the context-only skill against real authorized source evidence separately. Do not implement every pictured menu, invent features to fill a scene, or treat mockups as finished production assets.
-
-## What's included—and what is not
-
-The first demo is the labelled booking fixture. The 13 retained visual references are design context. The source-side skill is planned and will be created and validated separately.
-
-Application code, installed dependencies, browser tests, production artwork, and a tested real-PR skill result are **not included**. The next step is implementation, not more paperwork.
-
-Keep private context and source material out of publicly served files. The images are design references, not files to copy wholesale into the app bundle. A downloaded pack is a snapshot; earlier copies and remote repositories do not update automatically.
+Keep the 13 reference images as planning assets. They are not runtime product facts, licensed production art, or a promise to implement every depicted control.

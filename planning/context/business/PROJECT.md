@@ -1,18 +1,18 @@
 # Atlas — Living Project Context
 
-**Version:** 0.9  
+**Version:** 0.10\
 **Last updated:** 2026-09-24  
 **Owner:** Sayed  
-**Stage:** V1 defaults settled for the first build. The application, artwork, learning experience, and source-context skill still need implementation or real-use testing.  
+**Stage:** Revised first-build handoff: a reusable, database-backed local Atlas application. The static frontend and labelled booking learning loop are delivered; database migration, dynamic multi-project reuse, real-source accuracy, and the independent skill still require implementation or validation.\
 **Project name:** Atlas — confirmed by Sayed on 2026-09-24. Use Atlas in product titles, documentation, and future UI copy.
 
 > **North star:** Make it enjoyable to understand and remember what I built, without making me read documentation.
 
 This is a working record of the decisions, constraints, reasoning, V1 defaults, and prototype checks from the project conversation. It is not a transcript, a frozen specification, or an instruction to implement every idea below. The complete document is for preserving context; its length is not a template for the application's UI.
 
-**Design companion:** [DESIGN.md](DESIGN.md) v0.8 records the V1 navigation, interactions, reading budget, and art-production defaults. Exact compositions and usability still need prototype review. This document continues to own product requirements and scope; a build default is not evidence of a validated experience.
+**Design companion:** [DESIGN.md](DESIGN.md) v0.9 records the V1 navigation, interactions, reading budget, and art-production defaults. Exact compositions and usability still need prototype review. This document continues to own product requirements and scope; a build default is not evidence of a validated experience.
 
-**Technical companion:** [TECHNICAL.md](../technical/TECHNICAL.md) v0.5 records the frontend-only build baseline, repository-backed knowledge, component boundaries, and implementation checks. [README.md](../README.md) provides the shortest entry into this pack and states what has actually been reviewed.
+**Technical companion:** [TECHNICAL.md](../technical/TECHNICAL.md) v0.6 records the React interface, small local backend, one SQLite database, validated data updates, and implementation checks. [README.md](../README.md) provides the shortest entry into this pack and states what has actually been reviewed.
 
 ---
 
@@ -20,46 +20,47 @@ This is a working record of the decisions, constraints, reasoning, V1 defaults, 
 
 ### The problem
 
-Sayed can build software quickly with coding agents and his Dark Factory workflow, but struggles to retain the product knowledge: what features exist, what they do, how they behave, and which rules matter. He already tried a skill that produced a few lines per PR and stopped reading those summaries. More generated text does not solve the problem.
+Sayed builds software quickly with coding agents and Dark Factory, but struggles to retain what features exist, how they behave, and which product rules matter. He already stopped reading a skill's short PR summaries. More text is not the solution.
 
 ### The product
 
-A visual, playful guide to a software product's capabilities and behavior, maintained through explicit Atlas development updates as the source product evolves. It should help someone explore what users can do, what happens, and the important conditions—without first understanding the code or architecture.
+Atlas is a reusable, colorful, interactive guide to what web products do. One Atlas application renders separately stored project knowledge and visual settings. Adding a project or updating its facts does not require rebuilding the application.
 
-**Feature list:** [MVP features](#mvp-features) is the single place to see what Atlas will include. It consolidates the existing direction; no separate FEATURES.md is needed.
+**Feature list:** [MVP features](#mvp-features) owns the feature inventory; no separate FEATURES.md is needed.
 
 ### Requirements to preserve
 
-- **Human understanding comes first.** Helping coding agents retrieve context is not the central product goal.
-- **Visual-first and enjoyable, with minimal text.** Art must explain meaning, not just decorate a conventional documentation dashboard.
-- **Web applications first.** No terminal tools, frameworks, or libraries in the MVP; no e-commerce-only assumptions either.
-- **No manual product-definition onboarding.** Point the source-side agent at the repository; it infers the appropriate preparation scope. No mandatory runtime connection/scanner UI is implied.
-- **Greenfield:** start with actual known behavior and prepare context from subsequent merged work. The guide changes when that context is separately implemented in Atlas; no purpose, actor, feature, or glossary forms are required.
-- **Brownfield:** the planned source-side skill will prepare context from the existing product; that context can inform the initial guide. Small codebases are sufficient initially; large legacy discovery is deferred.
-- **Two depths:** a simple introduction to the essentials and optional access to more complete discovered knowledge. Never draw the entire product graph by default.
-- **Frontend-only first.** Atlas is an interactive product guide. Its maintained knowledge lives in the Atlas repository; there is no application backend, runtime AI, or automatic context importer in V1.
-- **Avoid overengineering.** No mandatory knowledge-graph platform, memory service, vector database, PM suite, or full 3D world.
-- **Generated mockups are references, not requirements.** Their example rules, statistics, buttons, and extra screens are not automatically approved.
+- **Human understanding first:** enjoyable, visual-first, minimal text, precise behavior, and optional depth. Not a generated wiki or another agent manager.
+- **Web apps first:** mostly greenfield and small existing codebases; no e-commerce-only assumptions. Terminal tools and libraries are outside the MVP.
+- **Independent source preparation:** `fill-atlas` inspects authorized source evidence, writes standalone Markdown context, and stops. No downstream planner, database calls, implementation instructions, or Atlas dependency belongs in it.
+- **Automatic new/existing handling is source-side:** scaffold-only sources produce honest limited context; existing sources get a bounded overview. Do not ask users to manually author their initial feature catalog.
+- **Application code and project data are separate:** use **one SQLite database for all projects**, at `.local/atlas.sqlite` inside the Atlas repository. Git-ignore the entire `.local/` directory. No per-project source-code changes or authoritative project JSON files.
+- **Ordinary local backend:** agents submit changes to Atlas's validated write API; the UI reads the saved data through that same backend. The checks are normal backend functions, not another agent or service.
+- **Assets:** project-specific images can live in `.local/assets/`, with database references. Shared reusable art can be tracked with the application. No separate folder per project is required.
+- **Creative but constrained rendering:** saved scene settings select supported, reusable compositions, illustrations, cases, and themes. A genuinely new interaction needs a reusable component—not executable code in a database field.
+- **Keep it small:** no PostgreSQL/MongoDB, memory/RAG platform, runtime AI, automatic source watcher, full 3D world, or collaboration suite in V1.
+- **Mockups are visual references, not feature requirements.** Never fabricate behavior, metrics, or live-sync status to fill them.
 
-### Current implementation direction
+### Current workflow
 
-**USER CLARIFICATION:** the planned `fill-atlas` skill must examine source product evidence, create a standalone Markdown context file, and stop. It must not reference or require a downstream planner, framework, or agent workflow.
+```text
+Independent source preparation:
+source project / PR → fill-atlas → atlas-context.md → STOP
 
-`Source project / PR → fill-atlas → product context Markdown → stop`
+Separately, under the user's direction:
+agent reads context + existing Atlas project data
+  → submits a proposed data change to the local backend
+  → validation + SQLite transaction
+  → refresh/refetch in Atlas → updated visual guide
+```
 
-Separately, Sayed can use that context to plan and implement a visual explanation inside Atlas with his chosen development tools. He has mentioned Superpowers for that separate work, but it is **not part of the skill, its template, its output, or a required dependency of Atlas**.
+The second step is not embedded in the skill. Sayed chooses his development tools independently. The backend does not interpret Markdown or run a coding agent. JSON may carry API requests/responses; it is not a second saved project store.
 
-The context file is development input, not automatically imported by the running application. **The current direction is frontend-only Atlas.** Keep the maintained product facts in small repository-backed content modules and their presentation in visual components. This is not a generic content engine or a required output format for the skill.
+**What changed from v0.9:** the handcrafted, frontend-only guide with facts compiled into TypeScript is superseded. Keep the React/art foundation; move each project's meaning, history, and visual configuration into SQLite. Routine data changes need no app rebuild. New reusable renderer code still does.
 
-[TECHNICAL.md](../technical/TECHNICAL.md) recommends React + TypeScript + Vite, Tailwind, SVG/illustration assets, Motion, and appropriate controls/tests. Exact dependency versions must be selected and verified during scaffolding; no install or build has been performed for this pack. No internal analysis service, database, live source synchronization, or backend belongs in V1.
+### First-build default
 
-The `fill-atlas` skill is planned, not included in this repository. It will be created and tested against real source evidence separately from the frontend prototype.
-
-### Immediate design priority
-
-Build the small visual experience defined in [V1 defaults and prototype checks](#16-v1-defaults-and-prototype-checks). Do not replace it with a large schema or integration platform.
-
-**First-build default:** use the labelled **Reschedule a booking** fixture in DESIGN.md with the frontend-only baseline in TECHNICAL.md. Open the activity, switch a saved case, inspect its reason, and compare the before/after change. Test whether this is enjoyable and understandable; do not claim that it already works.
+Preserve the delivered **Reschedule a booking** explanation while migrating its clearly labelled demo content through the validated database path. Then prove that a second project and an updated rule render in the **same unchanged application build**. Keep the familiar Start here / Explore / What changed experience. These are implementation targets, not completed tests.
 
 ---
 
@@ -67,12 +68,12 @@ Build the small visual experience defined in [V1 defaults and prototype checks](
 
 These labels distinguish settled direction from optional suggestions and remaining work:
 
-| Label                | Meaning                                                                                                                     |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **USER REQUIREMENT** | Explicitly requested or clarified by Sayed. Preserve unless he changes it.                                                  |
-| **V1 DEFAULT**       | Agreed starting decision for the prototype. Implement it first, then revise based on actual use; not a claim of validation. |
-| **PROPOSED**         | An additional recommendation not included in the settled V1 defaults. Not an implementation commitment.                     |
-| **OPEN / DEFERRED**  | Not decided, or deliberately outside the initial effort.                                                                    |
+| Label | Meaning |
+|---|---|
+| **USER REQUIREMENT** | Explicitly requested or clarified by Sayed. Preserve unless he changes it. |
+| **V1 DEFAULT** | Agreed starting decision for the prototype. Implement it first, then revise based on actual use; not a claim of validation. |
+| **PROPOSED** | An additional recommendation not included in the settled V1 defaults. Not an implementation commitment. |
+| **OPEN / DEFERRED** | Not decided, or deliberately outside the initial effort. |
 
 When sources disagree, use this order:
 
@@ -146,25 +147,26 @@ A terminal tool's sessions or a library's state model can be its user-facing dom
 
 **USER REQUIREMENT:** Web projects, mostly greenfield and small brownfield codebases.
 
-**First-build default:** one Atlas frontend guide explaining one source web application. Context preparation happens in the source-side workflow; Atlas is a separate development artifact. Use fixture data for the first visual test, then a small authorized real source project. Do not add multi-project tenancy, accounts, or integrations to begin.
+**First-build default:** one local Atlas application and one SQLite database, able to hold multiple independent web projects for the same user. Begin with the booking demo, then a second small demo to verify separation and reuse. Local project selection is not multi-user tenancy; accounts, real-time collaboration, and public hosted access are not part of this first build.
 
 The MVP should not bake in commerce-specific categories. A booking application, approval tool, or another web product should be explainable through its own vocabulary and activities.
 
 ### MVP features
 
-This is the consolidated feature list for Atlas itself, not the features of the source app it explains. It summarizes the existing scope rather than adding new capabilities. **These are planned capabilities, not implemented features.** Use Start here / Explore / What changed as the V1 navigation. Refine exact visual treatments during the prototype; these defaults are not test results.
+This is the consolidated feature list for Atlas itself, not the features of the source app it explains. It reflects the reusable-platform correction; the learning experience itself is unchanged. **The static booking experience exists; stored projects, validated database writes, and dynamic multi-project behavior are planned, not implemented.** Use Start here / Explore / What changed as the V1 navigation. Refine exact visual treatments during the prototype; these defaults are not test results.
 
-| Feature                     | What the user gets                                                                                                                                                                                         |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Start here**              | A small illustrated introduction to the product's main activities and essential concepts, not a literal 20% usage ranking.                                                                                 |
-| **Explore a feature**       | A visual explanation of who can do what, what happens, and the essential restrictions. Select recorded examples to understand the main case and important exceptions; no real business action is executed. |
-| **Find and go deeper**      | Search and grouped navigation to incorporated activities, with optional rules, clearly labelled relationships, and source evidence. Everything recorded remains reachable without drawing a giant graph.   |
-| **What changed**            | Visual explanations of added, changed, or removed behavior. Show before/after only when supported. Updates arrive through an explicit Atlas development change, not a runtime PR feed or importer.         |
-| **Honest knowledge states** | An empty guide when no behavior has been incorporated, clear gaps for unknown/partial evidence, and honest no-result or unavailable-feature states. No fictional features or live-analysis indicators.     |
+| Feature | What the user gets |
+|---|---|
+| **Stored projects** | Open a saved project from a small project list or switcher. Each project has its own facts, evidence, history, assets, and scene settings in the shared local database. |
+| **Start here** | A small illustrated introduction to the product's main activities and essential concepts, not a literal 20% usage ranking. |
+| **Explore a feature** | A visual explanation of who can do what, what happens, and the essential restrictions. Select recorded examples to understand the main case and important exceptions; no real business action is executed. |
+| **Find and go deeper** | Search and grouped navigation to incorporated activities, with optional rules, clearly labelled relationships, and source evidence. Everything recorded remains reachable without drawing a giant graph. |
+| **What changed** | Visual explanations of added, changed, or removed behavior. Show before/after only when supported. Updates appear after a validated database write and a refresh/refetch, not from a runtime PR feed or raw context-file import. |
+| **Honest knowledge states** | An empty guide when no behavior has been incorporated, clear gaps for unknown/partial evidence, and honest no-result or unavailable-feature states. No fictional features or live-analysis indicators. |
 
-**Separate source-preparation deliverable:** the planned `fill-atlas` skill will inspect an authorized source PR/range or small existing project, write standalone context Markdown, and stop. It should recognize scaffold-only sources and describe existing behavior. It is not a feature of the running Atlas app and has no downstream planning or implementation dependency.
+**Separate source-preparation deliverable:** `fill-atlas` inspects an authorized source PR/range or small existing project, writes standalone context Markdown, and stops. It can recognize scaffold-only sources and describe existing behavior. It is not a feature of the running Atlas app and has no downstream planning or implementation dependency.
 
-**First build, not the whole MVP at once:** demonstrate one illustrated activity, its saved cases, an important exception, a source/reason detail, and one visual change. Add only enough overview, search, and navigation to exercise that loop. The booking fixture and checks are in [DESIGN.md](DESIGN.md#8-next-design-checkpoint); wider coverage follows the first working scene.
+**First build, not the whole MVP at once:** demonstrate one illustrated activity, its saved cases, an important exception, evidence, and one visual change. Use the real validation/database path for the seeded demos; add a second project and change a rule without rebuilding the UI. Only enough project selection, overview, search, and navigation to test this loop is needed. See [DESIGN.md](DESIGN.md#8-next-design-checkpoint).
 
 ### Do not automatically add
 
@@ -187,7 +189,7 @@ Sayed wants the idea to remain usable with hundreds or thousands of features and
 
 ## 6. Automatic project initialization
 
-**USER REQUIREMENT:** infer new/existing behavior; do not ask Sayed to author initial product knowledge. The planned source-side skill will perform this investigation. A runtime Atlas scanner is not required.
+**USER REQUIREMENT:** infer new/existing behavior; do not ask Sayed to author initial product knowledge. The source-side skill performs this investigation. A runtime Atlas scanner is not required.
 
 ### Fresh source
 
@@ -207,17 +209,17 @@ Both paths end in a standalone Markdown context file. How that file is used afte
 
 ## 7. Learning from subsequent work
 
-**USER REQUIREMENT:** the visual guide evolves with the source product, especially after merged PRs. The latest clarification separates context creation from implementation.
+**USER REQUIREMENT:** the guide evolves with the source product, especially after merged PRs, but source preparation and saving Atlas data remain separate activities.
 
-**The skill:** inspect a source PR/range and relevant surrounding behavior, write the context file, stop. The file records facts, conditions, sources, differences, and unknowns—not implementation tasks, visual build instructions, or a named downstream workflow.
+**The skill:** inspect a source PR/range or initial source, write factual context, stop. No database operations, render schema, downstream tool, or plan belongs in its output.
 
-**Outside the skill:** Sayed may give that context to his coding tools to plan and implement an Atlas change. That separate development cycle updates the guide. Manual handoff is sufficient initially; no automatic chaining or instant runtime import is approved.
+**Outside the skill:** the user's agent reads that context and the relevant current Atlas project data, then proposes a data update using Atlas's documented API. Ordinary backend code checks its structure, supported scene settings, project-scoped references, and expected current revision. A valid change is saved transactionally; an invalid or conflicting change leaves the existing data intact.
 
-One source feature can span several PRs; a PR can affect several features. The context may describe added, changed, removed, unchanged, or inconclusive behavior. A refactor does not automatically justify a new explanation.
+One source feature can span several PRs; one PR can affect several features. Updates can add, modify, retire, or leave behavior unchanged. Do not create a new feature for every PR. Do not erase unrelated facts when applying partial context or silently override a supported correction.
 
-For Atlas implementation, reuse existing explanations and visual patterns rather than create a new page for each PR. Replace obsolete current rules; preserve important unchanged conditions and meaningful history. These are project design principles, not instructions to embed in each context file.
+**Routine project updates change database rows, not application source.** The viewer sees committed changes after a refresh/refetch. Preserve the user's selected case until a coherent newer revision is loaded. No WebSocket, continuous polling, or forced animated update is necessary initially.
 
-Keep source identity and analyzed revision available. A prepared file, an implemented Atlas change, a published Atlas build, and a deployed source feature are distinct. Before applying context, the development workflow should check existing and newer knowledge for duplication or conflicts. The V1 mechanism is an ordinary reviewed Atlas code/content change followed by a build when publishing. Updating a source PR or writing a context file alone never changes the running guide.
+Keep prepared context, saved Atlas revision, application-code release, and source deployment distinct. An Atlas revision records incorporated knowledge, not proof of production availability. An asset or a rule change using an existing renderer needs no rebuild; a new reusable interaction component requires a normal application-code change.
 
 ---
 
@@ -245,11 +247,11 @@ The user called this the “20/80” mode: the important concepts that help expl
 
 A feature may belong to more than one journey. Use one underlying record rather than duplicate its meaning. When exploring a feature, show its relevant neighborhood and offer expansion; do not generate an ever-growing global graph. An indirect path is not automatically a proven dependency.
 
-No graph database is implied. Small repository-backed records with stable references are the V1 direction; relationship names describe product meaning, not a storage technology.
+No graph database is implied. SQLite records and project-scoped relationships are sufficient for V1; query the selected neighborhood rather than drawing the entire graph.
 
 ### Choosing essentials
 
-**V1 DEFAULT:** Author the starting path from supported product purpose, main actors and journeys, prerequisites, and behavior-changing restrictions. Maintain that selection in Atlas content; no numerical 20% ranking or runtime ranking service. Correct the selection through normal content updates. In-app pinning remains optional, not a V1 requirement. Do not use code size, PR count, or graph degree as a substitute for business importance.
+**V1 DEFAULT:** Author the starting path from supported product purpose, main actors and journeys, prerequisites, and behavior-changing restrictions. Save that selection in the project database; no numerical 20% ranking or runtime ranking service. Correct it through the same validated data-update path. In-app pinning remains optional, not a V1 requirement. Do not use code size, PR count, or graph degree as a substitute for business importance.
 
 Usage analytics could answer a different question later, but are not needed to start explaining the product.
 
@@ -277,15 +279,15 @@ Islands were liked as art direction, but an island per feature does not scale an
 
 **V1 DEFAULT — choose the visual that explains the behavior:**
 
-| Meaning to explain   | Possible visual                            |
-| -------------------- | ------------------------------------------ |
-| Main activity        | Short illustrated walkthrough/storyboard   |
-| State changes        | Timeline or compact state illustration     |
-| Permissions          | Small, readable matrix or role comparison  |
-| A rule or exception  | Side-by-side documented cases              |
-| Product concept      | Annotated illustration or screenshot       |
-| Recent change        | Before/after or a short visual explanation |
-| Relevant connections | Small, labeled local relationship view     |
+| Meaning to explain | Possible visual |
+|---|---|
+| Main activity | Short illustrated walkthrough/storyboard |
+| State changes | Timeline or compact state illustration |
+| Permissions | Small, readable matrix or role comparison |
+| A rule or exception | Side-by-side documented cases |
+| Product concept | Annotated illustration or screenshot |
+| Recent change | Before/after or a short visual explanation |
+| Relevant connections | Small, labeled local relationship view |
 
 These are options for explaining content, not seven required separate modules.
 
@@ -307,7 +309,7 @@ Start with the light, warm illustrated style in DESIGN.md. Tune the palette and 
 
 The [MVP feature list](#mvp-features) owns scope. [DESIGN.md](DESIGN.md#2-v1-screens-and-interactions) owns the Start here / Explore / What changed navigation, shared layout, and interactions. Its section 8 supplies the first prototype brief.
 
-Feature explanations and their scenarios stay within Explore; rules and evidence open as optional details, not new top-level pages. Source preparation happens outside Atlas; an empty or partial guide is a content state, not a new setup workflow. The references illustrate useful visual treatments, not an obligation to build their sidebar entries or metadata panels. Use the three-place navigation for V1 and refine only its responsive layout during implementation. No separate layout document is required.
+A small project list/switcher selects the project; the three-place navigation stays inside it. Feature explanations and their scenarios stay within Explore; rules and evidence open as optional details, not new top-level pages. Source preparation happens outside Atlas; an empty or partial guide is a content state, not a new setup workflow. The references illustrate useful visual treatments, not an obligation to build their sidebar entries or metadata panels. Use the three-place navigation for V1 and refine only its responsive layout during implementation. No separate layout document is required.
 
 ---
 
@@ -321,7 +323,7 @@ Separate structured product meaning from reusable presentation:
 
 `Source evidence → standalone product context`
 
-Separately: `context + Atlas design → development work → reusable UI/art and feature-specific content → visual explanation`
+Separately: `context + existing project data → validated data update → SQLite → reusable renderer + project assets → visual explanation`
 
 The separation is intentional: the context-producing skill does not prescribe the second stage. The running app need not import the file or invoke an agent. Reuse visual components and artwork rather than author a new mini-application per feature.
 
@@ -333,9 +335,9 @@ Use image generation to explore the house style and create references. Create or
 
 ### Select during the first build
 
-Use reusable React/SVG elements for changing states and a small reviewed illustration set for richer subjects or texture. Choose the actual assets and verify their licenses while implementing the first scene, not in another planning document. Refine component types, spacing, and animation against the running result. TECHNICAL.md supplies the frontend defaults; dependency versions still need an actual compatibility check. No full asset library or additional design tool is a prerequisite.
+Use reusable React/SVG elements for changing states and a small reviewed illustration set for richer subjects or texture. Choose the actual assets and verify their licenses while implementing the first scene, not in another planning document. Refine component types, spacing, and animation against the running result. TECHNICAL.md supplies the client/backend/storage defaults; dependency versions still need an actual compatibility check. No full asset library or additional design tool is a prerequisite.
 
-The current build baseline is React with SVG/normal UI components, a small stable illustration set, and Motion when it explains a change. Mermaid, React Flow, full 3D, and layout engines were earlier candidates; none is required for V1. The reusable foundation must allow feature-specific compositions rather than force every feature into the same diagram.
+The visual baseline is React with SVG/normal UI components, a small stable illustration set, and Motion when it explains a change. Scene definitions live in application code; each project stores references, facts, and supported visual settings in SQLite. Mermaid, React Flow, full 3D, and layout engines were earlier candidates; none is required for V1. The reusable foundation must allow feature-specific compositions rather than force every feature into the same diagram.
 
 Any external art/icon assets will need a checked license before use or redistribution. No external art package has been selected or licensed as part of this document.
 
@@ -343,45 +345,48 @@ Any external art/icon assets will need a checked license before use or redistrib
 
 ## 12. Context artifacts, knowledge, and technical boundaries
 
-**USER REQUIREMENT:** `fill-atlas` produces standalone Markdown context only. It is not coupled to a consumer, planner, implementation workflow, output schema for the UI, or runtime importer.
+**USER REQUIREMENT:** `fill-atlas` creates standalone context Markdown and stops. Its instructions and template stay independent of the consumer and storage format. `atlas-context.md` or a user-selected filename does not trigger anything automatically.
 
-The planned skill should capture source scope, behavior, changes, exact conditions, examples, evidence, and uncertainty. No target Atlas paths or instructions for another agent belong in the generated context. The default filename is `atlas-context.md`; a user-specified `context.md` is also valid. The filename does not trigger anything.
+### One project knowledge store
 
-### Three different artifacts
+| Item | Responsibility |
+|---|---|
+| Source-context Markdown | Bounded source facts and evidence. Preparation input, not the accumulated project database. |
+| `.local/atlas.sqlite` | One SQLite database for all projects: features, rules, cases, relationships, evidence, incorporated revisions, history, and visual configuration. |
+| `.local/assets/` | Project-specific image files, referenced by database records. These are binary assets, not a competing knowledge store. |
+| Tracked Atlas source | UI, renderer patterns, strict request schemas, backend code, SQL migrations, and harmless demo seeds. No private project facts. |
 
-| Artifact                 | Responsibility                                                                                                          |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| Source-context Markdown  | A bounded statement of source behavior or a change. It is development input, not the entire accumulated product memory. |
-| Maintained Atlas content | The guide's current facts, conditions, cases, relationships, and supporting references, versioned in its repository.    |
-| Atlas visual components  | The artistic, interactive explanation of those facts. Reusable controls and art can support different compositions.     |
+The whole `.local/` directory is Git-ignored, including any database journal/sidecar files and local backups. It is not served as a static directory. No per-project `projects/` folder, saved project JSON document, TypeScript project-content module, or browser local-storage database is authoritative in V1. JSON may represent requests and validated visual configuration inside a database column; that does not create another database.
 
-For example, `reschedule.content.ts` can supply facts to `RescheduleScene.tsx`. These are illustrative internal filenames, not files the skill writes. Keep business facts out of repeated UI literals; simple and deeper views use the same current fact. A historical comparison deliberately keeps the old revision separate.
+### What the backend does
 
-The source product and its evidence determine truth; Atlas content is a maintained explanation, not an independent authority. A new PR brief updates the affected part without erasing existing, unrelated knowledge. Retain verified source revisions and coverage limits. A single newest brief is not a replacement for the whole guide.
+The small local backend receives proposed updates, checks them, and saves them to SQLite. It also reads the selected project's data and serves approved assets to the UI. It is not an LLM, a planner, or a separate “writer” product. Direct model-authored SQL is not the normal update interface.
 
-### What updates, and when
+Validation covers types, required fields, supported scene kinds/settings, stable IDs, same-project references, and update revisions. SQLite constraints and transactions enforce persistence consistency. Neither layer can prove a business claim true; retain source evidence and uncertainty. Schemas, migrations, and validation tests are tracked application code, not something regenerated to accept every agent output.
 
-The user or their chosen development tools can separately change Atlas content and, where necessary, the visual implementation. This may reuse an existing scene or add a genuinely needed pattern. A fresh context file is neither auto-ingested nor displayed as a long documentation panel.
+### Dynamic rendering and customization
 
-An implemented Atlas change must be built/published before a deployed viewer sees it. The guide shows the source revision actually incorporated, not a guessed live-sync status. No in-browser editing, data persistence service, or source watcher is needed for V1. Local UI preferences are not the product knowledge store.
+The frontend renders saved facts using a small registry of reviewed illustration/storyboard, comparison, and related patterns. Names, actors, cases, order, assets, and supported colors/layout settings are data. Refer to shared rule IDs instead of duplicating a threshold in visual prose.
 
-### Superseded assumptions
+Different projects can use different combinations and assets. A genuinely new interaction requires adding a reusable renderer component. Do not store or execute project-supplied React, JavaScript, arbitrary HTML/SVG markup, or generated expressions to fake unlimited customization. Recorded cases explain behavior; Atlas is not a copy of the source business engine.
 
-An internal Codex analysis service, automatically imported skill output, SQLite/Drizzle, Nest/Fastify, runtime ingestion validation, file watchers, webhooks, Notion, Obsidian, and memory/RAG services were earlier possibilities or mistaken interpretations. They are **not V1 requirements**. Zod is not required just to compile authored TypeScript content. Ordinary code-development hot reload is different from a source-context importer.
+### Scope, sharing, and privacy
 
-A previous interpretation also coupled the context skill to Superpowers. Sayed explicitly rejected that coupling. It must remain absent from any future skill and template; any downstream tool is a separate user choice.
+One local user can keep several projects in the database. The public application repository can remain separate from the private database and assets. Choose the code license before public release; this pack does not grant or select one. Open-sourcing the code is not the same as publishing project data.
 
-[TECHNICAL.md](../technical/TECHNICAL.md) now documents the frontend-only defaults. This pack contains specification material, not a scaffolded or tested application. React/TypeScript/Vite and the other named libraries are engineering recommendations for the first build, not a claim of universal superiority or verified package compatibility.
+No cloud accounts, collaboration, public-link service, or automatic export is implied. A local route is not a portable share link. Sharing a particular project's data will need an explicit, reviewed mechanism later; do not distribute the whole database to share one project. Git-ignore is not encryption, access control, or backup. Safeguard private data and test a consistent database-plus-assets backup/restore before relying on it.
 
-### Cost and evidence
+### Superseded directions
 
-Preparing context and implementing visual changes use the user's chosen coding workflow. Ordinary browsing of a built explanation and selecting its saved cases make no model calls. Analysis and development still have time/token costs; no subscription entitlement or fixed cost is promised.
+The earlier frontend-only, code-bundled project knowledge and rebuild-per-content-change plan is superseded. The short-lived per-project JSON-folder proposal and larger PostgreSQL platform proposal are also superseded by **one local SQLite database plus ordinary validated backend access**. Keep this history to prevent reintroducing contradictory instructions, not as parallel alternatives to implement.
 
-Source preparation stays authorized and bounded. Exclude secrets and unnecessary private data. A local frontend does not make the separate agent's model processing local. Preserve evidence and uncertainty; valid Markdown or TypeScript alone does not establish that the business claims are correct.
+Runtime model analysis, automatic Markdown ingestion, source watchers, memory services, arbitrary data-to-code execution, and coupling the context skill to a downstream workflow remain outside V1. [TECHNICAL.md](../technical/TECHNICAL.md) supplies implementation defaults and test gates.
 
-### Corrections
+### Cost, corrections, and freshness
 
-Initially fix an incorrect explanation through an Atlas development update. Record why the correction was made and the supporting evidence; do not silently overwrite it with a conflicting later brief. An in-app correction/feedback button was proposed but is **not required for V1**, and no feedback backend is implied.
+Source preparation and agent-authored data updates use the user's separately chosen coding workflow. Browsing and switching saved cases require no model calls. The local backend reads saved data; it does not request a new analysis.
+
+Fix facts through a validated database update with source evidence and a correction reason. A user-facing feedback editor is not required. Preserve old values only in labelled history, and preserve corrections when later evidence conflicts. Store coverage/revision at the affected-feature level; one recent PR cannot establish whole-project freshness.
 
 ---
 
@@ -407,30 +412,33 @@ Benefits such as “reduces support tickets” should not be displayed as measur
 
 ## 14. Decision history and superseded directions
 
-| Conversation development                                                                  | Current interpretation                                                                                                                                                           |
-| ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Initial search for a project after Dark Factory                                           | Background motivation only; do not reopen generic project ideation unless asked.                                                                                                 |
-| Sayed identified forgetting business/features after fast agentic development              | This became the central problem.                                                                                                                                                 |
-| Initial “Product Brain” proposal with extensive knowledge entities                        | Useful context, but must not grow into a generic memory/knowledge platform.                                                                                                      |
-| Restaurant-menu reference and request for colorful, low-text visuals                      | Strong visual direction and preference to preserve.                                                                                                                              |
-| Early islands for every feature                                                           | Art was liked; literal one-island-per-feature and huge maps were challenged.                                                                                                     |
-| Discussion of 1,000+ features and dense relations                                         | Preserve navigability and deeper access; do not require global graph rendering.                                                                                                  |
-| User emphasized the math-book balance                                                     | Preserve exact behavior and useful meaning, not decorative simplification.                                                                                                       |
-| Existing short PR-summary skill was abandoned by the user                                 | Another textual summary stream is not an adequate answer.                                                                                                                        |
-| Tools/frameworks such as Warp, tmux, React discussed                                      | Technical concepts can be product concepts, but web apps remain MVP scope.                                                                                                       |
-| Early greenfield setup wizard                                                             | Superseded: do not ask the user to author initial product knowledge.                                                                                                             |
-| Latest greenfield/brownfield clarification                                                | Infer strategy; initialize existing products, grow fresh ones from merged PRs.                                                                                                   |
-| Generated screenshots show manual setup choices or optional seed forms                    | Those image details do not override the clarification.                                                                                                                           |
-| Art production discussion suggested reusable SVG/UI with AI meaning extraction            | Working technical proposal, not a locked production pipeline.                                                                                                                    |
-| User asks whether to keep a living document now                                           | Maintain current decisions plus relevant background; avoid relying on a final conversation dump.                                                                                 |
-| User asks what is missing and whether to add a layout document                            | Refine layout and interactions inside DESIGN.md; test one learning loop rather than add documents.                                                                               |
-| Skill clarification                                                                       | Source investigation ends in standalone Markdown; implementation is a separate activity chosen by the user.                                                                      |
-| User rejects downstream-tool coupling in the skill                                        | No Superpowers references, downstream instructions, or consumer dependency in the skill, template, or generated context.                                                         |
-| User recognizes Atlas as illustrated interactive docs and accepts frontend-only direction | Maintain product knowledge in the Atlas repository; update content and visuals through development, not runtime ingestion.                                                       |
-| User requests a reviewed downloadable handoff                                             | Add the technical baseline, reconcile existing documents, and verify package integrity; do not claim the application or skill has been field-tested.                             |
-| User asks for only useful build material and a clear feature list                         | Remove superseded image experiments and the optional checksum file from the pack; consolidate MVP features in section 5 rather than create FEATURES.md.                          |
-| User finalizes the project name                                                           | Atlas is the official name. Feature Atlas and Visual Product Memory were earlier working names, retained only as historical context. The independent skill remains `fill-atlas`. |
-| Open-question cleanup                                                                     | Sayed approved replacing already-answered questions with V1 defaults; only real-source selection, implementation choices, and empirical checks remain. No new product features.  |
+| Conversation development | Current interpretation |
+|---|---|
+| Initial search for a project after Dark Factory | Background motivation only; do not reopen generic project ideation unless asked. |
+| Sayed identified forgetting business/features after fast agentic development | This became the central problem. |
+| Initial “Product Brain” proposal with extensive knowledge entities | Useful context, but must not grow into a generic memory/knowledge platform. |
+| Restaurant-menu reference and request for colorful, low-text visuals | Strong visual direction and preference to preserve. |
+| Early islands for every feature | Art was liked; literal one-island-per-feature and huge maps were challenged. |
+| Discussion of 1,000+ features and dense relations | Preserve navigability and deeper access; do not require global graph rendering. |
+| User emphasized the math-book balance | Preserve exact behavior and useful meaning, not decorative simplification. |
+| Existing short PR-summary skill was abandoned by the user | Another textual summary stream is not an adequate answer. |
+| Tools/frameworks such as Warp, tmux, React discussed | Technical concepts can be product concepts, but web apps remain MVP scope. |
+| Early greenfield setup wizard | Superseded: do not ask the user to author initial product knowledge. |
+| Latest greenfield/brownfield clarification | Infer strategy; initialize existing products, grow fresh ones from merged PRs. |
+| Generated screenshots show manual setup choices or optional seed forms | Those image details do not override the clarification. |
+| Art production discussion suggested reusable SVG/UI with AI meaning extraction | Working technical proposal, not a locked production pipeline. |
+| User asks whether to keep a living document now | Maintain current decisions plus relevant background; avoid relying on a final conversation dump. |
+| User asks what is missing and whether to add a layout document | Refine layout and interactions inside DESIGN.md; test one learning loop rather than add documents. |
+| Skill clarification | Source investigation ends in standalone Markdown; implementation is a separate activity chosen by the user. |
+| User rejects downstream-tool coupling in the skill | No Superpowers references, downstream instructions, or consumer dependency in the skill, template, or generated context. |
+| Earlier frontend-only phase | Superseded: it produced a handcrafted guide rather than the reusable platform. Keep the visual direction, not project facts compiled into app source. |
+| User requests a reviewed downloadable handoff | Add the technical baseline, reconcile existing documents, and verify package integrity; do not claim the application or skill has been field-tested. |
+| User asks for only useful build material and a clear feature list | Remove superseded image experiments and the optional checksum file from the pack; consolidate MVP features in section 5 rather than create FEATURES.md. |
+| User finalizes the project name | Atlas is the official name. Feature Atlas and Visual Product Memory were earlier working names, retained only as historical context. The independent skill remains `fill-atlas`. |
+| Open-question cleanup | Sayed approved replacing already-answered questions with V1 defaults; practical tests remain necessary. |
+| Reusable platform and data separation | Store independent projects separately from public application code and dynamically render them with the same application build. |
+| Storage clarification | One SQLite database at `.local/atlas.sqlite`, inside the repo but Git-ignored. Optional project assets sit alongside it; no authoritative JSON project files or per-project folders. |
+| Strict input clarification | Ordinary backend validation and transactions gate agent-proposed data changes. No extra agent, arbitrary SQL, or coupling of fill-atlas to storage. |
 
 Earlier rejected projects—benchmarks, patch optimizers, synthetic customers, autonomous product experimentation, and additional review layers—are not pending features of Atlas.
 
@@ -438,7 +446,7 @@ Earlier rejected projects—benchmarks, patch optimizers, synthetic customers, a
 
 ## 15. Visual-reference guide
 
-The context contains **13 retained visual references** in `references/inspiration/` and `references/concepts/`. Relative links work while the `context/` folder stays together. Superseded onboarding, scanner, dark-UI, and visual-engine experiments are not included.
+This planning context retains **13 visual references** in `business/references/inspiration/` and `business/references/concepts/`. The links below resolve in this repository. Superseded onboarding, scanner, dark-UI, and visual-engine experiments are not included in this build pack.
 
 **These are style and explanation references, not a production asset library or an approved page inventory.** Their example business rules, statistics, extra controls, and older branding are not requirements. Use **Atlas** in implemented UI copy. Pick one main visual reference for a scene instead of combining every pictured style or widget.
 
@@ -472,26 +480,27 @@ The previously open design questions now have starting decisions. Build these de
 
 ### Settled for the first build
 
-| Area                   | V1 default                                                                                                                                                                                                                  |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| First interaction      | Open a visual feature explanation, select an important alternate case, and see why its outcome changes. A before/after example explains one change. No mandatory quiz or slideshow.                                         |
-| Navigation             | **Start here / Explore / What changed.** Feature cases, rules, and evidence stay within the selected experience. Search and back navigation preserve orientation.                                                           |
-| Visual grammar         | Illustrated actions and walkthroughs for behavior; timelines for sequences; comparisons for conditions; compact tables for permissions. Only show scoped relationships that help the selected question.                     |
-| Test content           | Use the clearly labelled **Reschedule a booking** fixture in DESIGN.md, including its saved cases and 48-to-24-hour change. This is demo content, not a real product claim or a booking-only scope.                         |
-| Knowledge and evidence | Keep small TypeScript content files separate from scenes. Share current facts; retain source/revision references and explicit historical comparisons. Unsupported or conflicting facts remain unknown.                      |
-| Essentials             | Introduce supported product purpose, main user journeys, prerequisites, and essential restrictions. Maintain the selection in content; no literal top-20% ranking or usage analytics.                                       |
-| Artwork and renderer   | Reuse a small art kit with React/SVG and meaningful Motion transitions. Rich illustration may be raster. Choose and license-check actual assets while building the first scene; no full 3D or per-feature painting service. |
-| Evaluation             | Check understanding, voluntary return, visual usability, and a correct before/after. Test source-context accuracy separately against real evidence and observe actual development cost; do not add a benchmark platform.    |
+| Area | V1 default |
+|---|---|
+| First interaction | Open a visual feature explanation, select an important alternate case, and see why its outcome changes. A before/after example explains one change. No mandatory quiz or slideshow. |
+| Navigation | Choose a saved project, then **Start here / Explore / What changed.** Cases and evidence stay within the selected experience. Search, cache keys, and return paths retain project identity. |
+| Visual grammar | Illustrated actions and walkthroughs for behavior; timelines for sequences; comparisons for conditions; compact tables for permissions. Only show scoped relationships that help the selected question. |
+| Test content | Use the clearly labelled **Reschedule a booking** fixture in DESIGN.md, including its saved cases and 48-to-24-hour change. This is demo content, not a real product claim or a booking-only scope. |
+| Knowledge and evidence | One SQLite database, separate from app source. Strict backend writes preserve shared facts, project-scoped relationships, source/revision references, and labelled history. Unknown remains unknown. |
+| Platform/storage | React UI + a small local backend. All projects in `.local/atlas.sqlite`; assets in `.local/assets/`; `.local/` is ignored and not statically served. No project JSON files or app rebuild for ordinary data updates. |
+| Essentials | Introduce supported product purpose, main user journeys, prerequisites, and essential restrictions. Save the selection with its project; no literal top-20% ranking or usage analytics. |
+| Artwork and renderer | Reuse a small art kit with React/SVG and meaningful Motion transitions. Rich illustration may be raster. Choose and license-check actual assets while building the first scene; no full 3D or per-feature painting service. |
+| Evaluation | Check understanding, voluntary return, visual usability, and a correct before/after. Test source-context accuracy separately against real evidence and observe actual development cost; do not add a benchmark platform. |
 
 ### Still to select or test—not missing product features
 
-**Select later:** one small authorized source repository and PR for the independent skill test. None has been selected. This does not block the fixture-based frontend prototype, but real source evidence is required before claiming source accuracy.
+**Select later:** one small authorized source repository and PR for the independent skill test. None has been selected. This does not block the database-seeded visual prototype, but real source evidence is required before claiming source accuracy.
 
-**Resolve during implementation:** exact assets and their rights, compatible dependency versions, and the smallest useful content types. Keep the existing stack and architecture boundary; do not create a backend, memory service, or runtime importer to answer these questions.
+**Resolve during implementation:** exact assets and their rights, compatible dependency versions, and the initial database/request schema. Implement the agreed local backend and SQLite boundary; do not add a memory service, raw-context interpreter, enterprise platform, or another specification document.
 
 **Validate in use:** whether Sayed understands the behavior and wants to return, whether the reusable artwork works in a browser, and whether the skill produces accurate standalone context. None is established by the documents or mockups. Detailed checks remain in [section 17](#17-how-we-should-evaluate-the-first-version) and [DESIGN.md](DESIGN.md#what-to-check-before-building-more).
 
-A large brownfield engine, full 3D, cross-project enterprise search, multi-user governance, and analytics-driven ranking remain deferred. Nothing in this section adds a new feature or blocks the first prototype.
+A large brownfield engine, full 3D, cross-project enterprise search, multi-user governance, and analytics-driven ranking remain deferred. These deferred items do not block the first local prototype. The project picker and database path implement the explicitly requested reusable-platform correction.
 
 ---
 
@@ -502,7 +511,9 @@ A large brownfield engine, full 3D, cross-project enterprise search, multi-user 
 - Can Sayed explain what a selected feature does, who uses it, and its most important limitation without opening the code?
 - Does he willingly revisit the visual explanation after building something?
 - Can a new user distinguish the main path from an important exception?
-- Does source context, once separately implemented in Atlas, update the right explanation without contradictions or duplicates?
+- Does a separately submitted data update change the correct explanation without rebuilding the application, contradicting current rules, or duplicating features?
+- Can the same unchanged build display two projects without leaking one project's features, relationships, assets, or navigation state into the other?
+- Do invalid/stale writes roll back cleanly, and can database data plus assets be restored after a backup?
 - Does fill-atlas stop at factual context without downstream instructions or application changes?
 - Does a non-commerce web example still make sense without a new custom interface?
 - Can a crowded dataset be navigated without drawing everything at once?
@@ -516,7 +527,7 @@ Synthetic feature records can test navigation and rendering. A real small codeba
 
 ### For future conversations and coding agents
 
-Start with README.md, this section 1, the [V1 defaults](#16-v1-defaults-and-prototype-checks), DESIGN.md section 8, and TECHNICAL.md for a build. Read deeper context only for the question at hand. A source-side fill-atlas invocation needs only its standalone skill and source evidence, not this entire application handoff.
+Start with this context README.md, this section 1, the [V1 defaults](#16-v1-defaults-and-prototype-checks), DESIGN.md section 8, and TECHNICAL.md for a build. Read deeper context only for the question at hand. A source-side fill-atlas invocation needs only its standalone skill and source evidence, not this entire application handoff.
 
 Preserve the user's constraints. Do not silently promote a proposal, mockup widget, or plausible product convention into a requirement. Ask about consequential unresolved choices when necessary rather than filling them with enterprise defaults.
 
@@ -530,7 +541,7 @@ After an agreed change:
 2. Keep a short explanation of significant superseded decisions where future agents could otherwise repeat them.
 3. Label any new suggestion as proposed until accepted.
 4. Update the version/date and add a compact change-log entry. Keep PROJECT.md responsible for scope, DESIGN.md for experience, and TECHNICAL.md for implementation; do not duplicate whole sections.
-5. Regenerate the downloadable context pack when distributing an updated snapshot.
+5. Keep this repository planning context current. Regenerate a downloadable context pack only when a separate distribution is requested.
 
 Do not append every message or keep conflicting versions of the current requirements. Use normal repository history/versioned copies later rather than growing an endless transcript inside this file.
 
@@ -542,17 +553,18 @@ For another conversation or a coding session, supply the latest document and the
 
 ### Change log
 
-| Version | Date       | Change                                                                                                                                                                                                                                                                                              |
-| ------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0.1     | 2026-09-24 | Initial consolidated context from the project discussion; separated user requirements, proposals, open questions, and superseded mockup behavior; packaged the available visual references.                                                                                                         |
-| 0.2     | 2026-09-24 | Added DESIGN.md v0.1 as a proposed experience/visual-design companion and linked its candidate navigation. Existing product requirements are unchanged; the new design is not yet approved.                                                                                                         |
-| 0.3     | 2026-09-24 | Linked DESIGN.md v0.2 review: layout/navigation, concrete prototype behavior, art feasibility, and future evidence/update checks. Preserved requirements and reference status; all new design choices remain proposals.                                                                             |
-| 0.4     | 2026-09-24 | Recorded the independent context-only fill-atlas boundary and the user's rejection of downstream coupling. Reframed initialization and visual updates as separate concerns; added draft skill/template. No runtime importer, backend, named planner dependency, or completed skill test is claimed. |
-| 0.5     | 2026-09-24 | Consolidated frontend-only Atlas and repository-backed knowledge; added TECHNICAL.md v0.1, clarified briefs versus accumulated knowledge and explicit development updates, retained all 20 references, and recorded handoff review limits.                                                          |
-| 0.6     | 2026-09-24 | Finalized Atlas as the official project name; aligned document titles and current naming, updated companion versions, and preserved earlier names only as history. No product, stack, skill, or reference-image behavior changed.                                                                   |
-| 0.7     | 2026-09-24 | Packaging-only cleanup: one atlas/ root, documents in docs/, grouped and renamed visual references, updated links, and regenerated checksums. All project requirements, reference-image bytes, and the independent skill/template are preserved.                                                    |
-| 0.8     | 2026-09-24 | Removed superseded mockup files and the optional package checksum file; consolidated existing MVP features in section 5; linked design details instead of repeating a second feature inventory; retained the independent skill unchanged.                                                           |
-| 0.9     | 2026-09-24 | Replaced the open-question list with agreed V1 defaults and distinct prototype checks; aligned navigation, fixture choice, art, knowledge, and evaluation wording across the pack. Skill, images, stack, and feature scope are unchanged.                                                           |
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 2026-09-24 | Initial consolidated context from the project discussion; separated user requirements, proposals, open questions, and superseded mockup behavior; packaged the available visual references. |
+| 0.2 | 2026-09-24 | Added DESIGN.md v0.1 as a proposed experience/visual-design companion and linked its candidate navigation. Existing product requirements are unchanged; the new design is not yet approved. |
+| 0.3 | 2026-09-24 | Linked DESIGN.md v0.2 review: layout/navigation, concrete prototype behavior, art feasibility, and future evidence/update checks. Preserved requirements and reference status; all new design choices remain proposals. |
+| 0.4 | 2026-09-24 | Recorded the independent context-only fill-atlas boundary and the user's rejection of downstream coupling. Reframed initialization and visual updates as separate concerns; added draft skill/template. No runtime importer, backend, named planner dependency, or completed skill test is claimed. |
+| 0.5 | 2026-09-24 | Consolidated frontend-only Atlas and repository-backed knowledge; added TECHNICAL.md v0.1, clarified briefs versus accumulated knowledge and explicit development updates, retained all 20 references, and recorded handoff review limits. |
+| 0.6 | 2026-09-24 | Finalized Atlas as the official project name; aligned document titles and current naming, updated companion versions, and preserved earlier names only as history. No product, stack, skill, or reference-image behavior changed. |
+| 0.7 | 2026-09-24 | Packaging-only cleanup: one atlas/ root, documents in docs/, grouped and renamed visual references, updated links, and regenerated checksums. All project requirements, reference-image bytes, and the independent skill/template are preserved. |
+| 0.8 | 2026-09-24 | Removed superseded mockup files and the optional package checksum file; consolidated existing MVP features in section 5; linked design details instead of repeating a second feature inventory; retained the independent skill unchanged. |
+| 0.9 | 2026-09-24 | Replaced the open-question list with agreed V1 defaults and prototype checks; historical frontend-only baseline. |
+| 0.10 | 2026-09-24 | Replaced code-bundled project knowledge with one Git-ignored SQLite database, validated local backend writes, and data-driven rendering across projects. Preserved the visual experience, context-only skill, and 13 references. No application implementation or tests claimed. |
 
 ---
 

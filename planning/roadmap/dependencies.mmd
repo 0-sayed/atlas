@@ -1,18 +1,20 @@
 flowchart TD
-  T000["T000 Bootstrap Atlas frontend"]
-  T001["T001 Illustrated booking learning loop"]
-  T002["T002 V1 exploration and reuse"]
-  T003["T003 Source-context skill validation"]
-  T004["T004 Real-source guide and evaluation"]
+  T000["T000 Bootstrap static frontend"]
+  T001["T001 Booking learning loop"]
+  T002["T002 Local data platform"]
+  T003["T003 Dynamic exploration and reuse"]
+  T004["T004 Independent source-context skill"]
+  T005["T005 Real-source guide and evaluation"]
 
   T000 --> T001
-  T000 --> T003
   T001 --> T002
-  T002 --> T004
-  T003 --> T004
+  T002 --> T003
+  T000 --> T004
+  T003 --> T005
+  T004 --> T005
 
   %% Match each node's class to the Done column in tasks.md.
   classDef pending fill:#E5E7EB,stroke:#6B7280,color:#111827
   classDef done fill:#DCFCE7,stroke:#16A34A,color:#14532D
-  class T000 done
-  class T001,T002,T003,T004 pending
+  class T000,T001 done
+  class T002,T003,T004,T005 pending
