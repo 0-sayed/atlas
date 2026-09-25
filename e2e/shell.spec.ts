@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('the three foundation destinations are reachable and Back restores the prior view', async ({
   page,
 }) => {
-  await page.goto('/#/')
+  await page.goto('/#/projects/booking-demo/')
   await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
   await page.getByRole('link', { name: 'Explore', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Explore' })).toBeVisible()
@@ -18,11 +18,11 @@ test('the three foundation destinations are reachable and Back restores the prio
 test('a direct hash link loads, and an unknown destination states that it is unavailable', async ({
   page,
 }) => {
-  await page.goto('/#/changes')
+  await page.goto('/#/projects/booking-demo/changes')
   await expect(
     page.getByRole('heading', { name: 'What changed' }),
   ).toBeVisible()
-  await page.goto('/#/explore/missing?case=unknown')
+  await page.goto('/#/projects/booking-demo/explore/missing?case=unknown')
   await expect(
     page.getByRole('heading', { name: 'This guide is not here yet' }),
   ).toBeVisible()
@@ -34,7 +34,7 @@ test('a direct hash link loads, and an unknown destination states that it is una
 test('navigation stays usable by keyboard and at narrow widths', async ({
   page,
 }) => {
-  await page.goto('/#/')
+  await page.goto('/#/projects/booking-demo/')
   await expect(
     page.getByRole('link', { name: 'Skip to content' }),
   ).toBeVisible()
@@ -58,7 +58,7 @@ test('navigation stays usable by keyboard and at narrow widths', async ({
 test('keyboard navigation reaches the home link after the skip link', async ({
   page,
 }) => {
-  await page.goto('/#/')
+  await page.goto('/#/projects/booking-demo/')
   await expect(
     page.getByRole('link', { name: 'Skip to content' }),
   ).toBeVisible()

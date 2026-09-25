@@ -1,8 +1,13 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { validateDocument, type ProjectDocument } from '../../shared/contracts'
-import { bookingView } from '../../shared/booking'
-import { KnowledgeContext } from './knowledge'
-export function KnowledgeProvider({ children }: { children: ReactNode }) {
+import { ProjectContext } from './knowledge'
+export function KnowledgeProvider({
+  children,
+  projectId,
+}: {
+  children: ReactNode
+  projectId: string
+}) {
   const [document, setDocument] = useState<ProjectDocument | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -11,13 +16,16 @@ export function KnowledgeProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController()
     async function load() {
       try {
-        const response = await fetch('/api/v1/projects/booking-demo', {
-          signal: controller.signal,
-        })
+        const response = await fetch(
+          `/api/v1/projects/${encodeURIComponent(projectId)}`,
+          {
+            signal: controller.signal,
+          },
+        )
         if (!response.ok)
           throw new Error(
             response.status === 404
-              ? 'No saved booking guide. Seed the illustrative fixture to begin.'
+              ? 'Project unavailable. No saved guide has this identity.'
               : 'Guide unavailable. The local API could not load it.',
           )
         let doc: ProjectDocument
@@ -28,7 +36,7 @@ export function KnowledgeProvider({ children }: { children: ReactNode }) {
             'Guide incompatible. Its contract or scene version is unsupported.',
           )
         }
-        if (doc.id !== 'booking-demo')
+        if (doc.id !== projectId)
           throw new Error(
             'Guide incompatible. Project identity does not match.',
           )
@@ -49,8 +57,7 @@ export function KnowledgeProvider({ children }: { children: ReactNode }) {
     }
     void load()
     return () => controller.abort()
-  }, [request])
-  const feature = document?.features.find((f) => f.id === 'booking')
+  }, [request, projectId])
   return (
     <>
       <div className="knowledge-status">
@@ -75,12 +82,10 @@ export function KnowledgeProvider({ children }: { children: ReactNode }) {
           </button>
         )}
       </div>
-      {feature ? (
-        <KnowledgeContext.Provider value={bookingView(feature)}>
+      {document ? (
+        <ProjectContext.Provider value={document}>
           {children}
-        </KnowledgeContext.Provider>
-      ) : document ? (
-        <p>No booking activity is saved in this guide.</p>
+        </ProjectContext.Provider>
       ) : null}
     </>
   )

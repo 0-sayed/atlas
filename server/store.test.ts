@@ -26,9 +26,11 @@ it('persists create/update across restart and keeps immutable history', () => {
   })
   store.close()
   store = new Store(dir)
-  expect(store.read(seed.id).features[0].noticeHours).toBe(30)
+  expect(store.read(seed.id).features[0]).toMatchObject({ noticeHours: 30 })
   expect(store.read(seed.id).revision).toBe(2)
-  expect(store.history(seed.id)[0].features[0].noticeHours).toBe(24)
+  expect(store.history(seed.id)[0].features[0]).toMatchObject({
+    noticeHours: 24,
+  })
 })
 it('rejects unknown fields, scene versions, duplicate ids and stale revisions', () => {
   expect(() => store.create({ ...seed, sql: 'DROP TABLE projects' })).toThrow()
