@@ -53,7 +53,7 @@ NestJS, the SQLite binding, and Zod are defaults to implement, not a claim that 
 atlas/
   planning/context/         # Business and technical documents; business/references/ holds design images
   planning/roadmap/         # Task graph and dependencies
-  # fill-atlas is an independent later deliverable outside this repository
+  .agents/skills/fill-atlas/     # standalone source-context skill and template; not app runtime
   src/                      # Frontend, reusable scenes, shared artwork
   server/                   # Local API, checks, database access
   shared/                   # Request/response and scene-setting schemas/types

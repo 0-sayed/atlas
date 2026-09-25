@@ -2,7 +2,7 @@
 
 - Atlas is one React/TypeScript/Vite frontend with a local NestJS API and SQLite knowledge store. Keep `planning/` as development context; do not import its raw briefs or reference images into the app or `public/`.
 - The app displays reviewed, implemented knowledge only. Do not infer current source-product behavior from fixture content, old Atlas content, or a passing build. Keep fixtures and historical snapshots explicitly labelled.
-- The independent `fill-atlas` skill is a later task. It produces source-context Markdown and stops; it does not modify Atlas source or run in the browser.
+- The independent `fill-atlas` skill and template are maintained in `.agents/skills/fill-atlas/`. It produces source-context Markdown and stops; it does not modify Atlas source or run in the browser.
 - Keep persisted product facts in SQLite via shared strict Zod contracts; `src/content/` contains API loading and pure view helpers, with presentation in scenes/components. Add only boundaries needed by a real activity; avoid a generic content engine.
 - Use native controls, visible focus, clear unavailable states, and reduced-motion-safe presentation. Hash URLs must support direct loading and browser Back.
 - Run `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:e2e`, and `npm run build` before claiming a branch is ready. Unit tests cover content/helper contracts; Playwright covers user navigation and interaction.
