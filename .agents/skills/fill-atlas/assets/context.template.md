@@ -10,7 +10,7 @@
 
 ## What the product does
 
-<Short explanation of who can accomplish what. Preserve an essential condition in the headline when omitting it would be misleading.>
+<Short explanation of who can accomplish what. Preserve an essential condition in the headline when omitting it would be misleading.> [E1]
 
 ## Relevant behavior
 
@@ -19,12 +19,12 @@
 - Who: <actor and relevant permissions> [E1]
 - Action and result: <what happens> [E1]
 - Conditions: <preconditions, states, exact thresholds/operators/units, and restrictions; include configuration or time-zone scope where relevant> [E2]
-- Exceptions: <supported differences or explicitly unknown behavior>
-- Connections: <specific requires / blocks / triggers meaning, when established>
+- Exceptions: <supported differences or explicitly unknown behavior> [E2; identify the evidence gap for unknowns]
+- Connections: <specific requires / blocks / triggers meaning, when established> [E2]
 
 ## What changed
 
-<Supported before → after, including important unchanged context. Omit for initial discovery or no-change findings.>
+<Supported before → after, including important unchanged context. Omit for initial discovery or no-change findings. Cite evidence for each side of the comparison.> [E1 → E2]
 
 ## Examples
 

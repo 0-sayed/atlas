@@ -2,7 +2,7 @@
 
 ## Deliverable and provenance
 
-The independent `fill-atlas` skill and companion template are tracked in [`.agents/skills/fill-atlas/`](../../.agents/skills/fill-atlas/SKILL.md). A local agent installation also exists; the repository is the maintained source. The skill retains its original v0.10 bytes; the bundled template has only Prettier table formatting changes. The hashes in [source-pack retrieval](tasks.md#t004-source-pack-retrieval) identify the original reviewed baseline, not the formatted template. The relative template link resolves, and the skill-creator metadata validator passes.
+The independent `fill-atlas` skill and companion template are tracked in [`.agents/skills/fill-atlas/`](../../.agents/skills/fill-atlas/SKILL.md). A local agent installation also exists; the repository is the maintained source. The skill retains its original v0.10 bytes; the bundled template has Prettier table formatting and explicit evidence prompts for summaries, exceptions, connections and before/after claims. The hashes in [source-pack retrieval](tasks.md#t004-source-pack-retrieval) identify the original reviewed baseline, not the revised template. The relative template link resolves, and the skill-creator metadata validator passes.
 
 This branch carries the skill, template and validation record. Generated source context remains private and outside the repository; a fresh checkout does not need the original pack to use the skill. Local evaluation inputs and outputs are retained separately under the user's local application-data directory, in `atlas-t004-validation`; they are not published by this repository.
 
