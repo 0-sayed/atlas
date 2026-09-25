@@ -1,5 +1,5 @@
-import type { CreateRequest } from '../shared/contracts.js'
-export const seed: CreateRequest = {
+import type { CreateRequest, BookingFeature } from '../shared/contracts.js'
+export const seed: CreateRequest & { features: BookingFeature[] } = {
   contractVersion: 1,
   id: 'booking-demo',
   title: 'Illustrative booking guide',

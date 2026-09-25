@@ -3,7 +3,7 @@ test('an API rule edit updates current views on refresh, preserving history', as
   page,
   request,
 }) => {
-  await page.goto('/#/explore/booking?case=at-limit')
+  await page.goto('/#/projects/booking-demo/explore/booking?case=at-limit')
   await expect(
     page.getByRole('heading', { name: 'Booking moved', exact: true }),
   ).toBeVisible()
@@ -58,7 +58,7 @@ test('an API rule edit updates current views on refresh, preserving history', as
 test('refresh failure labels retained knowledge and initial failure has a retry', async ({
   page,
 }) => {
-  await page.goto('/#/')
+  await page.goto('/#/projects/booking-demo/')
   await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
   await page.route('**/api/v1/projects/booking-demo', (route) => route.abort())
   await page.getByRole('button', { name: 'Refresh guide' }).click()
@@ -118,7 +118,7 @@ test('saved case identity, actor and registered artwork reach current UI', async
         })
       ).ok(),
     ).toBeTruthy()
-    await page.goto('/#/')
+    await page.goto('/#/projects/booking-demo/')
     await page.getByRole('link', { name: /Explore the story/ }).click()
     await expect(page).toHaveURL(/case=eligible/)
     await expect(
@@ -136,12 +136,12 @@ test('saved case identity, actor and registered artwork reach current UI', async
         art.evaluate((image) => (image as HTMLImageElement).naturalWidth),
       )
       .toBe(1)
-    await page.goto('/#/explore')
+    await page.goto('/#/projects/booking-demo/explore')
     await page
       .getByRole('link', { name: 'Reschedule a booking', exact: true })
       .click()
     await expect(page).toHaveURL(/case=eligible/)
-    await page.goto('/#/explore/booking')
+    await page.goto('/#/projects/booking-demo/explore/booking')
     await expect(
       page.getByRole('heading', { name: 'Booking moved', exact: true }),
     ).toBeVisible()

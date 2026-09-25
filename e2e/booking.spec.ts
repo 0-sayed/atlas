@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test('saved cases change the scene and explain isolated conditions', async ({
   page,
 }) => {
-  await page.goto('/#/explore/booking?case=at-limit')
+  await page.goto('/#/projects/booking-demo/explore/booking?case=at-limit')
   await expect(
     page.getByRole('heading', { name: 'Booking moved', exact: true }),
   ).toBeVisible()
@@ -54,7 +54,7 @@ test('saved cases change the scene and explain isolated conditions', async ({
 test('search opens the activity directly and return preserves the query', async ({
   page,
 }) => {
-  await page.goto('/#/explore')
+  await page.goto('/#/projects/booking-demo/explore')
   const search = page.getByRole('searchbox', { name: 'Search activities' })
   await search.fill('MOVE')
   await page
@@ -77,7 +77,7 @@ test('search opens the activity directly and return preserves the query', async 
 test('browser Back restores the selected case and earlier search', async ({
   page,
 }) => {
-  await page.goto('/#/explore?q=booking')
+  await page.goto('/#/projects/booking-demo/explore?q=booking')
   await page
     .getByRole('link', { name: 'Reschedule a booking', exact: true })
     .click()
@@ -102,7 +102,9 @@ test('browser Back restores the selected case and earlier search', async ({
 test('missing activity and case links cannot show a successful booking', async ({
   page,
 }) => {
-  await page.goto('/#/explore/booking?case=missing&q=move')
+  await page.goto(
+    '/#/projects/booking-demo/explore/booking?case=missing&q=move',
+  )
   await expect(
     page.getByRole('heading', { name: 'This guide is not here yet' }),
   ).toBeVisible()
@@ -118,7 +120,7 @@ test('missing activity and case links cannot show a successful booking', async (
     '/explore/booking?case=missing',
     '/explore/booking?case=',
   ]) {
-    await page.goto(`/#${route}`)
+    await page.goto(`/#/projects/booking-demo${route}`)
     await expect(
       page.getByRole('heading', { name: 'This guide is not here yet' }),
     ).toBeVisible()
@@ -131,7 +133,7 @@ test('missing activity and case links cannot show a successful booking', async (
 test('a historical comparison keeps the same 36-hour booking and links to its current case', async ({
   page,
 }) => {
-  await page.goto('/#/changes')
+  await page.goto('/#/projects/booking-demo/changes')
   await expect(
     page.getByRole('heading', { name: 'Previously blocked' }),
   ).toBeVisible()
@@ -182,7 +184,7 @@ test('the learning loop works by keyboard, at narrow widths and with reduced mot
 }) => {
   await page.setViewportSize({ width: 375, height: 800 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/#/')
+  await page.goto('/#/projects/booking-demo/')
   await page.getByRole('link', { name: /Explore the story/ }).focus()
   await page.keyboard.press('Enter')
   await expect(
@@ -235,21 +237,27 @@ test('return restores the actual Explore position and new destinations start at 
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 600 })
-  await page.goto('/#/explore?q=move')
+  await page.goto('/#/projects/booking-demo/explore?q=move')
   await expect(
     page.getByRole('heading', { name: 'Explore', exact: true }),
   ).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 220))
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
-  await page
-    .getByRole('link', { name: 'Reschedule a booking', exact: true })
-    .click()
+  const activity = page.getByRole('link', {
+    name: 'Reschedule a booking',
+    exact: true,
+  })
+  await activity.scrollIntoViewIfNeeded()
+  const explorePosition = await page.evaluate(() => window.scrollY)
+  await activity.click()
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
   await page.getByRole('link', { name: 'Back to Explore', exact: true }).click()
   await expect(
     page.getByRole('searchbox', { name: 'Search activities' }),
   ).toHaveValue('move')
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBe(explorePosition)
   await page
     .getByRole('link', { name: 'Reschedule a booking', exact: true })
     .click()
@@ -278,7 +286,7 @@ test('unavailable guide return restores the actual Explore position', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 600 })
-  await page.goto('/#/explore?q=move')
+  await page.goto('/#/projects/booking-demo/explore?q=move')
   await expect(
     page.getByRole('heading', { name: 'Explore', exact: true }),
   ).toBeVisible()
@@ -286,7 +294,7 @@ test('unavailable guide return restores the actual Explore position', async ({
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
   await page.evaluate(() => {
     const link = document.createElement('a')
-    link.href = '#/explore/booking?case=missing&q=move'
+    link.href = '#/projects/booking-demo/explore/booking?case=missing&q=move'
     link.textContent = 'Open unavailable guide'
     document.body.append(link)
     link.click()
@@ -307,7 +315,7 @@ test('changing a saved case preserves the viewport position', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 600 })
-  await page.goto('/#/explore/booking?case=at-limit')
+  await page.goto('/#/projects/booking-demo/explore/booking?case=at-limit')
   await expect(
     page.getByRole('heading', { name: 'Booking moved', exact: true }),
   ).toBeVisible()

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
-import { useBooking } from '../content/knowledge'
+import { useBooking, useProject, projectPath } from '../content/knowledge'
+import { FeatureEvidence } from '../components/FeatureDetail'
 import { RegisteredArt } from '../components/RegisteredArt'
 import { BookingScene } from '../scenes/BookingScene'
 import { FixtureLabel, MissingPage } from './GuidePages'
@@ -14,6 +15,9 @@ export function BookingPage() {
     getBookingCase,
     defaultCaseId,
   } = useBooking()
+  const project = useProject()
+  const base = projectPath(project.id)
+  const feature = project.features.find((f) => f.id === booking.id)!
   const [params, setParams] = useSearchParams()
   const location = useLocation()
   const example = getBookingCase(params.get('case') ?? defaultCaseId)
@@ -23,10 +27,10 @@ export function BookingPage() {
   const origin = params.get('from')
   const returnPath =
     origin === 'start'
-      ? '/'
+      ? base
       : origin === 'changes'
-        ? '/changes'
-        : `/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
+        ? `${base}/changes`
+        : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
   const returnLabel =
     origin === 'start'
       ? 'Back to Start here'
@@ -44,7 +48,7 @@ export function BookingPage() {
         <span aria-hidden="true">← </span>
         {returnLabel}
       </Link>
-      <FixtureLabel />
+      <FixtureLabel feature={feature} />
       <div className="feature-heading">
         <div>
           <p className="eyebrow">Booking / {booking.actor}</p>
@@ -84,7 +88,7 @@ export function BookingPage() {
       {booking.assetIds.map((id) => (
         <RegisteredArt
           key={id}
-          projectId="booking-demo"
+          projectId={project.id}
           assetId={id}
           title={booking.title}
         />
@@ -106,7 +110,7 @@ export function BookingPage() {
           Why this outcome?{' '}
           <span aria-hidden="true">{detailOpen ? '−' : '+'}</span>
         </button>
-        <Link to="/changes">
+        <Link to={`${base}/changes`}>
           See what changed <span aria-hidden="true">↗</span>
         </Link>
       </div>
@@ -120,11 +124,7 @@ export function BookingPage() {
             <p className="eyebrow">The reason</p>
             <h2 id="reason-title">{example.result}</h2>
             <p>{example.reason}</p>
-            <h3>About this evidence</h3>
-            <p>{booking.evidence}</p>
-            <p className="revision-note">
-              {booking.revision} · Saved illustrative case: {example.label}
-            </p>
+            <FeatureEvidence feature={feature} />
           </div>
           <button
             type="button"

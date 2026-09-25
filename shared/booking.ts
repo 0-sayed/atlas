@@ -1,4 +1,4 @@
-import type { Feature, SavedCase } from './contracts.js'
+import type { BookingFeature, SavedCase } from './contracts.js'
 export type BookingCase = SavedCase & {
   outcome: 'allowed' | 'blocked' | 'unknown'
   result: string
@@ -50,7 +50,7 @@ function explain(item: SavedCase, notice: number): BookingCase {
     reason: `${item.hours} hours meets the “at least ${notice} hours” notice requirement. You own this confirmed booking and the replacement slot is free.`,
   }
 }
-export function bookingView(feature: Feature) {
+export function bookingView(feature: BookingFeature) {
   const booking = {
     id: feature.id,
     title: feature.title,

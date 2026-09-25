@@ -1,24 +1,54 @@
 import { Link, useSearchParams } from 'react-router'
-import { useBooking } from '../content/knowledge'
+import { isBookingFeature, type Feature } from '../../shared/contracts'
+import { useProject, projectPath } from '../content/knowledge'
 import { CalendarArt } from '../scenes/BookingScene'
+import { ApprovalArt } from '../scenes/ApprovalScene'
 
-export function FixtureLabel() {
-  const { booking } = useBooking()
+export function FixtureLabel({ feature }: { feature?: Feature }) {
+  const project = useProject()
   return (
     <p className="fixture-label">
       <span aria-hidden="true">◇</span>{' '}
-      {booking.status === 'demo'
-        ? 'Illustrative fixture'
-        : booking.status === 'uncertain'
-          ? 'Uncertain evidence'
-          : 'Source-supported guide'}{' '}
-      · {booking.revision} · Not a live booking app
+      {feature
+        ? `${feature.evidence.status === 'demo' ? 'Illustrative fixture' : feature.evidence.status === 'uncertain' ? 'Uncertain evidence' : 'Source-supported guide'} · ${feature.revisionLabel}`
+        : project.title}{' '}
+      · Atlas revision {project.revision} · No live product connection
     </p>
   )
 }
-
+export function FeatureArt({ feature }: { feature: Feature }) {
+  return isBookingFeature(feature) ? <CalendarArt /> : <ApprovalArt />
+}
+function featureLink(
+  projectId: string,
+  feature: Feature,
+  from: string,
+  query = '',
+) {
+  const caseId =
+    feature.cases[0]?.id ?? (isBookingFeature(feature) ? 'change-now' : '')
+  const params = new URLSearchParams({ from })
+  if (caseId) params.set('case', caseId)
+  if (query) params.set('q', query)
+  return `${projectPath(projectId)}/explore/${feature.id}?${params}`
+}
+export function EmptyGuide() {
+  return (
+    <div className="empty-search">
+      <h2>No activities incorporated yet</h2>
+      <p>This saved guide does not establish any product behavior yet.</p>
+    </div>
+  )
+}
 export function StartPage() {
-  const { booking, defaultCaseId } = useBooking()
+  const project = useProject()
+  const essentials = [...project.features]
+    .sort(
+      (a, b) =>
+        (a.essentialOrder ?? 100) - (b.essentialOrder ?? 100) ||
+        a.id.localeCompare(b.id),
+    )
+    .slice(0, 3)
   return (
     <section className="start-page" aria-labelledby="page-title">
       <FixtureLabel />
@@ -31,38 +61,75 @@ export function StartPage() {
           Find out what changes the outcome.
         </p>
       </div>
-      <Link
-        className="activity-hero"
-        to={`/explore/booking?${new URLSearchParams({ case: defaultCaseId, from: 'start' })}`}
-      >
-        <div className="hero-art">
-          <CalendarArt />
-          <span className="art-spark" aria-hidden="true">
-            ✦
-          </span>
-        </div>
-        <div className="activity-copy">
-          <p className="eyebrow">01 / Booking example</p>
-          <h2>{booking.title}</h2>
-          <p>{booking.purpose}</p>
-          <span className="text-link">
-            Explore the story <span aria-hidden="true">↗</span>
-          </span>
-        </div>
-      </Link>
-      <p className="start-note">
-        One activity, a few different outcomes. Select a saved case to see what
-        matters.
-      </p>
+      {essentials.length === 0 ? (
+        <EmptyGuide />
+      ) : (
+        essentials.map((feature, index) => (
+          <Link
+            key={feature.id}
+            className="activity-hero"
+            to={featureLink(project.id, feature, 'start')}
+          >
+            <div className="hero-art">
+              <FeatureArt feature={feature} />
+              <span className="art-spark" aria-hidden="true">
+                ✦
+              </span>
+            </div>
+            <div className="activity-copy">
+              <p className="eyebrow">
+                {String(index + 1).padStart(2, '0')} /{' '}
+                {feature.group ??
+                  (isBookingFeature(feature) ? 'Bookings' : 'Reviews')}
+              </p>
+              <h2>{feature.title}</h2>
+              <p>{feature.purpose}</p>
+              <p>
+                {isBookingFeature(feature)
+                  ? `At least ${feature.noticeHours} hours’ notice`
+                  : `At least ${feature.requiredApprovals} independent approvals`}
+              </p>
+              <p className="revision-note">
+                {feature.evidence.status === 'demo'
+                  ? 'Illustrative fixture'
+                  : feature.evidence.status === 'uncertain'
+                    ? 'Uncertain evidence'
+                    : 'Source-supported'}
+              </p>
+              <span className="text-link">Explore the story ↗</span>
+            </div>
+          </Link>
+        ))
+      )}
+      {essentials.length > 0 && (
+        <p className="start-note">
+          Select a saved case to see what matters.{' '}
+          <Link to={`${projectPath(project.id)}/explore`}>
+            Explore all activities ↗
+          </Link>
+        </p>
+      )}
     </section>
   )
 }
-
 export function ExplorePage() {
-  const { booking, matchesBooking, defaultCaseId } = useBooking()
+  const project = useProject()
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
-  const destination = `/explore/booking?${new URLSearchParams({ case: defaultCaseId, from: 'explore', q: query })}`
+  const words = query.trim().toLocaleLowerCase().split(/\s+/)
+  const matches = project.features.filter((f) =>
+    words.every((word) =>
+      `${f.title} ${f.purpose} ${f.actor} ${f.group ?? ''} ${f.cases.map((c) => c.label).join(' ')}`
+        .toLocaleLowerCase()
+        .includes(word),
+    ),
+  )
+  const groups = new Map<string, Feature[]>()
+  for (const feature of matches) {
+    const group =
+      feature.group ?? (isBookingFeature(feature) ? 'Bookings' : 'Reviews')
+    groups.set(group, [...(groups.get(group) ?? []), feature])
+  }
   return (
     <section className="explore-page" aria-labelledby="page-title">
       <FixtureLabel />
@@ -72,17 +139,17 @@ export function ExplorePage() {
       <form
         role="search"
         className="search-form"
-        onSubmit={(event) => event.preventDefault()}
+        onSubmit={(e) => e.preventDefault()}
       >
         <label htmlFor="activity-search">Search activities</label>
         <div className="search-row">
           <input
             id="activity-search"
             type="search"
-            placeholder="Try “move” or “booking”"
+            placeholder="Find an activity or saved case"
             value={query}
-            onChange={(event) =>
-              setParams(event.target.value ? { q: event.target.value } : {}, {
+            onChange={(e) =>
+              setParams(e.target.value ? { q: e.target.value } : {}, {
                 replace: true,
               })
             }
@@ -97,107 +164,53 @@ export function ExplorePage() {
           )}
         </div>
       </form>
-      {matchesBooking(query) ? (
-        <div className="activity-group">
-          <p className="eyebrow">Bookings / 1 illustrative activity</p>
-          <Link
-            className="activity-card"
-            aria-label={booking.title}
-            to={destination}
-          >
-            <CalendarArt />
-            <div>
-              <h2>{booking.title}</h2>
-              <p>{booking.purpose}</p>
-              <span className="text-link">
-                See the cases <span aria-hidden="true">↗</span>
-              </span>
-            </div>
-          </Link>
-        </div>
-      ) : (
+      {!project.features.length ? (
+        <EmptyGuide />
+      ) : matches.length === 0 ? (
         <div className="empty-search">
           <h2>No matching activity</h2>
-          <p>
-            This fixture guide contains one booking activity. Try “booking” or
-            clear your search.
-          </p>
+          <p>Try another word or clear your search within this project.</p>
         </div>
+      ) : (
+        [...groups].map(([group, features]) => (
+          <div className="activity-group" key={group}>
+            <h2 className="eyebrow">
+              {group} / {features.length}{' '}
+              {features.length === 1 ? 'activity' : 'activities'}
+            </h2>
+            {features.map((feature) => (
+              <Link
+                className="activity-card"
+                aria-label={feature.title}
+                key={feature.id}
+                to={featureLink(project.id, feature, 'explore', query)}
+              >
+                <FeatureArt feature={feature} />
+                <div>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.purpose}</p>
+                  <p className="revision-note">
+                    {feature.evidence.status === 'demo'
+                      ? 'Illustrative fixture'
+                      : feature.evidence.status === 'uncertain'
+                        ? 'Uncertain evidence'
+                        : 'Source-supported'}
+                  </p>
+                  <span className="text-link">See the cases ↗</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ))
       )}
     </section>
   )
 }
-
-export function ChangesPage() {
-  const { bookingChange } = useBooking()
-  return (
-    <section className="changes-page" aria-labelledby="page-title">
-      <FixtureLabel />
-      <p className="eyebrow">A small rule. A different possibility.</p>
-      <h1 id="page-title">What changed</h1>
-      <div className="change-heading">
-        <h2>{bookingChange.title}</h2>
-        <p>
-          The notice requirement changed from {bookingChange.before.noticeHours}{' '}
-          to {bookingChange.after.noticeHours} hours.
-        </p>
-      </div>
-      <div className="comparison-context">
-        <span className="context-number">
-          {bookingChange.after.example.hours}
-          <small>hours remaining</small>
-        </span>
-        <div>
-          <strong>The same booking. The same free slot.</strong>
-          <p>
-            Your confirmed booking, before its original start. Only the notice
-            rule changes.
-          </p>
-        </div>
-      </div>
-      <div className="comparison-grid">
-        {[bookingChange.before, bookingChange.after].map((snapshot) => (
-          <article
-            key={snapshot.revision}
-            className={`comparison-card outcome-${snapshot.example.outcome}`}
-          >
-            <p className="eyebrow">{snapshot.revision}</p>
-            <CalendarArt
-              state={
-                snapshot.example.outcome === 'allowed' ? 'moved' : 'blocked'
-              }
-            />
-            <p className="notice-rule">
-              At least {snapshot.noticeHours} hours’ notice
-            </p>
-            <h2>{snapshot.example.result}</h2>
-            <p>{snapshot.example.reason}</p>
-          </article>
-        ))}
-      </div>
-      <div className="comparison-footer">
-        <p>
-          A recorded fixture comparison, not a production release or measured
-          business impact.
-        </p>
-        <Link
-          className="primary-link"
-          to="/explore/booking?case=change-now&from=changes"
-        >
-          Explore this change <span aria-hidden="true">↗</span>
-        </Link>
-      </div>
-    </section>
-  )
-}
-
 export function MissingPage() {
+  const project = useProject()
   const [params] = useSearchParams()
   const query = params.get('q')
-  const returnPath = query
-    ? `/explore?${new URLSearchParams({ q: query })}`
-    : '/explore'
-
+  const returnPath = `${projectPath(project.id)}/explore${query ? `?${new URLSearchParams({ q: query })}` : ''}`
   return (
     <section className="missing-page" aria-labelledby="page-title">
       <p className="eyebrow">Atlas / Unavailable</p>

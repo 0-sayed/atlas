@@ -25,16 +25,21 @@ export const caseSchema = z.strictObject({
   confirmed: z.boolean(),
   slot: z.enum(['free', 'occupied', 'unknown']),
 })
-export const featureSchema = z.strictObject({
+const featureFields = {
   id: idSchema,
   title: short,
   actor: short,
   purpose: text,
-  scene: z.strictObject({ kind: z.literal('booking'), version: z.literal(1) }),
-  noticeHours: z.number().min(0).max(876000),
+  group: short.optional(),
+  essentialOrder: z.number().int().min(0).max(100).optional(),
   revisionLabel: short,
   evidence: evidenceSchema,
   assetIds: z.array(idSchema).max(20),
+}
+export const bookingFeatureSchema = z.strictObject({
+  ...featureFields,
+  scene: z.strictObject({ kind: z.literal('booking'), version: z.literal(1) }),
+  noticeHours: z.number().min(0).max(876000),
   cases: z.array(caseSchema).max(100),
   comparison: z.strictObject({
     title: short,
@@ -43,6 +48,23 @@ export const featureSchema = z.strictObject({
     beforeRevision: short,
   }),
 })
+export const approvalCaseSchema = z.strictObject({
+  id: idSchema,
+  label: short,
+  role: z.enum(['reviewer', 'requester']),
+  state: z.enum(['pending', 'closed']),
+  approvals: z.number().int().min(0).max(10).nullable(),
+})
+export const approvalFeatureSchema = z.strictObject({
+  ...featureFields,
+  scene: z.strictObject({ kind: z.literal('approval'), version: z.literal(1) }),
+  requiredApprovals: z.number().int().min(1).max(10),
+  cases: z.array(approvalCaseSchema).max(100),
+})
+export const featureSchema = z.union([
+  bookingFeatureSchema,
+  approvalFeatureSchema,
+])
 export const relationSchema = z.strictObject({
   id: idSchema,
   from: idSchema,
@@ -85,6 +107,12 @@ export const documentSchema = createSchema.extend({
   assets: z.array(assetSchema).max(200),
 })
 export type Feature = z.infer<typeof featureSchema>
+export type BookingFeature = z.infer<typeof bookingFeatureSchema>
+export type ApprovalFeature = z.infer<typeof approvalFeatureSchema>
+export type ApprovalCase = z.infer<typeof approvalCaseSchema>
+export function isBookingFeature(feature: Feature): feature is BookingFeature {
+  return feature.scene.kind === 'booking'
+}
 export type SavedCase = z.infer<typeof caseSchema>
 export type CreateRequest = z.infer<typeof createSchema>
 export type UpdateRequest = z.infer<typeof updateSchema>
