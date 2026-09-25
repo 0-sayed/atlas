@@ -31,6 +31,12 @@ test('source-supported booking comparisons retain their evidence status', async 
   ).toBeTruthy()
   await page.goto(`/#/projects/${id}/changes`)
   await expect(
+    page.getByRole('region', {
+      name: 'More time to change your plans',
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
     page.getByText(
       'A recorded historical comparison, not proof of a production release or measured business impact.',
       { exact: true },
@@ -111,7 +117,7 @@ test('history explains case-only edits, prerequisites and removed activities', a
     .last()
     .click()
   await expect(
-    history.getByText('Request approved', { exact: true }).first(),
+    history.getByText('Ready for approval', { exact: true }).first(),
   ).toBeVisible()
   await expect(
     history.getByText('More reviews needed', { exact: true }),
@@ -168,7 +174,7 @@ test('creates a non-booking guide through the API and explores both projects in 
   ).toBeVisible()
   await page.getByRole('link', { name: /Explore the story/ }).click()
   await expect(
-    page.getByRole('heading', { name: 'Request approved', exact: true }),
+    page.getByRole('heading', { name: 'Ready for approval', exact: true }),
   ).toBeVisible()
   await page
     .getByRole('button', { name: 'Reviews unknown', exact: true })
@@ -182,7 +188,7 @@ test('creates a non-booking guide through the API and explores both projects in 
   ).toBeVisible()
   await page.goBack()
   await expect(
-    page.getByRole('heading', { name: 'Request approved', exact: true }),
+    page.getByRole('heading', { name: 'Ready for approval', exact: true }),
   ).toBeVisible()
   await page.getByRole('link', { name: 'Explore', exact: true }).click()
   await page.getByRole('searchbox').fill('publishing')
@@ -216,7 +222,7 @@ test('rule updates preserve selected cases and historical comparisons in one run
   expect(original.ok()).toBeTruthy()
   await page.goto(`/#/projects/${id}/explore/approval?case=at-limit`)
   await expect(
-    page.getByRole('heading', { name: 'Request approved', exact: true }),
+    page.getByRole('heading', { name: 'Ready for approval', exact: true }),
   ).toBeVisible()
   expect(
     (
@@ -244,7 +250,7 @@ test('rule updates preserve selected cases and historical comparisons in one run
     page.getByText('1 → 2 independent approvals', { exact: true }),
   ).toBeVisible()
   await expect(
-    page.getByText('Request approved → More reviews needed', { exact: true }),
+    page.getByText('Ready for approval → More reviews needed', { exact: true }),
   ).toBeVisible()
   expect(
     (
@@ -313,7 +319,7 @@ test('project loading and failure never reuse another project’s facts, cases o
   await page.getByRole('link', { name: /Explore the story/ }).click()
   await expect(page).toHaveURL(new RegExp(`/projects/${id}/explore/booking`))
   await expect(
-    page.getByRole('heading', { name: 'Request approved', exact: true }),
+    page.getByRole('heading', { name: 'Ready for approval', exact: true }),
   ).toBeVisible()
   await expect(
     page.getByRole('button', { name: 'Why this outcome?' }),

@@ -131,7 +131,7 @@ export function validateDocument(input: unknown): ProjectDocument {
   const assets = new Set(doc.assets.map((a) => a.id))
   for (const f of doc.features) {
     uniqueIds(f.cases)
-    if (f.cases.some((c) => c.id === 'change-now'))
+    if (isBookingFeature(f) && f.cases.some((c) => c.id === 'change-now'))
       throw new Error('Reserved case ID')
     if (
       new Set(f.assetIds).size !== f.assetIds.length ||

@@ -32,7 +32,7 @@ export function approvalOutcome(
     }
   return {
     outcome: 'allowed' as const,
-    result: 'Request approved',
+    result: 'Ready for approval',
     reason: `The pending request has at least ${feature.requiredApprovals} independent approvals and a reviewer may approve it.`,
   }
 }

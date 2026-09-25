@@ -5,7 +5,7 @@ export function BookingComparison() {
   const { bookingChange, booking } = useBooking()
   const project = useProject()
   return (
-    <section className="changes-page" aria-labelledby="page-title">
+    <section className="changes-page" aria-label={bookingChange.title}>
       <p className="eyebrow">A small rule. A different possibility.</p>
 
       <div className="change-heading">

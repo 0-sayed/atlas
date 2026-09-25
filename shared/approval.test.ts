@@ -10,7 +10,10 @@ import { join } from 'node:path'
 
 it('derives approvals from the current rule without inventing unknown counts', () => {
   const example = approvalFeature.cases[0]
-  expect(approvalOutcome(approvalFeature, example).outcome).toBe('allowed')
+  expect(approvalOutcome(approvalFeature, example)).toMatchObject({
+    outcome: 'allowed',
+    result: 'Ready for approval',
+  })
   expect(
     approvalOutcome({ ...approvalFeature, requiredApprovals: 2 }, example)
       .outcome,
@@ -73,4 +76,13 @@ it('persists distinct scenes, scoped overlapping IDs and immutable approval hist
     store.close()
     rmSync(dir, { recursive: true, force: true })
   }
+})
+
+it('allows approval cases named change-now while reserving it for booking', () => {
+  const approval = structuredClone({ ...approvalSeed, revision: 1, assets: [] })
+  approval.features[0].cases[0].id = 'change-now'
+  expect(() => validateDocument(approval)).not.toThrow()
+  const booking = structuredClone({ ...seed, revision: 1, assets: [] })
+  booking.features[0].cases[0].id = 'change-now'
+  expect(() => validateDocument(booking)).toThrow('Reserved')
 })
