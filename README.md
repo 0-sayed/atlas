@@ -1,6 +1,6 @@
 # Atlas
 
-Atlas explains saved product knowledge through interactive scenes. The booking guide is an **illustrative fixture**, not verified source behavior or a real booking app. React reads a local NestJS API; one SQLite database owns knowledge, revisions, relationships and registered assets. Source interpretation and `fill-atlas` remain outside the app.
+Atlas explains saved product knowledge through interactive scenes. The booking guide is an **illustrative fixture**, not verified source behavior or a real booking app. React reads a local NestJS API; one SQLite database owns knowledge, revisions, relationships and registered assets. Source interpretation and `fill-atlas` remain outside the app runtime. The standalone [skill](.agents/skills/fill-atlas/SKILL.md) and [context template](.agents/skills/fill-atlas/assets/context.template.md) are included in this repository; Codex discovers it from `.agents/skills/` when working in this repository. To use it in other projects, install a copy in your agent's user-level skills directory.
 
 ## Run locally
 
