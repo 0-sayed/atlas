@@ -1,4 +1,11 @@
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs'
+import {
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+  mkdirSync,
+  readFileSync,
+} from 'node:fs'
+import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { expect, it } from 'vitest'
@@ -77,6 +84,36 @@ it('rejects corrupt knowledge beyond the first public page during restore', asyn
       '{}',
       'p-100',
     )
+    db.close()
+    // Keep the checksum consistent to exercise semantic validation, not hashing.
+    writeFileSync(
+      join(archive, 'manifest.json'),
+      JSON.stringify({
+        version: 1,
+        databaseSha256: createHash('sha256')
+          .update(readFileSync(join(archive, 'atlas.sqlite')))
+          .digest('hex'),
+      }),
+    )
+    await expect(restore(archive, join(root, 'restored'))).rejects.toThrow()
+  } finally {
+    store.close()
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+it('rejects a backup with deleted history even when SQLite integrity passes', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'atlas-history-backup-'))
+  const dir = join(root, 'live')
+  const archive = join(root, 'backup')
+  const store = new Store(dir)
+  try {
+    store.create(seed)
+    store.close()
+    await backup(dir, archive)
+    const { default: Database } = await import('better-sqlite3')
+    const db = new Database(join(archive, 'atlas.sqlite'))
+    db.exec('DELETE FROM history')
+    expect(db.pragma('integrity_check', { simple: true })).toBe('ok')
     db.close()
     await expect(restore(archive, join(root, 'restored'))).rejects.toThrow()
   } finally {

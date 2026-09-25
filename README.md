@@ -75,7 +75,7 @@ Errors use `{ "error": { "code": "revision_conflict", "message": "..." } }`; sha
 
 Tracked SQL is in `migrations/`, currently schema 2. Every connection enables foreign keys. Batches, snapshots and revisions commit together. Images are staged completely before registration; generated keys and symlink checks restrict serving.
 
-Before upgrading, stop Atlas and back up using the **existing compatible version**. Backup locks out the app and uses SQLite's backup facility without applying migrations, plus registered assets. Startup/migrate applies migrations transactionally; future schema versions are rejected.
+Before upgrading, stop Atlas and back up using the **existing compatible version**. Backup locks out the app and uses SQLite's backup facility without applying migrations, plus registered assets and a database checksum manifest. Keep the manifest with the backup; restore verifies it before migrations, so changed or missing history cannot silently pass SQLite integrity checks. Startup/migrate applies migrations transactionally; future schema versions are rejected.
 
 ```sh
 # Server stopped; destination must not exist.

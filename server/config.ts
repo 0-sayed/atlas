@@ -8,6 +8,11 @@ export type Config = {
   staticDir?: string
 }
 const port = z.coerce.number().int().min(1024).max(65535)
+export function dataDirectory(value = process.env.ATLAS_DATA_DIR) {
+  if (value !== undefined && !value.trim())
+    throw new Error('ATLAS_DATA_DIR must not be empty')
+  return resolve(value ?? '.local')
+}
 export function config(): Config {
   const token = z
     .string()
@@ -16,7 +21,7 @@ export function config(): Config {
     .regex(/^[A-Za-z0-9_-]+$/)
     .parse(process.env.ATLAS_WRITE_TOKEN)
   return {
-    dir: resolve(process.env.ATLAS_DATA_DIR ?? '.local'),
+    dir: dataDirectory(),
     port: port.parse(process.env.ATLAS_PORT ?? 4317),
     frontendPort: port.parse(process.env.ATLAS_FRONTEND_PORT ?? 5173),
     token,

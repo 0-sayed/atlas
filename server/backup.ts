@@ -7,11 +7,22 @@ import {
   rmSync,
   renameSync,
   writeFileSync,
+  readFileSync,
 } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { randomUUID } from 'node:crypto'
+import { randomUUID, createHash } from 'node:crypto'
+import { z } from 'zod'
 import { Store } from './store.js'
 import { readAssetFile } from './assets.js'
+const manifestSchema = z.strictObject({
+  version: z.literal(1),
+  databaseSha256: z.string().regex(/^[a-f0-9]{64}$/),
+})
+function databaseHash(dir: string) {
+  return createHash('sha256')
+    .update(readFileSync(join(dir, 'atlas.sqlite')))
+    .digest('hex')
+}
 function assertNew(path: string) {
   if (existsSync(path))
     throw new Error('Destination already exists; choose a new directory')
@@ -26,6 +37,11 @@ export async function backup(dir: string, destination: string) {
     mkdirSync(stage, { recursive: true, mode: 0o700 })
     mkdirSync(join(stage, 'assets'))
     await store.db.backup(join(stage, 'atlas.sqlite'))
+    writeFileSync(
+      join(stage, 'manifest.json'),
+      JSON.stringify({ version: 1, databaseSha256: databaseHash(stage) }),
+      { flag: 'wx', mode: 0o600 },
+    )
     const rows = store.db
       .prepare('SELECT storage_key AS key FROM assets')
       .all() as { key: string }[]
@@ -50,6 +66,11 @@ export async function restore(source: string, destination: string) {
     mkdirSync(stage, { recursive: true, mode: 0o700 })
     mkdirSync(join(stage, 'assets'))
     copyFileSync(join(source, 'atlas.sqlite'), join(stage, 'atlas.sqlite'))
+    const manifest = manifestSchema.parse(
+      JSON.parse(readFileSync(join(source, 'manifest.json'), 'utf8')),
+    )
+    if (databaseHash(stage) !== manifest.databaseSha256)
+      throw new Error('Backup database checksum mismatch')
     for (const key of readdirSync(join(source, 'assets')))
       writeFileSync(join(stage, 'assets', key), readAssetFile(source, key), {
         flag: 'wx',

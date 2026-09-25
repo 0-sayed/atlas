@@ -1,8 +1,9 @@
 import { resolve } from 'node:path'
 import { Store } from './store.js'
 import { backup, restore } from './backup.js'
+import { dataDirectory } from './config.js'
 const [command, target] = process.argv.slice(2)
-const dir = resolve(process.env.ATLAS_DATA_DIR ?? '.local')
+const dir = dataDirectory()
 if (command === 'migrate') {
   const store = new Store(dir)
   store.close()
@@ -11,6 +12,8 @@ if (command === 'migrate') {
   await backup(dir, resolve(target))
   console.log('Database and assets backed up')
 } else if (command === 'restore' && target) {
+  if (!process.env.ATLAS_DATA_DIR)
+    throw new Error('Restore requires an explicit new ATLAS_DATA_DIR')
   await restore(resolve(target), dir)
   console.log('Database and assets restored')
 } else
