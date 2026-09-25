@@ -5,7 +5,7 @@ import {
 } from './contracts.js'
 
 export type FeatureChange = {
-  kind: 'added' | 'changed' | 'removed'
+  kind: 'added' | 'changed' | 'removed' | 'evidence'
   id: string
   before?: Feature
   after?: Feature
@@ -78,6 +78,15 @@ export function featureChanges(
     else if (behavior(previous) !== behavior(current))
       changes.push({
         kind: 'changed',
+        id: current.id,
+        before: previous,
+        after: current,
+      })
+    else if (
+      JSON.stringify(previous.evidence) !== JSON.stringify(current.evidence)
+    )
+      changes.push({
+        kind: 'evidence',
         id: current.id,
         before: previous,
         after: current,

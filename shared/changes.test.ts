@@ -30,8 +30,7 @@ it('keeps saved rule values and distinguishes addition, change, removal and meta
       features: [
         {
           ...approvalFeature,
-          revisionLabel: 'new evidence',
-          evidence: { ...approvalFeature.evidence, sourceRevision: 'new' },
+          revisionLabel: 'new label',
         },
       ],
     }),
@@ -119,4 +118,28 @@ it('records added, removed and retargeted product relationships with scoped titl
       relations: [{ ...after.relations[0], kind: 'related' }],
     }).map((c) => c.kind),
   ).toEqual(['removed', 'added'])
+})
+
+it('exposes evidence corrections with original and corrected snapshots', () => {
+  const corrected = {
+    ...approvalFeature,
+    evidence: {
+      ...approvalFeature.evidence,
+      description: 'Corrected source prerequisite.',
+    },
+  }
+  expect(
+    featureChanges(original, {
+      ...original,
+      revision: 2,
+      features: [corrected],
+    }),
+  ).toEqual([
+    {
+      kind: 'evidence',
+      id: approvalFeature.id,
+      before: approvalFeature,
+      after: corrected,
+    },
+  ])
 })

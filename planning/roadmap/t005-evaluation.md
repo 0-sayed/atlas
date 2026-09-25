@@ -1,6 +1,6 @@
 # T005 — first real-source guide
 
-Status: runtime and local incorporation implemented; human comprehension and voluntary-return evaluation pending. This is not a claim of production deployment or broad source-extraction accuracy.
+Status: runtime and local incorporation implemented; human comprehension and voluntary-return evaluation inconclusive. This is not a claim of production deployment or broad source-extraction accuracy.
 
 ## What was evaluated
 
@@ -42,11 +42,21 @@ Observed on 2026-09-25: initial GET returned 404; create produced Atlas revision
 - Strict contract tests reject unsupported versions, mixed-scene fields, and invalid outcomes. Real SQLite tests cover restart persistence, immutable history, preservation of unrelated scenes, and stale/invalid-write rollback.
 - Browser tests exercise case selection, direct links, Back/search restoration, unknown and missing cases, empty cases, evidence, current/history outcomes, and keyboard/mobile use. Existing booking/approval coverage stays active.
 - Local real-guide checks cover both activities, source evidence, changed exploration snapshots, and an added picker without a fabricated before snapshot. Desktop/mobile screenshots are private.
-- Required validation: 43 unit/integration tests, 26 browser tests, formatting, lint, typecheck, frontend/backend builds, artifact privacy checks, and production restart/shutdown smoke.
+- Required validation: 44 unit/integration tests, 28 browser tests, formatting, lint, typecheck, frontend/backend builds, artifact privacy checks, and production restart/shutdown smoke.
 - The separate payload preparation took approximately two minutes. The two local writes plus read-back checks took about 0.1 seconds (recorded at 16:47:06 UTC). These exclude source extraction, manual review, scene implementation, browser QA, and retries; they are not an end-to-end cost benchmark. This run required a new scene, so routine content-update effort is still unproven.
+
+## Review correction
+
+Independent review found that revision 1's first starting condition was incomplete: at `f7810fd`, merely saving the `booking-demo` document did not display Start. `KnowledgeProvider` also required a feature with ID `booking`; without it, the reader displayed “No booking activity is saved in this guide.” The original snapshot and original baseline payload are retained as the historical incorporation record, not silently rewritten.
+
+An authenticated scoped update at Atlas revision 3 adds this explicit correction to the current exploration evidence. `correction.json`, its hash, and read-back verification are private. Revision 3 and three history snapshots were verified; revision 1 and the unrelated picker remain unchanged. This is an evidence correction, not a change in source behavior. The reader now displays evidence-only updates as **Evidence updated**, with original and corrected evidence available. The two previously reviewed no-change source scopes still generated no writes.
+
+The review also found valid long rules/case labels overflowing mobile. Wrapping and width constraints now have a failing-then-passing browser regression. Evidence-correction visibility likewise failed before its implementation and passed afterward. The real-guide desktop/mobile walkthrough checks the visible correction and retains both original snapshots.
+
+One minor wording refinement is deferred: the no-match example says no activity or case label matches rather than enumerating every searchable activity field (title, purpose, actor, group, case labels). Review found ambiguity, not a demonstrated false result.
 
 ## Human evaluation still needed
 
-The owner was invited to explore the running guide and explain what changed about project selection and search. No answer has yet been recorded. Comprehension, recognition of the important exception, and willingness to return are unknown. A stated intention to return is not observed voluntary return; that needs a later actual visit. Automated navigation and screenshots cannot answer those questions.
+The owner was invited to explore the running guide and explain what changed about project selection and search. He replied that he did not understand what the question meant. This is evidence that the evaluation prompt was unclear, not evidence of a completed walkthrough or successful comprehension. The prompt was clarified with a direct link and a first activity to open. Comprehension, recognition of the important exception, and willingness to return remain unknown. A stated intention to return is not observed voluntary return; that needs a later actual visit. Automated navigation and screenshots cannot answer those questions.
 
 T005 remains unchecked until these evaluation outcomes are recorded. The implementation is available for review on its feature branch; this record does not claim a T005 merge or release.

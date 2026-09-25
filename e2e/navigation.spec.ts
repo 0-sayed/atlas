@@ -228,3 +228,55 @@ test('valid long navigation rules and case labels fit a narrow viewport', async 
     page.getByRole('heading', { name: 'Guide opens', exact: true }),
   ).toBeVisible()
 })
+
+test('evidence corrections remain visible in history without claiming a behavior change', async ({
+  page,
+  request,
+}) => {
+  const id = 'navigation-correction'
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: { ...navigationSeed, id },
+      })
+    ).ok(),
+  ).toBe(true)
+  const description =
+    'Correction: the example requires a saved activity as well as a guide.'
+  expect(
+    (
+      await request.post(`/api/v1/projects/${id}/changes`, {
+        headers,
+        data: {
+          contractVersion: 1,
+          expectedRevision: 1,
+          upsertFeatures: [
+            {
+              ...navigationFeature,
+              evidence: { ...navigationFeature.evidence, description },
+            },
+          ],
+        },
+      })
+    ).ok(),
+  ).toBe(true)
+  await page.goto(`/#/projects/${id}/changes`)
+  await expect(
+    page.getByText('Evidence updated', { exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('Recorded behavior changed', { exact: true }),
+  ).toHaveCount(0)
+  const disclosures = page.getByText('Recorded rules, cases and evidence', {
+    exact: true,
+  })
+  await expect(disclosures).toHaveCount(2)
+  await disclosures.nth(0).click()
+  await disclosures.nth(1).click()
+  await expect(
+    page.getByText(navigationFeature.evidence.description, { exact: true }),
+  ).toBeVisible()
+  await expect(page.getByText(description, { exact: true })).toBeVisible()
+  await expect(page.getByText('Guide opens', { exact: true })).toHaveCount(2)
+})

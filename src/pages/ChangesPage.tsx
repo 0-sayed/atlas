@@ -145,7 +145,9 @@ function SavedChanges() {
               ? 'Removed from this guide'
               : change.kind === 'added'
                 ? 'Added to this guide'
-                : 'Recorded behavior changed'}
+                : change.kind === 'evidence'
+                  ? 'Evidence updated'
+                  : 'Recorded behavior changed'}
           </p>
           <RuleDifference change={change} />
           <div
