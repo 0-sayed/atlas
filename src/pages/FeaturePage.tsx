@@ -1,8 +1,9 @@
 import { useParams } from 'react-router'
-import { isBookingFeature } from '../../shared/contracts'
+import { isBookingFeature, isNavigationFeature } from '../../shared/contracts'
 import { bookingView } from '../../shared/booking'
 import { KnowledgeContext, useProject } from '../content/knowledge'
 import { BookingPage } from './BookingPage'
+import { NavigationPage } from './NavigationPage'
 import { ApprovalPage } from './ApprovalPage'
 import { MissingPage } from './GuidePages'
 
@@ -15,6 +16,8 @@ export function FeaturePage() {
     <KnowledgeContext.Provider value={bookingView(feature)}>
       <BookingPage key={feature.id} />
     </KnowledgeContext.Provider>
+  ) : isNavigationFeature(feature) ? (
+    <NavigationPage key={feature.id} feature={feature} />
   ) : (
     <ApprovalPage key={feature.id} feature={feature} />
   )

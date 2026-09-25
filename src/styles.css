@@ -959,3 +959,53 @@ h3 {
   max-height: 20rem;
   object-fit: contain;
 }
+
+.navigation-art {
+  width: 100%;
+  max-width: 320px;
+  color: #29433a;
+}
+.navigation-scene {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(100px, 0.4fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+  overflow-wrap: anywhere;
+}
+.navigation-start,
+.navigation-result {
+  border: 1px solid #bcc9b2;
+  border-radius: 24px;
+  padding: 28px;
+  background: #edf0e1;
+}
+.navigation-result {
+  background: #e5ecef;
+}
+.navigation-result h2 {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+}
+.navigation-action {
+  align-self: center;
+  text-align: center;
+}
+.navigation-action > span {
+  font-size: 2.5rem;
+}
+.navigation-evidence {
+  display: block;
+  margin-top: 24px;
+  overflow-wrap: anywhere;
+}
+.navigation-evidence summary {
+  cursor: pointer;
+}
+@media (max-width: 640px) {
+  .navigation-scene {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .navigation-action > span {
+    display: inline-block;
+    transform: rotate(90deg);
+  }
+}

@@ -1,7 +1,12 @@
 import { Link, useSearchParams } from 'react-router'
-import { isBookingFeature, type Feature } from '../../shared/contracts'
+import {
+  isBookingFeature,
+  isApprovalFeature,
+  type Feature,
+} from '../../shared/contracts'
 import { useProject, projectPath } from '../content/knowledge'
 import { CalendarArt } from '../scenes/BookingScene'
+import { NavigationArt } from '../scenes/NavigationScene'
 import { ApprovalArt } from '../scenes/ApprovalScene'
 
 export function FixtureLabel({ feature }: { feature?: Feature }) {
@@ -17,7 +22,13 @@ export function FixtureLabel({ feature }: { feature?: Feature }) {
   )
 }
 export function FeatureArt({ feature }: { feature: Feature }) {
-  return isBookingFeature(feature) ? <CalendarArt /> : <ApprovalArt />
+  return isBookingFeature(feature) ? (
+    <CalendarArt />
+  ) : isApprovalFeature(feature) ? (
+    <ApprovalArt />
+  ) : (
+    <NavigationArt />
+  )
 }
 function featureLink(
   projectId: string,
@@ -80,14 +91,20 @@ export function StartPage() {
               <p className="eyebrow">
                 {String(index + 1).padStart(2, '0')} /{' '}
                 {feature.group ??
-                  (isBookingFeature(feature) ? 'Bookings' : 'Reviews')}
+                  (isBookingFeature(feature)
+                    ? 'Bookings'
+                    : isApprovalFeature(feature)
+                      ? 'Reviews'
+                      : 'Navigation')}
               </p>
               <h2>{feature.title}</h2>
               <p>{feature.purpose}</p>
               <p>
                 {isBookingFeature(feature)
                   ? `At least ${feature.noticeHours} hours’ notice`
-                  : `At least ${feature.requiredApprovals} independent approvals`}
+                  : isApprovalFeature(feature)
+                    ? `At least ${feature.requiredApprovals} independent approvals`
+                    : (feature.rules[0] ?? 'Reviewed navigation cases')}
               </p>
               <p className="revision-note">
                 {feature.evidence.status === 'demo'
@@ -127,7 +144,12 @@ export function ExplorePage() {
   const groups = new Map<string, Feature[]>()
   for (const feature of matches) {
     const group =
-      feature.group ?? (isBookingFeature(feature) ? 'Bookings' : 'Reviews')
+      feature.group ??
+      (isBookingFeature(feature)
+        ? 'Bookings'
+        : isApprovalFeature(feature)
+          ? 'Reviews'
+          : 'Navigation')
     groups.set(group, [...(groups.get(group) ?? []), feature])
   }
   return (

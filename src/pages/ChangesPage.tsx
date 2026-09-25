@@ -8,7 +8,11 @@ import {
   relationChanges,
   type FeatureChange,
 } from '../../shared/changes'
-import { isBookingFeature, type ProjectDocument } from '../../shared/contracts'
+import {
+  isBookingFeature,
+  isApprovalFeature,
+  type ProjectDocument,
+} from '../../shared/contracts'
 import { KnowledgeContext, projectPath, useProject } from '../content/knowledge'
 import { FixtureLabel } from './GuidePages'
 import { BookingComparison } from './BookingComparison'
@@ -28,8 +32,8 @@ function RuleDifference({ change }: { change: FeatureChange }) {
       </p>
     )
   if (
-    !isBookingFeature(before) &&
-    !isBookingFeature(after) &&
+    isApprovalFeature(before) &&
+    isApprovalFeature(after) &&
     before.requiredApprovals !== after.requiredApprovals
   ) {
     const example = after.cases.find((c) =>
