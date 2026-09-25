@@ -1010,3 +1010,14 @@ h3 {
     transform: rotate(90deg);
   }
 }
+
+.navigation-page {
+  overflow-wrap: anywhere;
+}
+.navigation-page .feature-heading > div {
+  min-width: 0;
+}
+.navigation-page .restrictions li,
+.navigation-page .case-picker button {
+  max-width: 100%;
+}

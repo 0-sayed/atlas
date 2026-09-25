@@ -22,7 +22,10 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
         ? `${base}/changes`
         : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
   return (
-    <section className="booking-page" aria-labelledby="page-title">
+    <section
+      className="booking-page navigation-page"
+      aria-labelledby="page-title"
+    >
       <Link
         className="back-link"
         to={returnPath}

@@ -186,3 +186,45 @@ test('navigation snapshots preserve authored outcomes and handle empty or missin
     }),
   ).toBeVisible()
 })
+
+test('valid long navigation rules and case labels fit a narrow viewport', async ({
+  page,
+  request,
+}) => {
+  const id = 'navigation-long-text'
+  const label = 'x'.repeat(160)
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: {
+          ...navigationSeed,
+          id,
+          features: [
+            {
+              ...navigationFeature,
+              rules: ['https://example.test/' + 'a'.repeat(160)],
+              cases: [{ ...navigationFeature.cases[0], label }],
+            },
+          ],
+        },
+      })
+    ).ok(),
+  ).toBe(true)
+  await page.setViewportSize({ width: 375, height: 800 })
+  await page.goto(`/#/projects/${id}/explore/navigation`)
+  const choice = page.getByRole('button', { name: label, exact: true })
+  await expect(choice).toBeVisible()
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true)
+  await page.keyboard.press('Tab')
+  await choice.focus()
+  await expect(choice).toHaveCSS('outline-style', 'solid')
+  await page.keyboard.press('Enter')
+  await expect(
+    page.getByRole('heading', { name: 'Guide opens', exact: true }),
+  ).toBeVisible()
+})
