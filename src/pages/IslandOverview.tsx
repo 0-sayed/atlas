@@ -13,6 +13,8 @@ type IslandOverviewProps = {
   fixtureLabel: ReactNode
 }
 
+const expandedCounts = new Map<string, number>()
+
 export function IslandOverview({
   project,
   essentials,
@@ -22,7 +24,9 @@ export function IslandOverview({
 }: IslandOverviewProps) {
   const explorePath = `${projectPath(project.id)}/explore`
   const changesPath = `${projectPath(project.id)}/changes`
-  const [visibleCount, setVisibleCount] = useState(6)
+  const [visibleCount, setVisibleCount] = useState(
+    () => expandedCounts.get(project.id) ?? 6,
+  )
   const visibleActivities = essentials.slice(0, visibleCount)
 
   return (
@@ -55,6 +59,7 @@ export function IslandOverview({
                   key={feature.id}
                   to={featureHref(feature)}
                   aria-label={feature.title}
+                  aria-describedby={`island-evidence-${feature.id}`}
                 >
                   <div className="hero-art island-hero-art">
                     <img
@@ -74,6 +79,16 @@ export function IslandOverview({
                       ↗
                     </span>
                   </span>
+                  <span
+                    className="island-evidence"
+                    id={`island-evidence-${feature.id}`}
+                  >
+                    {feature.evidence.status === 'demo'
+                      ? 'Illustrative fixture'
+                      : feature.evidence.status === 'uncertain'
+                        ? 'Uncertain evidence'
+                        : 'Source-supported'}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -88,7 +103,11 @@ export function IslandOverview({
           {visibleActivities.length < essentials.length && (
             <button
               className="island-show-more"
-              onClick={() => setVisibleCount((count) => count + 6)}
+              onClick={() => {
+                const next = visibleCount + 6
+                expandedCounts.set(project.id, next)
+                setVisibleCount(next)
+              }}
             >
               Showing {visibleActivities.length} of {essentials.length} · Show
               more activities

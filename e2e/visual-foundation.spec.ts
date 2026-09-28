@@ -1,17 +1,22 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type TestInfo } from '@playwright/test'
 import { navigationFeature } from '../fixtures/navigation'
 
 const headers = {
   authorization: 'Bearer e2e-only-token-not-a-production-secret',
 }
 
+const projectId = (base: string, testInfo: TestInfo) =>
+  `${base}-${testInfo.parallelIndex}-${testInfo.retry}`
+
 test('two saved projects share navigation but retain distinct live illustration settings', async ({
   page,
   request,
 }, testInfo) => {
+  const skyId = projectId('visual-sky', testInfo)
+  const peachId = projectId('visual-peach', testInfo)
   for (const [id, title, illustration, accent] of [
-    ['visual-sky', 'Sky project', 'compass', 'sky'],
-    ['visual-peach', 'Peach project', 'parcel', 'peach'],
+    [skyId, 'Sky project', 'compass', 'sky'],
+    [peachId, 'Peach project', 'parcel', 'peach'],
   ] as const) {
     const response = await request.post('/api/v1/projects', {
       headers,
@@ -32,7 +37,7 @@ test('two saved projects share navigation but retain distinct live illustration 
     expect(response.ok()).toBe(true)
   }
 
-  await page.goto('/#/projects/visual-sky')
+  await page.goto(`/#/projects/${skyId}`)
   await expect(
     page.getByRole('navigation', { name: 'Guide navigation' }),
   ).toBeVisible()
@@ -61,7 +66,7 @@ test('two saved projects share navigation but retain distinct live illustration 
   expect(artBounds.svgTop).toBeGreaterThanOrEqual(artBounds.frameTop)
   expect(artBounds.svgBottom).toBeLessThanOrEqual(artBounds.frameBottom + 1)
   await page.getByRole('link', { name: 'Explore', exact: true }).click()
-  await expect(page).toHaveURL(/visual-sky\/explore$/)
+  await expect(page).toHaveURL(new RegExp(`${skyId}/explore$`))
   await page.goBack()
   await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
   await page.screenshot({
@@ -81,7 +86,7 @@ test('two saved projects share navigation but retain distinct live illustration 
     'peach',
   )
 
-  const update = await request.post('/api/v1/projects/visual-peach/changes', {
+  const update = await request.post(`/api/v1/projects/${peachId}/changes`, {
     headers,
     data: {
       contractVersion: 1,
@@ -116,6 +121,7 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
   page,
   request,
 }, testInfo) => {
+  const longId = projectId('visual-long', testInfo)
   await page.route('**/api/v1/projects', (route) => route.fulfill({ json: [] }))
   await page.goto('/#/')
   await expect(
@@ -129,7 +135,7 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
     headers,
     data: {
       contractVersion: 1,
-      id: 'visual-long',
+      id: longId,
       title: 'Project' + 'y'.repeat(145),
       relations: [],
       features: Array.from({ length: 100 }, (_, index) => ({
@@ -144,7 +150,7 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
   expect(response.ok()).toBe(true)
   await page.setViewportSize({ width: 375, height: 800 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/#/projects/visual-long')
+  await page.goto(`/#/projects/${longId}`)
   await expect(
     page.getByRole('link', { name: longLabel, exact: true }),
   ).toBeVisible()
@@ -192,12 +198,13 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
 test('an explicitly selected essential activity alone appears on Start', async ({
   page,
   request,
-}) => {
+}, testInfo) => {
+  const selectionId = projectId('visual-essential-selection', testInfo)
   const response = await request.post('/api/v1/projects', {
     headers,
     data: {
       contractVersion: 1,
-      id: 'visual-essential-selection',
+      id: selectionId,
       title: 'Essential selection',
       relations: [],
       features: [
@@ -212,7 +219,7 @@ test('an explicitly selected essential activity alone appears on Start', async (
     },
   })
   expect(response.ok()).toBe(true)
-  await page.goto('/#/projects/visual-essential-selection')
+  await page.goto(`/#/projects/${selectionId}`)
   await expect(page.locator('.activity-hero')).toHaveCount(1)
   await expect(
     page.getByRole('link', { name: 'Selected activity', exact: true }),
@@ -227,4 +234,90 @@ test('an explicitly selected essential activity alone appears on Start', async (
   await expect(
     page.getByRole('link', { name: 'Selected activity' }),
   ).toBeVisible()
+})
+
+test('expanded Start activities survive return navigation without leaking to another project', async ({
+  page,
+  request,
+}, testInfo) => {
+  const firstId = projectId('visual-expanded-one', testInfo)
+  const secondId = projectId('visual-expanded-two', testInfo)
+  for (const id of [firstId, secondId]) {
+    const response = await request.post('/api/v1/projects', {
+      headers,
+      data: {
+        contractVersion: 1,
+        id,
+        title: id,
+        relations: [],
+        features: Array.from({ length: 8 }, (_, index) => ({
+          ...navigationFeature,
+          id: `activity-${index}`,
+          title: `Activity ${index}`,
+        })),
+      },
+    })
+    expect(response.ok()).toBe(true)
+  }
+
+  await page.goto(`/#/projects/${firstId}`)
+  await page.getByRole('button', { name: /Show more activities/ }).click()
+  await expect(page.locator('.island-link')).toHaveCount(8)
+  const eighth = page.locator('.island-link').nth(7)
+  await eighth.scrollIntoViewIfNeeded()
+  const originalScroll = await page.evaluate(() => window.scrollY)
+  expect(originalScroll).toBeGreaterThan(0)
+  await eighth.click()
+  await page.getByRole('link', { name: 'Back to Start here' }).click()
+  await expect(page.locator('.island-link')).toHaveCount(8)
+  await expect
+    .poll(async () => page.evaluate(() => window.scrollY))
+    .toBeGreaterThanOrEqual(originalScroll - 2)
+
+  await page.locator('.island-link').nth(7).click()
+  await page.goBack()
+  await expect(page.locator('.island-link')).toHaveCount(8)
+
+  await page.goto(`/#/projects/${secondId}`)
+  await expect(page.locator('.island-link')).toHaveCount(6)
+  await page.goto(`/#/projects/${firstId}`)
+  await expect(page.locator('.island-link')).toHaveCount(8)
+})
+
+test('Start tiles identify each activity evidence status', async ({
+  page,
+  request,
+}, testInfo) => {
+  const evidenceId = projectId('visual-evidence-status', testInfo)
+  const response = await request.post('/api/v1/projects', {
+    headers,
+    data: {
+      contractVersion: 1,
+      id: evidenceId,
+      title: 'Evidence status',
+      relations: [],
+      features: [
+        ['demo', 'Demo activity'],
+        ['uncertain', 'Uncertain activity'],
+        ['supported', 'Supported activity'],
+      ].map(([status, title]) => ({
+        ...navigationFeature,
+        id: status,
+        title,
+        evidence: { ...navigationFeature.evidence, status },
+      })),
+    },
+  })
+  expect(response.ok()).toBe(true)
+
+  await page.goto(`/#/projects/${evidenceId}`)
+  for (const [title, label] of [
+    ['Demo activity', 'Illustrative fixture'],
+    ['Uncertain activity', 'Uncertain evidence'],
+    ['Supported activity', 'Source-supported'],
+  ]) {
+    await expect(
+      page.locator('.island-link').filter({ hasText: title }).getByText(label),
+    ).toBeVisible()
+  }
 })

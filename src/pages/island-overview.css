@@ -30,15 +30,15 @@
 
 .island-overview h1,
 .island-summary h2 {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Kalam', 'Trebuchet MS', sans-serif;
   font-weight: 700;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.025em;
 }
 
 .island-overview h1 {
   margin: 0.15rem 0 0;
   color: #163d58;
-  font-size: clamp(3.2rem, 6vw, 5.6rem);
+  font-size: clamp(3rem, 5vw, 4.6rem);
   line-height: 0.98;
 }
 
@@ -82,14 +82,13 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 680px;
+  min-height: 590px;
   overflow: hidden;
   isolation: isolate;
   background-color: #75c9dd;
   background-image:
-    linear-gradient(180deg, #b9e8f5a8 0%, #76cfe275 40%, #4db9d56b 100%),
-    url('/art/atlas-water.png');
-  background-position: center, center;
+    linear-gradient(#d9f6ff22, #b1edec18), url('/art/atlas-water.png');
+  background-position: center top;
   background-size: cover;
 }
 
@@ -128,7 +127,7 @@
   justify-items: center;
   gap: 0.15rem 0.1rem;
   min-width: 0;
-  padding: 1.35rem 1.1rem 3.75rem;
+  padding: 3.4rem 1.1rem 3.75rem;
 }
 
 .island-overview .island-link.activity-hero {
@@ -199,7 +198,7 @@
 
 .island-overview .island-hero-art .activity-art {
   position: absolute;
-  inset: -4% 0 0;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -216,7 +215,7 @@
   height: 100%;
 }
 
-.island-name {
+.island-overview .island-name {
   position: relative;
   z-index: 1;
   display: inline-flex;
@@ -234,10 +233,11 @@
     0 4px 0 #ba985e,
     0 8px 13px #12516b4a;
   color: #253b42;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(0.88rem, 1.1vw, 1rem);
+  font-family: 'Kalam', 'Trebuchet MS', sans-serif;
+  font-size: 1.05rem;
   font-weight: 700;
-  line-height: 1.15;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
@@ -252,6 +252,20 @@
   color: #126e87;
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 1rem;
+}
+
+.island-evidence {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.7rem;
+  padding: 0.32rem 0.65rem;
+  border: 1px solid #b8dce2;
+  border-radius: 999px;
+  background: #f4fcffed;
+  color: #244e60;
+  font-size: 0.7rem;
+  font-weight: 750;
+  line-height: 1.2;
 }
 
 .island-sea-bottom {
@@ -342,8 +356,8 @@
 .island-summary h2 {
   margin-top: 0.45rem;
   color: #173f5a;
-  font-size: clamp(1.65rem, 2.2vw, 2.15rem);
-  line-height: 1.08;
+  font-size: 2rem;
+  line-height: 1.2;
 }
 
 .island-summary-top > p:last-child {
@@ -494,19 +508,11 @@
   .island-field {
     padding-inline: 0.45rem;
   }
-
-  .island-name {
-    font-size: 0.83rem;
-  }
 }
 
 @media (max-width: 780px) {
   .island-overview-body {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .island-sea {
-    min-height: 560px;
   }
 
   .island-summary {
@@ -538,10 +544,6 @@
     gap: 0.85rem;
   }
 
-  .island-overview h1 {
-    font-size: clamp(3.15rem, 13vw, 4.3rem);
-  }
-
   .island-overview-count {
     margin: 0;
   }
@@ -557,7 +559,7 @@
   .island-field {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.6rem;
-    padding: 1rem 0.75rem 1.75rem;
+    padding: 1.5rem 0.75rem 1.75rem;
   }
 
   .island-overview .island-link.activity-hero,
@@ -566,10 +568,6 @@
     grid-column: 1;
     width: min(100%, 330px);
     margin: 0;
-  }
-
-  .island-name {
-    font-size: 0.9rem;
   }
 
   .island-sea-bottom {

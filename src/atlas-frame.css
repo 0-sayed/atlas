@@ -24,9 +24,6 @@
 
 .atlas-sidebar .brand,
 .sidebar-link,
-.island-overview h1,
-.island-summary h2,
-.island-overview .island-name,
 .navigation-page h1,
 .navigation-page h2,
 .navigation-page h3 {
@@ -71,35 +68,6 @@
   background: url('/art/atlas-island.png') no-repeat bottom right / 105px auto;
 }
 
-.island-overview .island-hero-art .activity-art {
-  inset: 0;
-}
-
-.island-overview .island-name {
-  font-size: 1.05rem;
-  line-height: 1.35;
-}
-
-.island-overview h1 {
-  font-size: clamp(3rem, 5vw, 4.6rem);
-}
-
-.island-summary h2 {
-  font-size: 2rem;
-  line-height: 1.2;
-}
-
-.island-sea {
-  min-height: 590px;
-  background-image:
-    linear-gradient(#d9f6ff22, #b1edec18), url('/art/atlas-water.png');
-  background-position: center top;
-}
-
-.island-field {
-  padding-top: 3.4rem;
-}
-
 .navigation-page .navigation-hero {
   padding: 1.4rem 1.7rem;
 }
@@ -138,12 +106,6 @@
 }
 
 @media (max-width: 560px) {
-  .island-sea {
-    min-height: 0;
-  }
-  .island-field {
-    padding-top: 1.5rem;
-  }
   .navigation-page .navigation-hero {
     padding: 1.2rem;
   }
