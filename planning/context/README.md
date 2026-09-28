@@ -1,25 +1,33 @@
 # Atlas planning context
 
-**Updated:** 2026-09-24\
-**Current state:** The static React app and labelled booking learning loop from T000/T001 are delivered. The reusable database-backed Atlas canvas in v0.10 is the next implementation target, not a current runtime capability.
+**Updated:** 2026-09-28\
+**Current state:** React/TypeScript/Vite, the local NestJS API, SQLite persistence, project-scoped exploration, and the source-context skill are implemented. The current working foundation is not the final Penpot desktop experience. Broader knowledge contracts and the remaining desktop views are planned work.
 
 ## Start here
 
-Read [MVP features](business/PROJECT.md#mvp-features) for the product scope, [V1 defaults](business/PROJECT.md#16-v1-defaults-and-prototype-checks) for settled choices, and the [task graph](../roadmap/tasks.md) for implementation status.
+Start with [the planning entry point](../README.md), then read these documents in order:
 
 | File | Purpose |
 |---|---|
-| [PROJECT.md](business/PROJECT.md) | Product requirements, source-preparation boundary, and decision history. |
-| [DESIGN.md](business/DESIGN.md) | Navigation, cases, visual style, and the booking experience. |
-| [TECHNICAL.md](technical/TECHNICAL.md) | Target local API, SQLite store, validation, assets, and acceptance checks. |
-| [Visual references](business/PROJECT.md#15-visual-reference-guide) | Guide to the 13 retained design images in `business/references/`. |
+| [PROJECT.md](business/PROJECT.md) | Product purpose, seven destinations, dynamic reuse, scope, and human evaluation. |
+| [Design reference](design-reference.md) | Verified Penpot board links, shared component IDs, task mapping, access instructions and export freshness. |
+| [DESIGN.md](business/DESIGN.md) | Illustrated desktop composition, shared components, content sizing, interactions, and honest knowledge states. |
+| [TECHNICAL.md](technical/TECHNICAL.md) | Implemented architecture, proposed contract/rendering extensions, library choices, and technical acceptance. |
+| [Desktop delivery brief](../roadmap/desktop-delivery.md) | T007–T011 deliverables, prerequisites, acceptance gates, and handoff requirements. |
+| [Task graph](../roadmap/tasks.md) | Task completion, dependencies, and historical verification boundaries. |
 
-## Boundary
+## Runtime and authoring boundaries
 
-The independent `fill-atlas` skill is a later deliverable **outside this repository**. It reads authorized source evidence, produces standalone source-context Markdown, and stops. Separately, an agent may interpret that context and submit data through Atlas's future validated local API. The app renders prepared project knowledge; it does not interpret raw source context or run an agent at browse time.
+`fill-atlas` is a portable, context-only skill bundled in `.agents/skills/fill-atlas/`. It inspects authorized source evidence, writes standalone Markdown, and stops. The separate `.agents/skills/update-atlas/` workflow incorporates reviewed context through the local API. Neither runs while a person browses Atlas.
 
-One local SQLite database will hold all projects, with registered image assets in a private local directory. Ordinary project additions and fact updates must render in the same application build. New reusable renderer behavior still requires reviewed application code.
+One local SQLite database stores all projects; private registered image files live alongside it. The frontend reads validated saved knowledge. Normal storage starts empty; fixtures and Penpot examples are explicitly illustrative. Ordinary supported project additions and fact/art updates must work without changing or rebuilding the app. Unsupported semantics require a reviewed reusable contract/renderer addition.
 
-The existing booking app is a labelled fixture experience. Its current TypeScript content and static deployment are historical T001 implementation, not evidence that the v0.10 backend exists. T002 migrates it; T003 proves dynamic reuse with a second distinct project. Source-skill validation and real-source evaluation follow separately.
+The running model currently accepts booking, approval, and navigation scenes. The domain-neutral authored activity, full seven-view knowledge model, and capability-aware authoring described in the refreshed specification are **targets**, not installed capabilities.
 
-Keep the 13 reference images as planning assets. They are not runtime product facts, licensed production art, or a promise to implement every depicted control.
+## Source material and freshness
+
+The v0.10 pack was incorporated into this folder; maintain these files instead of a second context pack. Keep the [13 original references](business/PROJECT.md#15-visual-reference-guide) as planning assets only. They are not runtime screenshots, source-product facts, or licensed production artwork.
+
+The older `docs/superpowers/specs/2026-09-25-reference-experience-correction-design.md` records the earlier reference correction. This refreshed context and the delivery brief supersede its conflicting status, scope, and library assumptions. The private `.local/handoffs/2026-09-27-atlas-design-session-handoff.md` contains historical design-session detail; it is supplementary and is not required to understand the public plan. Do not copy its embedded conversation or private content into tracked documentation.
+
+T007 must capture one synchronized final desktop design package. Mixed-date local exports and a list of passed visual audits do not constitute that package. Mobile/tablet design work remains deferred.
