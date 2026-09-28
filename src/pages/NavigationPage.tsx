@@ -32,6 +32,10 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
       : from === 'changes'
         ? `${base}/changes`
         : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
+  const relatedParams = new URLSearchParams()
+  if (from) relatedParams.set('from', from)
+  const query = params.get('q')
+  if (query) relatedParams.set('q', query)
   const related = project.relations.flatMap((relation) => {
     if (relation.from !== feature.id && relation.to !== feature.id) return []
     const outgoing = relation.from === feature.id
@@ -218,7 +222,9 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
             <ul className="navigation-related-list">
               {related.map((relation) => (
                 <li key={relation.id}>
-                  <Link to={`${base}/explore/${relation.feature.id}`}>
+                  <Link
+                    to={`${base}/explore/${relation.feature.id}${relatedParams.size ? `?${relatedParams}` : ''}`}
+                  >
                     <span>
                       <small>{relation.label}</small>
                       <strong>{relation.feature.title}</strong>

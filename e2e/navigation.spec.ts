@@ -6,6 +6,62 @@ const headers = {
   authorization: 'Bearer e2e-only-token-not-a-production-secret',
 }
 
+test('related navigation retains Explore search and return position without the previous case', async ({
+  page,
+  request,
+}) => {
+  const id = `navigation-related-return-${Date.now()}`
+  const related = {
+    ...navigationFeature,
+    id: 'another-guide',
+    title: 'Open another saved guide',
+    cases: [{ ...navigationFeature.cases[0], id: 'another-case' }],
+  }
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: {
+          ...navigationSeed,
+          id,
+          features: [navigationFeature, related],
+          relations: [
+            {
+              id: 'related-guides',
+              from: 'navigation',
+              to: related.id,
+              kind: 'related',
+            },
+          ],
+        },
+      })
+    ).ok(),
+  ).toBe(true)
+
+  await page.setViewportSize({ width: 375, height: 400 })
+  await page.goto(`/#/projects/${id}/explore?q=guide`)
+  await expect(
+    page.getByRole('link', { name: navigationFeature.title, exact: true }),
+  ).toBeVisible()
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  const exploreScroll = await page.evaluate(() => window.scrollY)
+  expect(exploreScroll).toBeGreaterThan(0)
+  await page
+    .getByRole('link', { name: navigationFeature.title, exact: true })
+    .click()
+  await page.getByRole('link', { name: related.title, exact: false }).click()
+  await expect(page.getByRole('heading', { name: related.title })).toBeVisible()
+  const relatedParams = new URL(page.url().split('#')[1], 'http://atlas.test')
+    .searchParams
+  expect(relatedParams.get('from')).toBe('explore')
+  expect(relatedParams.get('q')).toBe('guide')
+  expect(relatedParams.has('case')).toBe(false)
+
+  await page.getByRole('link', { name: 'Back to Explore', exact: true }).click()
+  await expect(page.getByRole('searchbox')).toHaveValue('guide')
+  expect(await page.evaluate(() => window.scrollY)).toBe(exploreScroll)
+})
+
 test('navigation cases support scoped search, direct links, Back, evidence and keyboard', async ({
   page,
   request,
