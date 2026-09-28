@@ -145,12 +145,15 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
   await page.setViewportSize({ width: 375, height: 800 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/#/projects/visual-long')
+  await expect(
+    page.getByRole('link', { name: longLabel, exact: true }),
+  ).toBeVisible()
   await page.keyboard.press('Tab')
   await expect(
     page.getByRole('link', { name: 'Skip to content' }),
   ).toBeFocused()
   await page.keyboard.press('Enter')
-  await expect(page.locator('main')).toBeFocused()
+  await expect(page.locator('#workspace-content')).toBeFocused()
   await expect(
     page.getByRole('link', { name: longLabel, exact: true }),
   ).toBeVisible()

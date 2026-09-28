@@ -231,7 +231,8 @@ button {
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
-main:focus-visible {
+main:focus-visible,
+#workspace-content:focus-visible {
   outline: 3px solid #995039;
   outline-offset: 4px;
 }

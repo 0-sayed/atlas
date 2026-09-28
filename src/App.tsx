@@ -13,7 +13,7 @@ function ProjectWorkspace() {
   return (
     <div className="atlas-workspace">
       <AtlasSidebar project={project} />
-      <div className="workspace-content">
+      <div className="workspace-content" id="workspace-content" tabIndex={-1}>
         <Routes>
           <Route index element={<StartPage />} />
           <Route path="explore" element={<ExplorePage />} />
@@ -37,7 +37,7 @@ function ProjectSelection() {
   return (
     <div className="atlas-workspace">
       <AtlasSidebar />
-      <div className="workspace-content">
+      <div className="workspace-content" id="workspace-content" tabIndex={-1}>
         <ProjectPicker />
       </div>
     </div>
@@ -49,10 +49,13 @@ export default function App() {
       <NavigationScroll />
       <a
         className="skip-link"
-        href="#main"
+        href="#workspace-content"
         onClick={(event) => {
           event.preventDefault()
-          document.getElementById('main')?.focus()
+          const target =
+            document.getElementById('workspace-content') ??
+            document.getElementById('main')
+          target?.focus()
         }}
       >
         Skip to content
