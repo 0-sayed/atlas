@@ -9,4 +9,5 @@ playwright-report/
 test-results/
 package-lock.json
 .archon/
+.serena/
 pr.md
