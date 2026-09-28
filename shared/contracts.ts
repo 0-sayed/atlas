@@ -25,6 +25,11 @@ export const caseSchema = z.strictObject({
   confirmed: z.boolean(),
   slot: z.enum(['free', 'occupied', 'unknown']),
 })
+export const presentationSchema = z.strictObject({
+  illustration: z.enum(['calendar', 'document', 'compass', 'parcel', 'people']),
+  accent: z.enum(['sky', 'sage', 'peach']),
+})
+export type Presentation = z.infer<typeof presentationSchema>
 const featureFields = {
   id: idSchema,
   title: short,
@@ -35,6 +40,7 @@ const featureFields = {
   revisionLabel: short,
   evidence: evidenceSchema,
   assetIds: z.array(idSchema).max(20),
+  presentation: presentationSchema.optional(),
 }
 export const bookingFeatureSchema = z.strictObject({
   ...featureFields,

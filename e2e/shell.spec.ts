@@ -31,6 +31,16 @@ test('a direct hash link loads, and an unknown destination states that it is una
   ).toBeVisible()
 })
 
+test('legacy guide links return to the project picker', async ({ page }) => {
+  for (const route of ['/explore/booking?case=at-limit', '/changes']) {
+    await page.goto(`/#${route}`)
+    await expect(page).toHaveURL(/#\/$/)
+    await expect(
+      page.getByRole('heading', { name: 'Choose a project' }),
+    ).toBeVisible()
+  }
+})
+
 test('navigation stays usable by keyboard and at narrow widths', async ({
   page,
 }) => {
@@ -65,6 +75,10 @@ test('keyboard navigation reaches the home link after the skip link', async ({
   await page.keyboard.press('Tab')
   await expect(
     page.getByRole('link', { name: 'Skip to content' }),
+  ).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(
+    page.getByRole('button', { name: 'Refresh guide' }),
   ).toBeFocused()
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: 'Atlas home' })).toBeFocused()

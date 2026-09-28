@@ -57,13 +57,21 @@ function canonicalDocument(doc: ProjectDocument) {
   })
 }
 function behavior(feature: Feature) {
-  const { revisionLabel, evidence, assetIds, group, essentialOrder, ...facts } =
-    feature
+  const {
+    revisionLabel,
+    evidence,
+    assetIds,
+    group,
+    essentialOrder,
+    presentation,
+    ...facts
+  } = feature
   void revisionLabel
   void evidence
   void assetIds
   void group
   void essentialOrder
+  void presentation
   return JSON.stringify(facts)
 }
 export function featureChanges(

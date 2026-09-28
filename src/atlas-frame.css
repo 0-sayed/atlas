@@ -1,0 +1,150 @@
+@font-face {
+  font-family: 'Kalam';
+  src: url('/fonts/Kalam-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.site-shell {
+  background: linear-gradient(135deg, #f6fcff, #e8f6fb 70%, #f9fcff);
+}
+
+.atlas-workspace {
+  grid-template-columns: minmax(0, 205px) minmax(0, 1fr);
+  gap: 1.4rem;
+}
+
+.atlas-sidebar {
+  border-color: #cfe7f2;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px #4385a00a;
+  padding-inline: 0.7rem;
+}
+
+.atlas-sidebar .brand,
+.sidebar-link,
+.island-overview h1,
+.island-summary h2,
+.island-overview .island-name,
+.navigation-page h1,
+.navigation-page h2,
+.navigation-page h3 {
+  font-family: 'Kalam', 'Trebuchet MS', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.atlas-sidebar .brand {
+  font-size: 2rem;
+  gap: 0.4rem;
+}
+
+.sidebar-link {
+  font-size: 1.05rem;
+  min-height: 3.3rem;
+  color: #283766;
+  gap: 0.75rem;
+}
+
+.sidebar-link[aria-current='page'] {
+  color: #243d80;
+  background: linear-gradient(100deg, #e0f0ff, #d6e6ff);
+}
+
+.sidebar-icon {
+  flex-basis: 1.65rem;
+  color: #303e77;
+}
+
+.sidebar-icon svg {
+  display: block;
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.sidebar-footer {
+  min-height: 130px;
+  align-items: start;
+  position: relative;
+  padding-bottom: 4rem;
+  background: url('/art/atlas-island.png') no-repeat bottom right / 105px auto;
+}
+
+.island-overview .island-hero-art .activity-art {
+  inset: 0;
+}
+
+.island-overview .island-name {
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.island-overview h1 {
+  font-size: clamp(3rem, 5vw, 4.6rem);
+}
+
+.island-summary h2 {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.island-sea {
+  min-height: 590px;
+  background-image:
+    linear-gradient(#d9f6ff22, #b1edec18), url('/art/atlas-water.png');
+  background-position: center top;
+}
+
+.island-field {
+  padding-top: 3.4rem;
+}
+
+.navigation-page .navigation-hero {
+  padding: 1.4rem 1.7rem;
+}
+
+.navigation-page .navigation-hero h1 {
+  max-width: 22ch;
+  font-size: clamp(2rem, 3.2vw, 3.25rem);
+  line-height: 1.14;
+}
+
+.navigation-page .navigation-purpose {
+  font-size: 1rem;
+}
+
+.navigation-page .navigation-meta {
+  margin-top: 1rem;
+}
+
+.navigation-page .navigation-panel-heading h2 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 900px) {
+  .atlas-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .atlas-sidebar {
+    padding: 0.75rem;
+  }
+  .sidebar-link {
+    min-height: 2.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .island-sea {
+    min-height: 0;
+  }
+  .island-field {
+    padding-top: 1.5rem;
+  }
+  .navigation-page .navigation-hero {
+    padding: 1.2rem;
+  }
+}

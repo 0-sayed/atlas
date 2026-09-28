@@ -119,7 +119,7 @@ test('saved case identity, actor and registered artwork reach current UI', async
       ).ok(),
     ).toBeTruthy()
     await page.goto('/#/projects/booking-demo/')
-    await page.getByRole('link', { name: /Explore the story/ }).click()
+    await page.locator('.island-link').first().click()
     await expect(page).toHaveURL(/case=eligible/)
     await expect(
       page.getByRole('heading', { name: 'Booking moved', exact: true }),

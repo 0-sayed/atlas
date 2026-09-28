@@ -31,7 +31,7 @@ test('navigation cases support scoped search, direct links, Back, evidence and k
     page.getByRole('heading', { name: 'Guide opens', exact: true }),
   ).toBeVisible()
   await expect(
-    page.getByText('Authored example', { exact: true }),
+    page.getByText('Selected saved case', { exact: true }),
   ).toBeVisible()
   await page.getByRole('button', { name: 'Missing guide', exact: true }).click()
   await expect(

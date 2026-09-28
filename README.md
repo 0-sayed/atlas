@@ -1,6 +1,17 @@
 # Atlas
 
-Atlas explains saved product knowledge through interactive scenes. The booking guide is an **illustrative fixture**, not verified source behavior or a real booking app. React reads a local NestJS API; one SQLite database owns knowledge, revisions, relationships and registered assets. Source interpretation and `fill-atlas` remain outside the app runtime. The standalone [skill](.agents/skills/fill-atlas/SKILL.md) and [context template](.agents/skills/fill-atlas/assets/context.template.md) are included in this repository; Codex discovers it from `.agents/skills/` when working in this repository. To use it in other projects, install a copy in your agent's user-level skills directory.
+Atlas is an empty, reusable visual guide for saved product knowledge. React reads a local NestJS API; one SQLite database owns knowledge, revisions, relationships, visual choices and registered assets. The shared frame and illustration vocabulary belong to Atlas; project facts and supported presentation choices come from the database. Publishing Studio is the optional fictional showcase; small booking, approval and navigation fixtures remain internal test content. None establishes behavior of a real source product.
+
+## Agent workflow
+
+The repository includes two separate skills:
+
+- [fill-atlas](.agents/skills/fill-atlas/SKILL.md) inspects authorized source evidence, writes standalone context Markdown, and stops.
+- [update-atlas](.agents/skills/update-atlas/SKILL.md) consumes reviewed context, checks whether supported scenes can explain it, prepares visual choices and optional art, writes scoped changes through the API, and verifies the saved guide. Its bundled API and art references travel with the skill.
+
+Copy the whole skill folder, including references/assets, when installing it outside this repository. Claude Code supports personal skills under `~/.claude/skills/` and repository skills under `.claude/skills/` ([official installation guidance](https://code.claude.com/docs/en/skills#choose-where-skills-load)). Other agents should use their documented skill directory or be explicitly instructed to read the skill file. Installation grants no source access, credentials, or permission to publish. The folders use the portable [Agent Skills format](https://agentskills.io/specification); provider-specific discovery and tools still differ.
+
+Normal incorporation changes data and assets, not the frontend. Supported scenes are booking, approval and navigation; artwork choices are calendar, document, compass, parcel and people, with sky, sage or peach accents. A new interaction requires a separately scoped reusable renderer. Valid JSON is not proof of source accuracy. Neither skill runs in the browser or watches PRs automatically.
 
 ## Run locally
 
@@ -16,7 +27,20 @@ npm run storage -- migrate
 npm start
 ```
 
-In another terminal run `npm run seed` once, then open `http://127.0.0.1:4317`. The fixture is saved through the authenticated API; reseeding conflicts rather than overwriting data. Startup never silently seeds. For development run `npm run dev:api` and `npm run dev` in separate terminals. Vite proxies `/api` to Nest. `npm run preview` serves frontend files only; `npm start` serves the complete production app.
+Open `http://127.0.0.1:4317`. Fresh storage shows an empty project shelf; startup never seeds. For development run `npm run dev:api` and `npm run dev` in separate terminals. Vite proxies `/api` to Nest. `npm run preview` serves frontend files only; `npm start` serves the complete production app.
+
+To explore **Publishing Studio**, run a separate demo server with its own storage and port. This single fictional project follows one article through preparation, review, approval, publication and discovery, with saved allowed/blocked/unknown cases, connected activities and varied artwork:
+
+```sh
+ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm run storage -- migrate
+ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm start
+# In another terminal:
+ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm run seed
+```
+
+Open `http://127.0.0.1:4318/#/projects/publishing-studio`. The seed creates an initial snapshot and a second revision changing the requirement from one independent approval to two. In **What changed**, the same one-review case demonstrates the difference. These are invented demo rules, not Ghost behavior, and Atlas explains saved cases rather than executing a publishing workflow.
+
+The seed uses the authenticated API. Reseeding rejects an existing project and never overwrites edits. Creation and the history update are separate requests; if the second request fails, the error reports the saved initial project rather than claiming completion. Keep normal storage separate. The smaller booking/approval fixtures remain for automated tests, not additional showcase projects.
 
 | Setting               | Default / requirement                                                                                                       |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -26,11 +50,11 @@ In another terminal run `npm run seed` once, then open `http://127.0.0.1:4317`. 
 | `ATLAS_FRONTEND_PORT` | `5173`, loopback Vite; use distinct ports for parallel checkouts                                                            |
 | `ATLAS_E2E_PORT`      | `4174`; set in the invoking environment for parallel browser tests                                                          |
 
-Keep `.env`, SQLite, journals, images and backups private. `.local/` is ignored and never statically served. **Refresh guide** loads a coherent revision; failure labels retained content as last loaded. T003 owns project selection and the second distinct composition; T002 opens `booking-demo`.
+Keep `.env`, SQLite, journals, images and backups private. `.local/` is ignored and never statically served. **Refresh guide** loads a coherent revision; failure labels retained content as last loaded. Startup opens the project picker, including an honest empty state when nothing has been incorporated.
 
 ## API for local agents
 
-[shared/contracts.ts](shared/contracts.ts) owns strict versioned schemas. Write bodies require `contractVersion: 1`; unknown fields fail. Current project responses carry the version. Limits: JSON 2 MiB; images 1 MiB; 100 features, 100 cases per feature, 200 relations and 200 assets per project. IDs use lowercase ASCII letters/digits/hyphens, at most 64 characters. Only `booking` scene version 1 is supported.
+[shared/contracts.ts](shared/contracts.ts) owns strict versioned schemas. Write bodies require `contractVersion: 1`; unknown fields fail. Current project responses carry the version. Limits: JSON 2 MiB; images 1 MiB; 100 features, 100 cases per feature, 200 relations and 200 assets per project. IDs use lowercase ASCII letters/digits/hyphens, at most 64 characters. Supported scenes are `booking`, `approval`, and `navigation`, all version 1.
 
 All routes below start with `/api/v1`:
 

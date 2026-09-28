@@ -185,7 +185,7 @@ test('the learning loop works by keyboard, at narrow widths and with reduced mot
   await page.setViewportSize({ width: 375, height: 800 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/#/projects/booking-demo/')
-  await page.getByRole('link', { name: /Explore the story/ }).focus()
+  await page.locator('.island-link').first().focus()
   await page.keyboard.press('Enter')
   await expect(
     page.getByRole('heading', { name: 'Booking moved', exact: true }),

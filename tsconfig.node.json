@@ -8,6 +8,8 @@
     "vite.config.ts",
     "playwright.config.ts",
     "server/**/*.test.ts",
-    "shared/**/*.test.ts"
+    "shared/**/*.test.ts",
+    "fixtures/**/*.test.ts",
+    "scripts/**/*.test.ts"
   ]
 }

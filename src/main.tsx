@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter } from 'react-router'
 import App from './App'
 import './styles.css'
+import './atlas-frame.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -8,7 +8,7 @@ function scan(dir: string) {
     if (entry.isDirectory()) scan(path)
     else if (
       /\.(js|html|css)$/.test(path) &&
-      /ATLAS_WRITE_TOKEN|fixture-v2|Illustrative rules authored for this prototype|planning\/context\//.test(
+      /ATLAS_WRITE_TOKEN|fixture-v2|publishing-studio-fixture|Atlas authored Publishing Studio fixture|Illustrative rules authored for this prototype|planning\/context\//.test(
         readFileSync(path, 'utf8'),
       )
     )
