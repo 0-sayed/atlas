@@ -385,6 +385,17 @@ test('empty, unknown, incompatible and unavailable knowledge have distinct state
   ).toBeVisible()
 })
 
+test('missing project offers a route back to the project picker', async ({
+  page,
+}) => {
+  await page.goto('/#/projects/not-saved')
+  await expect(page.getByRole('alert')).toContainText('Project unavailable')
+  await page.getByRole('link', { name: 'Choose a project' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Choose a project' }),
+  ).toBeVisible()
+})
+
 test('grouped search and related evidence stay scoped and work with keyboard at narrow widths', async ({
   page,
   request,
