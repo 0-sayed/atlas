@@ -427,7 +427,13 @@
 }
 
 .navigation-page .navigation-evidence {
+  display: block;
+  overflow-wrap: anywhere;
   margin-top: 1.25rem;
+}
+
+.navigation-page .navigation-evidence summary {
+  cursor: pointer;
 }
 
 @media (max-width: 1150px) {
