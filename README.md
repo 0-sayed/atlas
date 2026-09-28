@@ -71,18 +71,18 @@ All routes below start with `/api/v1`:
 
 Writes require `Authorization: Bearer <local credential>`. CLI callers may omit Origin; browser Origin/Host are restricted to configured loopback ports. Cross-site requests fail. No permissive CORS or frontend credential.
 
-After building and starting the server, this reads a project and changes only its current notice rule:
+After starting and seeding the separate Publishing Studio demo above, this changes its illustrative approval requirement to three independent approvals:
 
 ```sh
-node --env-file=.env --input-type=module <<'JS'
+ATLAS_PORT=4318 node --env-file=.env --input-type=module <<'JS'
 import { updateSchema } from './dist-server/shared/contracts.js'
-const base = `http://127.0.0.1:${process.env.ATLAS_PORT || 4317}/api/v1`
-const read = await fetch(`${base}/projects/booking-demo`)
+const base = `http://127.0.0.1:${process.env.ATLAS_PORT || 4318}/api/v1`
+const read = await fetch(`${base}/projects/publishing-studio`)
 if (!read.ok) throw new Error(`Read failed: ${read.status}`)
 const project = await read.json()
-const feature = project.features.find(item => item.id === 'booking')
+const feature = project.features.find(item => item.id === 'approve-article')
 const body = updateSchema.parse({ contractVersion: 1, expectedRevision: project.revision,
-  upsertFeatures: [{ ...feature, noticeHours: 30 }] })
+  upsertFeatures: [{ ...feature, requiredApprovals: 3 }] })
 const response = await fetch(`${base}/projects/${project.id}/changes`, {
   method: 'POST', headers: { 'content-type': 'application/json',
     authorization: `Bearer ${process.env.ATLAS_WRITE_TOKEN}` }, body: JSON.stringify(body),

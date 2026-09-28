@@ -2,7 +2,7 @@
 
 Implemented on `feat/t006-visual-authoring-foundation`, based on the existing T005 work. This task establishes the reusable application frame and incorporation workflow; it does not complete T005's human comprehension evaluation.
 
-**Historical snapshot:** This record describes the 2026-09-25 validation. Subsequent local overview changes select all authored essentials, or all features ordered by ID when no selection exists, and reveal six at a time. The three-item behavior below is historical, not the current renderer contract. These later changes were inspected on 2026-09-28; this note does not claim a fresh application test run.
+**Historical snapshot:** This record describes the 2026-09-25 validation. Subsequent local overview changes select all authored essentials, or all features ordered by ID when no selection exists, and reveal six at a time. The three-item behavior below is historical, not the current renderer contract. The September 25 results below predate those changes; the September 28 verification refresh at the end records their later full validation.
 
 ## Delivered boundary
 

@@ -585,7 +585,7 @@ For another conversation or a coding session, supply the latest document and the
 | 0.9 | 2026-09-24 | Replaced the open-question list with agreed V1 defaults and prototype checks; historical frontend-only baseline. |
 | 0.10 | 2026-09-24 | Replaced code-bundled project knowledge with one Git-ignored SQLite database, validated local backend writes, and data-driven rendering across projects. Preserved the visual experience, context-only skill, and 13 references. No application implementation or tests claimed. |
 | 0.11 | 2026-09-25 | Superseded the historical three-place recommendation with seven fixed destinations, specified full-product knowledge needs, and limited the active visual milestone to the overview plus one feature explanation. Visual acceptance remains pending. |
-| 0.12 | 2026-09-28 | Distinguished uncommitted T006 and reviewed desktop references from target behavior; bounded authored activities and specified T007–T011 same-build acceptance. Documentation proposal only. |
+| 0.12 | 2026-09-28 | Distinguished committed T006 and reviewed desktop references from target behavior; bounded authored activities and specified T007–T011 same-build acceptance. Documentation proposal only. |
 
 ---
 
