@@ -45,6 +45,8 @@ export default defineConfig(() => {
         'src/**/*.{test,spec}.{ts,tsx}',
         'server/**/*.test.ts',
         'shared/**/*.test.ts',
+        'fixtures/**/*.test.ts',
+        'scripts/**/*.test.ts',
       ],
     },
   }

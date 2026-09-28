@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { Link } from 'react-router'
 import { validateDocument, type ProjectDocument } from '../../shared/contracts'
 import { ProjectContext } from './knowledge'
 export function KnowledgeProvider({
@@ -70,6 +71,7 @@ export function KnowledgeProvider({
           </p>
         )}
         {loading && <p role="status">Loading saved guide…</p>}
+        {error && !document && <Link to="/">Choose a project</Link>}
         {!loading && (
           <button
             type="button"

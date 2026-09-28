@@ -1,6 +1,11 @@
 import { bookingView } from '../../shared/booking'
 import { approvalOutcome } from '../../shared/approval'
-import { isBookingFeature, type Feature } from '../../shared/contracts'
+import {
+  isBookingFeature,
+  isApprovalFeature,
+  isNavigationFeature,
+  type Feature,
+} from '../../shared/contracts'
 
 export function HistoricalFeature({
   feature,
@@ -18,22 +23,29 @@ export function HistoricalFeature({
         reason: c.reason,
         conditions: `${c.hours} hours remaining · ${c.owner === 'you' ? 'Owned by you' : 'Owned by someone else'} · ${c.confirmed ? 'Confirmed' : 'Not confirmed'} · Slot ${c.slot}`,
       }))
-    : !isBookingFeature(feature)
+    : isApprovalFeature(feature)
       ? feature.cases.map((c) => ({
           ...c,
           ...approvalOutcome(feature, c),
           conditions: `${c.role === 'reviewer' ? 'Independent reviewer' : 'Requester'} · Request ${c.state} · ${c.approvals ?? 'Unknown'} approvals`,
         }))
-      : []
+      : isNavigationFeature(feature)
+        ? feature.cases.map((c) => ({
+            ...c,
+            conditions: `${c.start} · Action: ${c.action} · Outcome: ${c.outcome}`,
+          }))
+        : []
   const restrictions =
     view?.bookingRestrictions ??
-    (!isBookingFeature(feature)
+    (isApprovalFeature(feature)
       ? [
           'Pending request',
           'Independent reviewer',
           `At least ${feature.requiredApprovals} independent approvals`,
         ]
-      : [])
+      : isNavigationFeature(feature)
+        ? feature.rules
+        : [])
   return (
     <div className="historical-feature">
       <p className="eyebrow">{label} · Historical</p>

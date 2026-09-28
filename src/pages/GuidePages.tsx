@@ -1,8 +1,12 @@
 import { Link, useSearchParams } from 'react-router'
-import { isBookingFeature, type Feature } from '../../shared/contracts'
+import {
+  isBookingFeature,
+  isApprovalFeature,
+  type Feature,
+} from '../../shared/contracts'
 import { useProject, projectPath } from '../content/knowledge'
-import { CalendarArt } from '../scenes/BookingScene'
-import { ApprovalArt } from '../scenes/ApprovalScene'
+import { ActivityArt } from '../scenes/ActivityArt'
+import { IslandOverview } from './IslandOverview'
 
 export function FixtureLabel({ feature }: { feature?: Feature }) {
   const project = useProject()
@@ -15,9 +19,6 @@ export function FixtureLabel({ feature }: { feature?: Feature }) {
       · Atlas revision {project.revision} · No live product connection
     </p>
   )
-}
-export function FeatureArt({ feature }: { feature: Feature }) {
-  return isBookingFeature(feature) ? <CalendarArt /> : <ApprovalArt />
 }
 function featureLink(
   projectId: string,
@@ -42,74 +43,23 @@ export function EmptyGuide() {
 }
 export function StartPage() {
   const project = useProject()
-  const essentials = [...project.features]
-    .sort(
-      (a, b) =>
-        (a.essentialOrder ?? 100) - (b.essentialOrder ?? 100) ||
-        a.id.localeCompare(b.id),
-    )
-    .slice(0, 3)
+  const selected = project.features.filter(
+    (feature) => feature.essentialOrder !== undefined,
+  )
+  const essentials = selected.length
+    ? [...selected].sort(
+        (a, b) =>
+          a.essentialOrder! - b.essentialOrder! || a.id.localeCompare(b.id),
+      )
+    : [...project.features].sort((a, b) => a.id.localeCompare(b.id))
   return (
-    <section className="start-page" aria-labelledby="page-title">
-      <FixtureLabel />
-      <div className="start-intro">
-        <p className="eyebrow">A little exploration. A clearer picture.</p>
-        <h1 id="page-title">Start here</h1>
-        <p className="intro">
-          See what a product lets you do.
-          <br />
-          Find out what changes the outcome.
-        </p>
-      </div>
-      {essentials.length === 0 ? (
-        <EmptyGuide />
-      ) : (
-        essentials.map((feature, index) => (
-          <Link
-            key={feature.id}
-            className="activity-hero"
-            to={featureLink(project.id, feature, 'start')}
-          >
-            <div className="hero-art">
-              <FeatureArt feature={feature} />
-              <span className="art-spark" aria-hidden="true">
-                ✦
-              </span>
-            </div>
-            <div className="activity-copy">
-              <p className="eyebrow">
-                {String(index + 1).padStart(2, '0')} /{' '}
-                {feature.group ??
-                  (isBookingFeature(feature) ? 'Bookings' : 'Reviews')}
-              </p>
-              <h2>{feature.title}</h2>
-              <p>{feature.purpose}</p>
-              <p>
-                {isBookingFeature(feature)
-                  ? `At least ${feature.noticeHours} hours’ notice`
-                  : `At least ${feature.requiredApprovals} independent approvals`}
-              </p>
-              <p className="revision-note">
-                {feature.evidence.status === 'demo'
-                  ? 'Illustrative fixture'
-                  : feature.evidence.status === 'uncertain'
-                    ? 'Uncertain evidence'
-                    : 'Source-supported'}
-              </p>
-              <span className="text-link">Explore the story ↗</span>
-            </div>
-          </Link>
-        ))
-      )}
-      {essentials.length > 0 && (
-        <p className="start-note">
-          Select a saved case to see what matters.{' '}
-          <Link to={`${projectPath(project.id)}/explore`}>
-            Explore all activities ↗
-          </Link>
-        </p>
-      )}
-    </section>
+    <IslandOverview
+      project={project}
+      essentials={essentials}
+      isAuthoredSelection={selected.length > 0}
+      featureHref={(feature) => featureLink(project.id, feature, 'start')}
+      fixtureLabel={<FixtureLabel />}
+    />
   )
 }
 export function ExplorePage() {
@@ -127,7 +77,12 @@ export function ExplorePage() {
   const groups = new Map<string, Feature[]>()
   for (const feature of matches) {
     const group =
-      feature.group ?? (isBookingFeature(feature) ? 'Bookings' : 'Reviews')
+      feature.group ??
+      (isBookingFeature(feature)
+        ? 'Bookings'
+        : isApprovalFeature(feature)
+          ? 'Reviews'
+          : 'Navigation')
     groups.set(group, [...(groups.get(group) ?? []), feature])
   }
   return (
@@ -185,7 +140,7 @@ export function ExplorePage() {
                 key={feature.id}
                 to={featureLink(project.id, feature, 'explore', query)}
               >
-                <FeatureArt feature={feature} />
+                <ActivityArt feature={feature} />
                 <div>
                   <h3>{feature.title}</h3>
                   <p>{feature.purpose}</p>

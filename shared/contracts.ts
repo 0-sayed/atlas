@@ -25,6 +25,11 @@ export const caseSchema = z.strictObject({
   confirmed: z.boolean(),
   slot: z.enum(['free', 'occupied', 'unknown']),
 })
+export const presentationSchema = z.strictObject({
+  illustration: z.enum(['calendar', 'document', 'compass', 'parcel', 'people']),
+  accent: z.enum(['sky', 'sage', 'peach']),
+})
+export type Presentation = z.infer<typeof presentationSchema>
 const featureFields = {
   id: idSchema,
   title: short,
@@ -35,6 +40,7 @@ const featureFields = {
   revisionLabel: short,
   evidence: evidenceSchema,
   assetIds: z.array(idSchema).max(20),
+  presentation: presentationSchema.optional(),
 }
 export const bookingFeatureSchema = z.strictObject({
   ...featureFields,
@@ -61,9 +67,28 @@ export const approvalFeatureSchema = z.strictObject({
   requiredApprovals: z.number().int().min(1).max(10),
   cases: z.array(approvalCaseSchema).max(100),
 })
+export const navigationCaseSchema = z.strictObject({
+  id: idSchema,
+  label: short,
+  start: text,
+  action: short,
+  result: short,
+  reason: text,
+  outcome: z.enum(['available', 'unavailable', 'unknown']),
+})
+export const navigationFeatureSchema = z.strictObject({
+  ...featureFields,
+  scene: z.strictObject({
+    kind: z.literal('navigation'),
+    version: z.literal(1),
+  }),
+  rules: z.array(text).max(20),
+  cases: z.array(navigationCaseSchema).max(100),
+})
 export const featureSchema = z.union([
   bookingFeatureSchema,
   approvalFeatureSchema,
+  navigationFeatureSchema,
 ])
 export const relationSchema = z.strictObject({
   id: idSchema,
@@ -112,6 +137,18 @@ export type ApprovalFeature = z.infer<typeof approvalFeatureSchema>
 export type ApprovalCase = z.infer<typeof approvalCaseSchema>
 export function isBookingFeature(feature: Feature): feature is BookingFeature {
   return feature.scene.kind === 'booking'
+}
+export type NavigationFeature = z.infer<typeof navigationFeatureSchema>
+export type NavigationCase = z.infer<typeof navigationCaseSchema>
+export function isNavigationFeature(
+  feature: Feature,
+): feature is NavigationFeature {
+  return feature.scene.kind === 'navigation'
+}
+export function isApprovalFeature(
+  feature: Feature,
+): feature is ApprovalFeature {
+  return feature.scene.kind === 'approval'
 }
 export type SavedCase = z.infer<typeof caseSchema>
 export type CreateRequest = z.infer<typeof createSchema>

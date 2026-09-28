@@ -1,6 +1,6 @@
 # Atlas Project Bootstrap Checklist
 
-This checklist records the delivered T000 static frontend foundation. T001 later delivered the labelled booking experience (merged PR #2). T002 now implements the v0.10 local data platform; the original T000 checkboxes remain historical frontend evidence. T002 verification is recorded separately below.
+This checklist records the delivered T000 static frontend foundation and subsequent T002 platform transition. T001 delivered the labelled booking experience (merged PR #2); T002 implemented the local API/SQLite platform. The checkboxes and verification statements below are historical evidence, not current setup instructions. Read [the planning entry point](README.md) and [current task graph](roadmap/tasks.md) for the 2026-09-28 baseline and T007–T011 desktop work.
 
 ## Phase 0 — Planning and repository foundation
 
@@ -151,4 +151,4 @@ SQLite runs inside the backend process, so the initial integration suite uses re
 
 If container distribution is selected later, add a dedicated packaging checklist and CI job covering image build, production startup/readiness, persistent database-and-asset storage, restart persistence, writable-volume permissions, and clean shutdown. Keep images free of private `.local/` data and secrets. Keep image verification separate from routine npm validation; registry publishing requires an explicit distribution decision. Use Testcontainers when a real containerized dependency or container-runtime test needs it.
 
-T003 then proves a second project and changed rule in the same unchanged build. T004 validates the independent skill outside this repository, and T005 evaluates verified source knowledge through the API.
+T003 subsequently proved a second project and changed rule in the same unchanged build. T004 validated the independent, portable skill now bundled in this repository. T005's runtime and real-source incorporation are implemented; its human evaluation remains open. These historical milestones do not establish completion of the final desktop design.

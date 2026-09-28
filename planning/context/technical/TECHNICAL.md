@@ -1,186 +1,134 @@
-# Atlas — Technical Baseline
+# Atlas — Technical Baseline and Proposed Guide Model
 
-**Version:** 0.6\
-**Updated:** 2026-09-24\
-**Status:** v0.10 target architecture. The static React frontend and booking learning loop are delivered; the local backend, SQLite database, and validated data API remain to be implemented.
+**Version:** 0.7\
+**Updated:** 2026-09-28\
+**Status:** Current implementation reconciled with the proposed full-guide direction. The proposed model and sequence below are for owner review; they are not an executable implementation plan or a claim of delivered behavior.
 
-> One reusable visual application. One local SQLite database for all projects. Ordinary backend validation before saving. The context-only skill stays independent.
+[PROJECT.md](../business/PROJECT.md) owns product scope and the seven destinations. [DESIGN.md](../business/DESIGN.md) owns their visual behavior. This document states the implemented technical boundary, then the smallest data and renderer extensions that appear necessary to support that direction.
 
-[PROJECT.md](../business/PROJECT.md) owns scope; [DESIGN.md](../business/DESIGN.md) owns the visual experience. This file replaces the earlier frontend-only baseline. The storage/runtime boundary follows Sayed's latest clarification; library and folder choices below are implementation recommendations, not claims that the new backend or storage libraries are installed or benchmarked.
+For concrete Penpot boards, components and token lookup, use the [design reference](../design-reference.md). Design changes do not automatically update application code.
 
 ## 1. The architecture in one minute
 
 ```text
-Independent source preparation:
-  source project / PR → fill-atlas → atlas-context.md → STOP
-
-Separately, when the user chooses to update a project:
-  agent reads context + existing project data
-    → submits data to Atlas's local API
-    → backend checks it and saves one SQLite transaction
-
-Browsing:
-  React interface → the same local API → SQLite + registered assets
+Authorized source → independent fill-atlas → reviewed context Markdown → stop
+Reviewed context + selected Atlas project → separate update-atlas workflow
+  → local versioned API → validated SQLite transaction → explicit browser refresh
+React guide → local API → SQLite and registered assets
 ```
 
-The backend is normal application code, not another agent, planner, analysis job, or separate “writer” service. It does not convert free-form context Markdown into facts. The separate agent prepares a structured request using the application's documented contract; that contract does not belong in `fill-atlas`.
+`fill-atlas` records source facts only. `update-atlas` prepares a scoped write after scene-fit and evidence review. The NestJS API validates and persists it; the browsing app does not analyze source, execute a model, or run either skill. JSON is the API encoding, while SQLite is the authoritative project store. A validated data update can change saved knowledge without rebuilding Atlas. A new interaction or contract capability still needs an application release.
 
-JSON is the request/response encoding, not a second authoritative store. There are no saved per-project JSON documents to keep synchronized. The running guide never executes source-context instructions or calls an LLM to open a feature or switch a saved case.
+**Implemented today:** One React/TypeScript/Vite client with hash-based React Router navigation; a loopback NestJS API on its Express adapter; one SQLite database through `better-sqlite3`; tracked SQL migrations; shared strict version-1 Zod contracts; project-scoped features, cases, relations, registered raster assets, and immutable revision snapshots. Booking, approval, and navigation are the only accepted scene kinds, all at scene version 1. The frontend has their explicit code-owned scene helpers and components. Normal storage starts empty; fixtures are labelled demo data and stay outside browser runtime imports.
 
-**Adding projects and changing facts, supported scene settings, or project assets must work without rebuilding Atlas.** Adding a genuinely new reusable interaction component still requires a normal application release. Project data never contains executable React or an unrestricted scene program.
+**Proposed:** A domain-neutral, versioned authored-activity scene and first-class supporting records for the complete guide. Neither exists in the current write contract or renderer. The current visual foundation and two-screen proof do not establish that all seven destinations work or that arbitrary web-product behavior fits the three existing scenes.
 
-## 2. Small stack to implement
+## 2. Stack and dependency decisions
 
-| Responsibility | First-build recommendation |
+| Concern | Implemented baseline and proposed limit |
 |---|---|
-| Visual frontend | React + TypeScript + Vite; retain the existing illustrated direction. [T1] |
-| Styling | Tailwind CSS, own theme tokens, and ordinary CSS where clearer. [T2] |
-| Controls and motion | Native controls first; Radix where needed; SVG/React illustrations and Motion for meaningful transitions. [T3][T4] |
-| Local backend | Node.js + a small NestJS app using its normal HTTP adapter. No microservices, CQRS, or worker platform. Nest supports request validation and serving a built frontend. [T5] |
-| Database | SQLite, with `better-sqlite3` as the suggested Node binding. Use prepared statements and tracked SQL migrations; an ORM is not required for this first schema. [T6][T7] |
-| Input contract | Versioned Zod schemas shared as code between API/tests and any preparation helper; infer TypeScript types. Validate every write at the backend boundary. [T8] |
-| Navigation | React Router; retain hash routing initially if convenient. Include project, feature, and case identity in routes. [T9] |
-| Tests | Vitest for schema/helpers and small database integration tests; Playwright for the running app/API learning loop. Use the test setup supported by the scaffold for Nest-specific integration wiring. [T10][T11] |
-| Toolchain | A mutually compatible supported Node LTS and package versions, npm, one lockfile, strict TypeScript. Pin these after installation checks, not from guesses. |
+| Client | React, TypeScript, Vite, React Router `HashRouter`, Tailwind CSS and ordinary CSS. Keep the existing illustrated Atlas style and scene components. [T1][T2][T9] |
+| Server | One NestJS process on Express, with local API checks and optional built-client serving. No new service tier is needed for authored knowledge. [T5] |
+| Persistence | `better-sqlite3`, prepared SQL and tracked migrations in `migrations/`; no ORM, Redis, queue or graph database justified by this change. [T6][T7][T16] |
+| Contracts | Strict shared Zod schemas and TypeScript types in `shared/`, with backend validation and version checks. [T8] |
+| Interaction | Native controls, visible focus, and reduced-motion-safe behavior. Radix is a candidate only for a complex widget that needs it; Radix and shadcn are not installed baselines. [T3][T4] |
+| Art/navigation | Existing code-owned SVG/React illustrations and registered PNG/JPEG/WebP. `react-zoom-pan-pinch` is a candidate for a bounded map interaction check, not a selected or installed dependency. |
+| Verification | Vitest for contracts, pure helpers and real SQLite/API behavior; Playwright for navigation and interaction. Run repository-required gates before claiming a branch ready. [T10][T11] |
 
-NestJS, the SQLite binding, and Zod are defaults to implement, not a claim that Sayed separately approved every library. Keep one backend process; all database access goes through its small data module. Do not add Fastify, Drizzle, Prisma, or a second validator without an actual need. With the installed Nest release, use its supported schema-validation pipe or a small Zod pipe; do not duplicate all rules in decorator DTOs. [T5][T8]
-
-**Not in V1:** PostgreSQL/MongoDB, Redis/queues, vector or graph databases, an AI memory service, source watchers/webhooks, internal Codex jobs, a Markdown-to-data AI service, a drag-and-drop editor, arbitrary plugins, real-time collaboration, or full 3D.
+The current package versions and lockfile, rather than this document, are the source for installed versions. Keep the established `src/components/`, `src/pages/`, `src/scenes/`, `src/content/`, `shared/`, and `server/` boundaries. Add a boundary only when real behavior needs one. No generic content engine, new framework, separate writer service, schema-generated UI, or per-project frontend build is implied.
 
 ## 3. Where everything lives
 
-```text
-atlas/
-  planning/context/         # Business and technical documents; business/references/ holds design images
-  planning/roadmap/         # Task graph and dependencies
-  .agents/skills/fill-atlas/     # standalone source-context skill and template; not app runtime
-  src/                      # Frontend, reusable scenes, shared artwork
-  server/                   # Local API, checks, database access
-  shared/                   # Request/response and scene-setting schemas/types
-  migrations/               # Tracked, reviewed SQL schema changes
-  fixtures/                 # Harmless demo seeds, not live private project truth
-  .gitignore                # Excludes .local/ and build/dependency output
-  .local/                   # Created at runtime; NOT tracked or statically served
-    atlas.sqlite            # ONE database, containing ALL saved projects
-    assets/                 # Registered project-specific image files
-    backups/                # Private local backups, if produced
-```
+| Path | Role |
+|---|---|
+| `planning/` | Development context and roadmap; its raw briefs and reference images are not app assets. |
+| `.agents/skills/fill-atlas/` | Independent source-context Markdown skill. |
+| `.agents/skills/update-atlas/` | Separate portable workflow for reviewed API incorporation; its reference and tests must evolve with advertised API capabilities. |
+| `src/content/`, `src/components/`, `src/pages/`, `src/scenes/` | API loading and pure view helpers; presentation and explicit interactions. |
+| `shared/` | Strict versioned contracts, typed relationships and pure scene helpers. |
+| `server/`, `migrations/` | Local API, SQLite access, registered-asset handling and tracked SQL changes. |
+| `fixtures/` | Isolated demo and tests only; never imported into browser runtime. |
+| `.local/` | Ignored private SQLite data, registered assets and optional backups. |
 
-The `src/` frontend already exists. `server/`, `shared/`, `migrations/`, `fixtures/`, and `.local/` illustrate the T002 target and are not delivered folders. No additional nested repo, one database per project, or `projects/<name>/project.json` hierarchy is needed.
-
-SQLite stores the primary database in a file; journaling modes can create sidecar files. Ignore the whole `.local/` directory, not only `atlas.sqlite`. Git-ignore does not remove files already tracked, encrypt data, or create backups. [T6][T12]
-
-Store all project knowledge and visual settings in the database. Image bytes may remain in `.local/assets/`; the database owns their IDs, relative storage keys, project association, media types, and provenance. Shared licensed icons/illustrations shipped with Atlas are application assets, not private project data. Keep private files out of Vite's `public/`, frontend imports, and build artifacts. [T13]
+One database contains all projects. Assets have project-scoped registrations; raw storage directories are never statically served. `.env` and `.local/` remain private and ignored. Git-ignore is not encryption or a backup. [T12][T13]
 
 ## 4. Minimal data model and constraints
 
-Use ordinary SQL tables for projects, features/activities, saved cases, typed relationships, registered assets, and revision/change history. Keep identities and links explicit. A project owns its facts, essential-activity ordering, themes, and scene settings. A feature owns or references its supported rules and evidence. Do not create a table for every descriptive noun just to appear rigorous.
+**Current contract:** A project has a stable ID, title, revision, up to 100 features and 200 relations. Each feature contains its scene-specific payload, actor/purpose, one evidence object, case list, optional group/essential order/presentation, and asset IDs. Relations have project-scoped stable endpoints and only `requires` or `related` meaning. The SQLite schema stores projects, features, cases, relations, assets, feature-asset links and revision snapshots. Its SQL migrations are tracked. Those are current facts, not a sufficient model for every activity in a large web app.
 
-Stable project-scoped IDs and foreign keys should protect links between records. Cases, relations, assets, and every API query must retain project scope. A relation between two existing features in *different* projects must be rejected, not accepted because both IDs happen to exist. Enforce this with project-scoped keys/constraints where possible and backend checks where needed. Enable and verify `PRAGMA foreign_keys = ON` on **every connection**, before transactions. [T14]
+**Proposed record set for the seven destinations:**
 
-Nested rule details, saved examples, or scene settings can use strictly validated serialized fields where that keeps the schema small. Such a field is still inside SQLite, not a parallel project JSON file. Persist primary identities and relationship endpoints as columns so references remain checkable. Exact columns belong in the first migration and its tests.
+| Record or binding | Purpose |
+|---|---|
+| Project | Stable identity, title and optional evidenced purpose; absent purpose stays absent. |
+| Activity and authored scene | Stable project-scoped feature identity, purpose, versioned scene selection, ordered observable steps, actors involved, explicit conditions, recorded cases and their outcome **and reason**. A case is a cited observation/example, not an executable simulation or universal rule program. |
+| Actor and participation | Identifiable person/system entries and scoped links to activities/steps. Do not infer permissions from participation. |
+| Rule/condition | A stable, searchable condition with precise authored meaning, applicability and affected activities/cases; preserve exact operators, thresholds and units where applicable. Preserve unknown or configuration-dependent values; do not duplicate a changed rule as conflicting prose across views. |
+| Journey | Authored goal and ordered references to existing activities/steps, with supported cautions. Do not derive journeys from dependency links. |
+| Relationship | Stable typed, evidenced links with an explicit meaning and scope. Keep current `requires`/`related`; introduce further kinds only where an actual source distinction and renderer treatment warrant them. Decorative paths carry no relationship claim. |
+| Glossary term | Saved definition, scope, evidence and references to relevant records. |
+| Domain/group and essentials | Optional grouping and curated Start Here ordering. No universal taxonomy, island count, or fabricated usage score. |
+| Evidence and history | Source identity, inspected revision/scope, status and precise source reference for each meaningful claim or shared record; immutable Atlas revision snapshots and classified changes. |
 
-Preserve the following distinctions:
+Evidence at one feature level is too coarse when steps, conditions, actors, journeys, terms, and cases can have different support. Give each meaningful claim or shared record evidence identifiers and scoped references to inspected paths, symbols, documents or verified sources. Preserve `supported`, `uncertain` and `demo` distinctions; record source revision separately from Atlas revision. A valid schema cannot establish source truth or production deployment.
 
-- **Current facts versus history:** reference current rule values from scenes; before/after deliberately retains a labelled prior snapshot.
-- **Atlas revision versus source revision:** a successful Atlas save increments a project-data revision. It does not prove the entire source product was examined at that commit or deployed.
-- **Evidence versus format validity:** important claims carry source identity, inspected revision/scope, evidence, and supported/uncertain/demo status. Valid fields do not prove true business rules.
-- **Partial update versus replacement:** omitted features remain unchanged. Removing/retiring behavior is explicit; a brief about one PR cannot replace the whole project.
-
-SQLite supports transactions, but only one write transaction can proceed at a time. Keep writes brief and bounded. This is appropriate for a local user and sequential agent updates; do not promise unlimited concurrent writers or migrate based on feature count alone. [T15][T16]
+Use stable project-scoped IDs and check cross-record references within the same project. Store primary identities and relationship endpoints in checkable columns; use strictly validated serialized detail only where it keeps the schema small. Do not turn every noun into a table or accept arbitrary JSON as a user interface specification. The exact next SQL shape belongs to the reviewed contract/migration work. Foreign keys remain enabled per connection. [T14]
 
 ## 5. What “the backend validates” means
 
-These are ordinary request/service checks inside the same backend, not another deployed program:
+The existing API parses strict version-1 requests, rejects unknown scene kinds and malformed or cross-project references, checks the expected Atlas revision, and writes the scoped change plus history in one transaction. Omitted features remain unchanged; explicit removals are required. An upsert replaces the full named feature, so callers must read and preserve unmodified fields. Failed batches roll back. Stored history gives a previous value only when that value was actually saved; it is not a reconstruction from a new context brief. [T8][T15]
 
-1. **Parse the request:** enforce the supported contract version, bounded sizes, required fields, correct types, and unexpected-field rejection. Use Zod strict schemas. [T8]
-2. **Check meaning-independent integrity:** allowed scene kinds/settings, unique stable IDs, asset references, same-project links, and consistent references between scenes, facts, and cases.
-3. **Check the target revision:** the caller supplies the current revision it read. Recheck that revision and database-dependent conditions inside the write transaction. Reject stale updates instead of silently overwriting newer data.
-4. **Save together:** apply the scoped batch, related history, and revision increment in one transaction. On an error, roll back all database changes. Do not run agent/model calls inside the transaction. [T15]
-5. **Respond honestly:** return saved IDs/revision or useful field/conflict errors. A rejected write must not produce a success badge, duplicate features, or a partial new guide.
+The proposed contract must keep those guarantees for new activities and records: bound text and collection sizes; unique project-scoped IDs; typed references; no orphaned steps, rules, case evidence or relationships; supported scene/version combinations; exact source/status fields; and transactionally consistent current data, history and revision. Classify added, changed, removed, evidence-only and no-behavior-change results deliberately. A source change or a new inspected commit alone must not create a behavior change entry. Existing version-1 documents must remain readable after migration, including their optional presentation and historical snapshots. A conversion may add optional structure, but it must not silently reinterpret a booking threshold, an approval decision, a navigation outcome, or prior evidence.
 
-Requests contain data only, never SQL strings. Use prepared parameterized statements in the backend. Small create/read/apply-update endpoints are enough; do not expose a generic SQL console or filesystem API. The agent reads the actual contract/schema and examples before submitting a change, then corrects errors if needed. Those examples are not instructions added to the context-only skill. [T7]
+The API should advertise the **actual accepted scene kinds, scene versions, contract extensions and presentation options** through a read-only supported-capabilities response. `GET /ready` returning `contractVersion: 1` only proves readiness for that contract; it does not prove a particular scene or optional presentation extension is accepted. `update-atlas` must inspect advertised support before preparing a write, and its portable API/art references and contract tests must change in the same task as the server contract. Never use a normal project write as a capability probe. Keep unsupported source behavior as an explicit renderer gap, not a forced navigation case.
 
-The implemented API should let an agent list/select/create projects, read relevant current data/revision, register assets when necessary, and submit a scoped batch of changes. Exact routes are implementation details. No separate API-spec Markdown file is required; keep the contract in tested code and concise usage examples.
-
-Stable IDs prevent duplicate features. Reapplying an already-used stale revision can simply return a conflict; elaborate retry/event infrastructure is unnecessary. The frontend should also reject incompatible response/scene versions rather than render arbitrary data, but it must not be the only validation boundary.
-
-**Limits:** backend validation protects the normal API path, not against a person or agent with unrestricted filesystem access editing the DB directly. Keep direct DB writes outside the ordinary workflow. Neither Zod nor SQL constraints verifies business truth; source review remains necessary.
+Requests contain data, never SQL, JSX, arbitrary expressions or executable scene programs. Backend validation protects the normal API boundary; it does not make unreviewed source claims true. [T7]
 
 ## 6. Dynamic visuals without a generic game engine
 
-Keep a small code-owned registry of reviewed explanation patterns: illustrated walkthrough, recorded-case comparison, timeline, compact permission comparison, and a scoped relationship treatment as needed. Implement only the patterns needed by the first demo, then extend through normal code review.
+The proposed authored-activity scene is a **reviewed, versioned composition** for a finite activity with recorded actors, steps, conditions, cases, outcome and reason. Its renderer can change a selected recorded case, highlight applicable steps/conditions and show the recorded consequence. It must not evaluate an arbitrary rule tree, invent an unrecorded outcome, fetch live product state, or generate UI from arbitrary JSON. Booking/approval/navigation can stay as existing specialized version-1 scenes; shared facts may become reusable records when migration and exact source meaning support that change.
 
-Each saved feature binds a supported scene kind/version to its facts, cases, illustrations, and permitted layout/theme options. This is how the booking project and another project can look different without shipping different Atlas applications. Scene code renders facts; it does not duplicate thresholds or infer unknown outcomes. The overview and deeper view consume the same current data.
+Start Here uses curated essentials or honestly labelled unprioritized content. Feature Map groups and searches all recorded activities, with selective local relationships and stable routes. User Journeys follow authored order. Actors, Rules and Glossary read their own saved records and links. Recent Changes reads classified snapshot differences and opens the affected current or historical explanation. One record can appear in several destinations without conflicting copies of its facts. A new visual treatment is code-owned, reviewed, versioned and explicitly advertised before the portable updater may target it.
 
-A saved configuration cannot invent a new renderer. Reject unknown kinds during writes; use a clear compatibility error if an older app encounters newer saved data. Do not store/evaluate arbitrary JSX, JavaScript, MDX, raw HTML/SVG markup, CSS programs, or expressions inside project records. Trusted shared SVG components are application code, not uploaded instructions.
-
-Project-specific art may be PNG/WebP/JPEG initially; simple dynamic elements use the shared reviewed vector components. Support SVG uploads only with a deliberate sanitization/content-security strategy, not by injecting raw markup. Asset references resolve through controlled backend handlers by ID, not arbitrary filesystem paths. Missing art should preserve a readable explanation, not fabricate a subject.
-
-Keep the warm 2D/2.5D style, a few reusable assets, real readable labels, keyboard/focus support, reduced-motion alternatives, and precise restrictions. A database does not justify turning the interface into an admin dashboard. Labels are not baked into paintings. [T4]
+Project data can select supported art and accent choices and refer to registered images, but cannot provide JSX, JavaScript, MDX, HTML, raw SVG, CSS or unrestricted layout. Native controls and semantic text carry the meaning; art remains decorative or explanatory. Implement the packaged Penpot desktop style in the two-screen proof while preserving existing functional behavior. Tablet/mobile refinements are deferred while retaining the present usable responsive baseline. Add map pan/zoom only after a bounded interaction and accessibility check demonstrates that it helps; a package name alone does not establish the design. [T3][T4]
 
 ## 7. Loading, updates, and project selection
 
-Use a small project picker, then Start here / Explore / What changed within that project. Routes can be `#/projects/<id>/explore/<feature>?case=<case>`; they are local navigation links, not automatically shareable project exports.
+The current client selects a saved project, reads it through the API, and uses project-scoped hash routes, direct feature/case links and browser Back. Current views cover Start Here, Explore/feature detail and Changes. The proposed full guide keeps one stable seven-destination frame within a chosen project: Start Here, Feature Map, User Journeys, Actors, Rules, Glossary and Recent Changes. Feature-local tabs and filters do not become extra project destinations. Empty destinations need truthful states, not placeholder claims of completion.
 
-The frontend fetches project-scoped summaries and selected feature data from the local API. Keep loaded UI state separate from persistent knowledge. Cache keys include project and revision identity; do not show the previous project's facts while the next project loads. Use bounded lists and queries for larger catalogs rather than rendering every scene simultaneously.
+A browser view must use one coherent loaded Atlas revision for its facts, cases, evidence and links. A successful API write needs a refetch/Refresh before an open browser reflects it; there is no live source sync. Preserve project/feature/case identity in navigation and cache state so switching projects cannot show stale content from another project. Handle empty storage, empty or partial projects, unknown outcomes, missing assets, retired features and API failure distinctly. Routes should remain directly loadable and Back should restore orientation.
 
-After an external agent saves a valid update, an explicit Refresh/refetch is sufficient for V1. No polling or push infrastructure is needed. A selected scene and its evidence must use one coherent revision. Read a complete feature response consistently; do not mix current rules with old cases from separate cached responses. Database commit does not imply an already-open browser has refetched.
-
-Handle no projects, an empty project, loading, missing features, partial evidence, unknown outcomes, backend failure, and rejected writes distinctly. Retain last-loaded content on a request failure where possible, labelled as such. There is no source scanner, live source-sync status, or compulsory context upload form.
+The current document cap of 100 features and full-project reads/history are acceptable as a present constraint, not as a large-project answer. The desktop delivery roadmap targets a future test dataset of at least 160 features, above that cap; this fixture is not implemented yet. Before raising limits, create and measure that fixture through contract validation, storage read/write, history size, search and browser rendering. Then choose bounded page/section reads, targeted history, grouping and selective relationship expansion based on the measured bottleneck. Preserve complete reachability and revision consistency while avoiding a giant rendered graph. Do not add Redis, an ORM, vector search or separate databases ahead of that evidence. [T16]
 
 ## 8. Privacy, assets, and backups
 
-**Local first:** bind the backend and development UI to loopback. Use one application origin when serving the built frontend; development can proxy the API. Nest can serve the compiled frontend, but `.local/` must never be mounted as a static directory. A static frontend host alone cannot replace the database/API runtime. [T5]
+The existing server binds loopback, checks Host/Origin, denies cross-site requests, requires a local write token and serves only registered images. Keep those checks with any new endpoints and never place the token in the frontend build, URL or logs. Private source context and assets remain outside `public/` and build artifacts. A static frontend host alone cannot serve the local knowledge store. [T5][T13][T17]
 
-Protect the local API from unrelated websites: restrict Host/Origin handling, do not use permissive CORS, and require an explicit local credential for writes (a small local token, not a user-account system). Do not bake credentials into the frontend build, put them in URLs, or log sensitive payloads. CORS alone is not authorization; tests must cover cross-origin write rejection. Exact local credential delivery can be implemented alongside the first API without creating a cloud identity platform. [T17]
+Back up SQLite **and** registered asset files. A database transaction does not include filesystem writes, so stage/verify an image before committing its registration and clean unreferenced leftovers separately. Before changing migrations, test a nonempty upgrade and backup/restore with the real SQLite binding, including version-1 documents and their history; a fresh empty database test is insufficient. Preserve historical asset references and reject incompatible future schema versions. [T7][T18]
 
-Assets are served only through allowlisted routes with project/asset validation, safe relative paths, known file types, and traversal/symlink escape checks. Do not offer the raw database, source code, arbitrary local files, or unregistered images as public downloads. Vite's client environment variables and static public assets are not secret storage. [T13]
-
-The user owns the local machine; Git-ignore and loopback are not encrypted storage or multi-user authorization. Hosted sharing requires a separate access-control/deployment decision. Open-source code can remain separate from private `.local/` data; select a project license before public release, not as part of this documentation edit.
-
-**Back up the database plus its registered assets.** Use the SQLite/binding backup facility or a clean shutdown procedure; do not copy only an active database file and assume journal/sidecar consistency. Track numbered schema migrations and test them against an existing nonempty database. SQLite's backup facilities support consistent database snapshots. [T7][T18]
-
-Database transactions do not include filesystem writes. For a new image, stage and verify the file before committing its reference. Failed transactions may leave an unreferenced file for cleanup, but must not leave a visible row pointing to an incomplete upload. Take coordinated backups with writes paused for the simple V1; preserve asset files referenced by historical scenes. A private backup outside the working directory is useful protection against deleting the entire repo. Test restoration before relying on the data.
-
-Do not share the whole multi-project database to share one selected project. A selective share/export mechanism and public-link service are deferred, not silently promised as already implemented.
+The repository is public but all rights reserved; private local knowledge and credentials are not release artifacts. License choice and hosted sharing remain owner decisions, not consequences of this document.
 
 ## 9. First-build tests and acceptance
 
-Implement tests before considering this a working platform; the current static booking tests cover only the delivered frontend behavior, not these database-backed acceptance checks.
+The existing platform and scenes have unit, API, storage and Playwright coverage. A future branch is ready only after the repository-required `format:check`, `lint`, `typecheck`, `test:unit`, `test:e2e` and `build` gates pass; the `validate` script also runs artifact and production restart/shutdown checks. Use temporary storage and the real production SQLite binding for backend integration tests. Do not infer source-product accuracy or owner approval from passing tests.
 
-| Check | Required first-build result |
-|---|---|
-| Storage | Creating and updating a project persists after backend restart. Migrations preserve existing data; backup/restore recovers the database and assets. |
-| Strict writes | Invalid shape, unknown scene, broken/cross-project references, stale revision, and disallowed asset paths are rejected. Failed batches leave the previous state intact. |
-| Data/code separation | The same unchanged built frontend/backend displays two saved projects; adding a project or editing a rule does not rebuild application code. |
-| Shared facts/history | A current rule change reaches its current views; a saved historical comparison retains the earlier value. Partial context leaves unrelated facts unchanged. |
-| Booking behavior | Labelled fixture covers allowed, time-blocked, occupied-slot, ownership, unknown, and the 48-to-24-hour change at 36 hours remaining. No real booking is made. |
-| Visual experience | One inviting interactive explanation works in code; essential restrictions stay visible and different cases visibly explain consequences. |
-| Navigation | Project switching, search, direct links, back, case selection, and evidence drawers preserve correct scope and orientation. |
-| Accessibility | Keyboard, focus, reduced motion, contrast, and narrow layouts work; automated checks supplement actual inspection. |
-| Runtime boundary | Ordinary browsing makes no model or source-repository calls. The context skill does not call Atlas or write its database. |
-| Privacy | `.local/` is ignored and absent from build output; DB and private source paths are not served. Unrelated website writes fail. |
-
-Use temporary isolated SQLite files for tests; never point test resets at the user's `.local/atlas.sqlite`. Use real database constraints in integrity tests, not mocks alone. Playwright checks the learning loop against the running local app. Retain the verified frontend toolchain; pin compatible backend dependencies and verify install, type-check, unit/integration tests, browser tests, and build. Do not copy hypothetical commands as though scripts already exist. [T10][T11]
-
-**Human check:** Sayed can explain the feature's purpose and important restriction and wants to revisit it. This is not an in-app quiz or a proven learning metric.
-
-**Source-skill check is separate:** test one authorized PR, an initial small app, scaffolding-only scope, a refactor with no behavior change, and missing evidence. Verify context-only output and factual support. Rendering demo data cannot establish source-analysis accuracy.
+For the proposed expansion, test strict scene/version and capabilities discovery, legacy version-1 reads and nonempty migration/restore, cross-project reference rejection, stale revision and rollback, and exact classification of behavioral versus evidence-only changes. Test the authored case against its recorded outcome/reason and source reference without building a parallel rules engine. Browser checks should cover each implemented destination, direct links and Back, project isolation, selectable cases, keyboard focus and reduced motion. A large labelled fixture should exercise the 160+ feature boundary and measured read/history behavior. Check three genuinely distinct domains, including at least two authorized real-source contexts; use a clearly labelled synthetic domain only if needed to expose a renderer boundary. These are future acceptance targets, not results already observed.
 
 ## 10. Build order and remaining choices
 
-1. Migrate the delivered frontend and booking fixture to a minimal backend/database/schema path. Seed the labelled demo through that validated path and replace compiled fixture reads.
-2. Preserve and adapt the delivered learning loop. Add a second small, differently composed demo project and change a rule through the API. Verify no-rebuild behavior and project separation.
-3. Review the experience with Sayed, then separately exercise `fill-atlas` on real authorized evidence and use the result for a real validated data update. Check an addition, a changed/removed behavior, and a refactor/no-change case.
+The proposed sequence for owner review is:
 
-Choose compatible package versions, exact columns, supported scene props, and real assets during implementation. These are not reasons for another planning round. The real source repo and publication license can be selected before their respective tests/releases; they do not block a local seeded prototype.
+1. **T007 — package the desktop baseline:** capture one named Penpot version with matching desktop/system exports, tokens, assets, component states, interactions and data bindings. Record missing contract capabilities and verify the package is usable without live Penpot access.
+2. **T008 — two-screen visual proof:** review the illustrated Start Here and one activity explanation in the current shared frame before expanding the guide.
+3. **T009 — models, capabilities and authoring:** design and test the versioned authored-activity scene, supporting records, evidence granularity, migration and capabilities response; update `update-atlas` references/tests with the same contract change.
+4. **T010 — desktop views and map:** implement the remaining seven-destination views, grouped map and relevant relationship exploration against saved data.
+5. **T011 — cross-domain verification:** test three distinct domains, at least two based on authorized real-source evidence, and size/accessibility behavior; keep synthetic examples labelled.
 
-Keep public hosting, collaboration, universal scene generation, large legacy discovery, export UI, heavier search, and high-write-concurrency infrastructure for a demonstrated need. One shared SQLite file does not mean unlimited writers or cloud multi-tenancy. It does satisfy the current local, reusable-project design without a separate DB server. [T16]
+This is a dependency outline, not authorization to implement all five tasks or a substitute for reviewed task specs. Exact schemas, evidence references, migration steps and measured capacity budgets belong in the scoped implementation plans within these boundaries; owner review evaluates visual results and consequential scope changes. Desktop is the design priority; preserve today's responsive baseline while full tablet/mobile design is deferred. No real source should be inferred from fixtures or old Atlas content.
 
 ## 11. Primary technical references
 
-New storage/backend/validation references were checked during this revision on 2026-09-24; the existing frontend documentation links are retained as implementation references. They support capabilities and constraints, not claims that Atlas has been built or tested.
+These primary references explain relevant technology constraints; they do not prove an Atlas feature is installed, tested or accepted. Existing links are retained. Motion is a historical reference, not a selected new dependency; use the existing reduced-motion-safe presentation unless a demonstrated interaction needs more.
 
 - **[T1]** [Vite guide](https://vite.dev/guide/) and [production build](https://vite.dev/guide/build).
 - **[T2]** [Tailwind CSS with Vite](https://tailwindcss.com/docs/installation/using-vite).
@@ -205,5 +153,6 @@ New storage/backend/validation references were checked during this revision on 2
 
 | Version | Date | Change |
 |---|---|---|
-| 0.1–0.5 | 2026-09-24 | Earlier frontend-only/code-bundled knowledge baseline and subsequent naming/packaging/default refinements. **Superseded**, not parallel instructions to implement. |
-| 0.6 | 2026-09-24 | One Git-ignored SQLite database, local backend validation, project-scoped data and assets, data-driven reusable scenes, and no-rebuild updates. Preserved independent context-only skill and visual direction; added integrity/privacy/restore test gates. No application tests claimed. |
+| 0.1–0.5 | 2026-09-24 | Earlier frontend-only/code-bundled baseline. Superseded. |
+| 0.6 | 2026-09-24 | Proposed local SQLite/API platform and project-scoped data. |
+| 0.7 | 2026-09-28 | Reconciled implemented platform and three current scenes; scoped proposed authored activities, seven-view records, evidence, capability discovery, migration, size checks and T007–T011 sequence for review. |

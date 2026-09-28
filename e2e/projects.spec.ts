@@ -172,7 +172,7 @@ test('creates a non-booking guide through the API and explores both projects in 
   await expect(
     page.getByRole('heading', { name: 'Start here', exact: true }),
   ).toBeVisible()
-  await page.getByRole('link', { name: /Explore the story/ }).click()
+  await page.locator('.island-link').first().click()
   await expect(
     page.getByRole('heading', { name: 'Ready for approval', exact: true }),
   ).toBeVisible()
@@ -316,7 +316,7 @@ test('project loading and failure never reuse another project’s facts, cases o
   await expect(page.getByRole('alert')).toContainText('Guide unavailable')
   await page.unroute(`**/api/v1/projects/${id}`)
   await page.getByRole('button', { name: 'Retry', exact: true }).click()
-  await page.getByRole('link', { name: /Explore the story/ }).click()
+  await page.locator('.island-link').first().click()
   await expect(page).toHaveURL(new RegExp(`/projects/${id}/explore/booking`))
   await expect(
     page.getByRole('heading', { name: 'Ready for approval', exact: true }),
@@ -382,6 +382,17 @@ test('empty, unknown, incompatible and unavailable knowledge have distinct state
   await page.goto(`/#/projects/${id}/explore/approval?case=missing`)
   await expect(
     page.getByRole('heading', { name: 'This guide is not here yet' }),
+  ).toBeVisible()
+})
+
+test('missing project offers a route back to the project picker', async ({
+  page,
+}) => {
+  await page.goto('/#/projects/not-saved')
+  await expect(page.getByRole('alert')).toContainText('Project unavailable')
+  await page.getByRole('link', { name: 'Choose a project' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Choose a project' }),
   ).toBeVisible()
 })
 

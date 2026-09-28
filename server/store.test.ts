@@ -16,6 +16,31 @@ afterEach(() => {
   store?.close()
   rmSync(dir, { recursive: true, force: true })
 })
+it('preserves optional artwork settings across restart and immutable history', () => {
+  store.create(seed)
+  const feature = {
+    ...seed.features[0],
+    presentation: { illustration: 'calendar', accent: 'sky' },
+  }
+  store.apply(seed.id, {
+    contractVersion: 1,
+    expectedRevision: 1,
+    upsertFeatures: [feature],
+  })
+  expect(() =>
+    store.apply(seed.id, {
+      contractVersion: 1,
+      expectedRevision: 2,
+      upsertFeatures: [{ ...feature, presentation: { html: '<svg />' } }],
+    }),
+  ).toThrow()
+  store.close()
+  store = new Store(dir)
+  expect(store.read(seed.id).revision).toBe(2)
+  expect(store.read(seed.id).features[0]).toEqual(feature)
+  expect(store.history(seed.id)[0].features[0]).toEqual(seed.features[0])
+  expect(store.history(seed.id)).toHaveLength(2)
+})
 it('persists create/update across restart and keeps immutable history', () => {
   store.create(seed)
   const changed = { ...seed.features[0], noticeHours: 30 }

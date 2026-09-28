@@ -5,7 +5,7 @@ import {
 } from './contracts.js'
 
 export type FeatureChange = {
-  kind: 'added' | 'changed' | 'removed'
+  kind: 'added' | 'changed' | 'removed' | 'evidence'
   id: string
   before?: Feature
   after?: Feature
@@ -57,13 +57,21 @@ function canonicalDocument(doc: ProjectDocument) {
   })
 }
 function behavior(feature: Feature) {
-  const { revisionLabel, evidence, assetIds, group, essentialOrder, ...facts } =
-    feature
+  const {
+    revisionLabel,
+    evidence,
+    assetIds,
+    group,
+    essentialOrder,
+    presentation,
+    ...facts
+  } = feature
   void revisionLabel
   void evidence
   void assetIds
   void group
   void essentialOrder
+  void presentation
   return JSON.stringify(facts)
 }
 export function featureChanges(
@@ -78,6 +86,15 @@ export function featureChanges(
     else if (behavior(previous) !== behavior(current))
       changes.push({
         kind: 'changed',
+        id: current.id,
+        before: previous,
+        after: current,
+      })
+    else if (
+      JSON.stringify(previous.evidence) !== JSON.stringify(current.evidence)
+    )
+      changes.push({
+        kind: 'evidence',
         id: current.id,
         before: previous,
         after: current,

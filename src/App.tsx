@@ -1,40 +1,19 @@
-import {
-  Link,
-  NavLink,
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useParams,
-} from 'react-router'
+import { Link, Navigate, Route, Routes, useParams } from 'react-router'
+import { AtlasSidebar } from './components/AtlasSidebar'
 import { NavigationScroll } from './components/NavigationScroll'
 import { KnowledgeProvider } from './content/KnowledgeProvider'
-import { destinations } from './content/project'
+import { useProject } from './content/knowledge'
 import { StartPage, ExplorePage, MissingPage } from './pages/GuidePages'
 import { ChangesPage } from './pages/ChangesPage'
 import { FeaturePage } from './pages/FeaturePage'
 import { ProjectPicker } from './pages/ProjectPicker'
 
-function ProjectGuide() {
-  const { projectId = '' } = useParams()
-  const base = `/projects/${projectId}`
+function ProjectWorkspace() {
+  const project = useProject()
   return (
-    <>
-      <nav className="project-nav" aria-label="Main navigation">
-        {destinations.map((item) => (
-          <NavLink
-            key={item.id}
-            to={`${base}${item.path === '/' ? '' : item.path}`}
-            end={item.path === '/'}
-          >
-            {item.label}
-          </NavLink>
-        ))}
-        <Link to={`${base}/explore`} aria-label="Search activities">
-          ⌕ Search
-        </Link>
-      </nav>
-      <KnowledgeProvider key={projectId} projectId={projectId}>
+    <div className="atlas-workspace">
+      <AtlasSidebar project={project} />
+      <div className="workspace-content" id="workspace-content" tabIndex={-1}>
         <Routes>
           <Route index element={<StartPage />} />
           <Route path="explore" element={<ExplorePage />} />
@@ -42,17 +21,26 @@ function ProjectGuide() {
           <Route path="changes" element={<ChangesPage />} />
           <Route path="*" element={<MissingPage />} />
         </Routes>
-      </KnowledgeProvider>
-    </>
+      </div>
+    </div>
   )
 }
-function LegacyRoute() {
-  const location = useLocation()
+function ProjectGuide() {
+  const { projectId = '' } = useParams()
   return (
-    <Navigate
-      replace
-      to={`/projects/booking-demo${location.pathname}${location.search}`}
-    />
+    <KnowledgeProvider key={projectId} projectId={projectId}>
+      <ProjectWorkspace />
+    </KnowledgeProvider>
+  )
+}
+function ProjectSelection() {
+  return (
+    <div className="atlas-workspace">
+      <AtlasSidebar />
+      <div className="workspace-content" id="workspace-content" tabIndex={-1}>
+        <ProjectPicker />
+      </div>
+    </div>
   )
 }
 export default function App() {
@@ -61,31 +49,23 @@ export default function App() {
       <NavigationScroll />
       <a
         className="skip-link"
-        href="#main"
+        href="#workspace-content"
         onClick={(event) => {
           event.preventDefault()
-          document.getElementById('main')?.focus()
+          const target =
+            document.getElementById('workspace-content') ??
+            document.getElementById('main')
+          target?.focus()
         }}
       >
         Skip to content
       </a>
-      <header className="site-header">
-        <Link className="brand" to="/" aria-label="Atlas home">
-          <span className="brand-mark" aria-hidden="true">
-            ✦
-          </span>{' '}
-          Atlas
-        </Link>
-        <Link className="header-search" to="/">
-          Projects
-        </Link>
-      </header>
       <main id="main" tabIndex={-1}>
         <Routes>
-          <Route path="/" element={<ProjectPicker />} />
+          <Route path="/" element={<ProjectSelection />} />
           <Route path="/projects/:projectId/*" element={<ProjectGuide />} />
-          <Route path="/explore/*" element={<LegacyRoute />} />
-          <Route path="/changes" element={<LegacyRoute />} />
+          <Route path="/explore/*" element={<Navigate replace to="/" />} />
+          <Route path="/changes" element={<Navigate replace to="/" />} />
           <Route
             path="*"
             element={
@@ -98,7 +78,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="site-footer">
-        <span>Atlas · A visual guide to how things work</span>
+        <span>Atlas · A guide to saved product knowledge</span>
         <span>Saved knowledge. No live product connection.</span>
       </footer>
     </div>
