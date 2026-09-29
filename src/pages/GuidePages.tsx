@@ -5,14 +5,15 @@ import {
   type Feature,
 } from '../../shared/contracts'
 import { useProject, projectPath } from '../content/knowledge'
-import { ActivityArt } from '../scenes/ActivityArt'
+import { AtlasActivityIcon, AtlasIcon } from '../components/AtlasIcon'
 import { IslandOverview } from './IslandOverview'
+import { DecorativeIsland } from './DecorativeIsland'
+import './collection-states.css'
 
 export function FixtureLabel({ feature }: { feature?: Feature }) {
   const project = useProject()
   return (
     <p className="fixture-label">
-      <span aria-hidden="true">◇</span>{' '}
       {feature
         ? `${feature.evidence.status === 'demo' ? 'Illustrative fixture' : feature.evidence.status === 'uncertain' ? 'Uncertain evidence' : 'Source-supported guide'} · ${feature.revisionLabel}`
         : project.title}{' '}
@@ -26,8 +27,7 @@ function featureLink(
   from: string,
   query = '',
 ) {
-  const caseId =
-    feature.cases[0]?.id ?? (isBookingFeature(feature) ? 'change-now' : '')
+  const caseId = feature.cases[0]?.id ?? ''
   const params = new URLSearchParams({ from })
   if (caseId) params.set('case', caseId)
   if (query) params.set('q', query)
@@ -35,9 +35,23 @@ function featureLink(
 }
 export function EmptyGuide() {
   return (
-    <div className="empty-search">
-      <h2>No activities incorporated yet</h2>
-      <p>This saved guide does not establish any product behavior yet.</p>
+    <div className="collection-empty-guide">
+      <div className="collection-empty-panel">
+        <h2>
+          <AtlasIcon name="map" /> What this guide can say
+        </h2>
+        <DecorativeIsland />
+        <h3>There is no behavior to explain yet.</h3>
+        <p>This saved guide does not establish any product behavior yet.</p>
+      </div>
+      <div className="collection-next-panel">
+        <h2>
+          <AtlasIcon name="link" /> When an activity is incorporated
+        </h2>
+        <p>
+          Reviewed behavior will appear here when it is added to this project.
+        </p>
+      </div>
     </div>
   )
 }
@@ -52,6 +66,18 @@ export function StartPage() {
           a.essentialOrder! - b.essentialOrder! || a.id.localeCompare(b.id),
       )
     : [...project.features].sort((a, b) => a.id.localeCompare(b.id))
+  if (project.features.length === 0) {
+    return (
+      <section className="scaffold-guide" aria-labelledby="page-title">
+        <FixtureLabel />
+        <h1 id="page-title">No implemented activities found</h1>
+        <p className="intro">
+          This project has no reviewed, implemented activities yet.
+        </p>
+        <EmptyGuide />
+      </section>
+    )
+  }
   return (
     <IslandOverview
       project={project}
@@ -86,22 +112,42 @@ export function ExplorePage() {
     groups.set(group, [...(groups.get(group) ?? []), feature])
   }
   return (
-    <section className="explore-page" aria-labelledby="page-title">
+    <section
+      className="explore-page collection-page"
+      aria-labelledby="page-title"
+    >
       <FixtureLabel />
-      <p className="eyebrow">Follow a question</p>
-      <h1 id="page-title">Explore</h1>
-      <p className="intro">What would you like to understand?</p>
+      <h1 id="page-title">
+        {project.features.length > 0 && query.trim() && matches.length === 0
+          ? `No activity matched “${query.trim()}”`
+          : 'Browse recorded activities'}
+      </h1>
+      <p className="intro">
+        {project.features.length > 0 && query.trim() && matches.length === 0
+          ? 'Try a different search or browse all activities.'
+          : 'Explore the activities recorded for this project.'}
+      </p>
+      <span className="collection-status-badge">
+        {project.features.length === 0
+          ? 'No activities'
+          : query.trim() && matches.length === 0
+            ? 'No matches'
+            : `${matches.length} recorded ${matches.length === 1 ? 'activity' : 'activities'}`}
+      </span>
       <form
         role="search"
-        className="search-form"
+        className="search-form collection-search"
         onSubmit={(e) => e.preventDefault()}
       >
-        <label htmlFor="activity-search">Search activities</label>
+        <label className="collection-visually-hidden" htmlFor="activity-search">
+          Search activities
+        </label>
         <div className="search-row">
+          <AtlasIcon name="search" />
           <input
             id="activity-search"
             type="search"
-            placeholder="Find an activity or saved case"
+            placeholder="Search activities, cases, or areas"
             value={query}
             onChange={(e) =>
               setParams(e.target.value ? { q: e.target.value } : {}, {
@@ -109,54 +155,72 @@ export function ExplorePage() {
               })
             }
           />
+        </div>
+      </form>
+      {!project.features.length ? (
+        <EmptyGuide />
+      ) : matches.length === 0 ? (
+        <div className="collection-no-results">
+          <h2>
+            <AtlasIcon name="compass" /> No matching activities
+          </h2>
+          <DecorativeIsland />
+          <h3>Try another name or explore by area.</h3>
+          <p>Your search for “{query.trim()}” found no activities.</p>
+          <button
+            className="atlas-button collection-reset"
+            type="button"
+            onClick={() => setParams({}, { replace: true })}
+          >
+            Return to all activities
+          </button>
+        </div>
+      ) : (
+        <>
           {query && (
             <button
+              className="collection-clear"
               type="button"
               onClick={() => setParams({}, { replace: true })}
             >
               Clear search
             </button>
           )}
-        </div>
-      </form>
-      {!project.features.length ? (
-        <EmptyGuide />
-      ) : matches.length === 0 ? (
-        <div className="empty-search">
-          <h2>No matching activity</h2>
-          <p>Try another word or clear your search within this project.</p>
-        </div>
-      ) : (
-        [...groups].map(([group, features]) => (
-          <div className="activity-group" key={group}>
-            <h2 className="eyebrow">
-              {group} / {features.length}{' '}
-              {features.length === 1 ? 'activity' : 'activities'}
-            </h2>
-            {features.map((feature) => (
-              <Link
-                className="activity-card"
-                aria-label={feature.title}
-                key={feature.id}
-                to={featureLink(project.id, feature, 'explore', query)}
+          {[...groups].map(([group, features], index) => (
+            <div className="activity-group collection-group" key={group}>
+              <h2
+                className="collection-group-badge"
+                data-tone={index % 3}
+                aria-label={`${group}, ${features.length} ${features.length === 1 ? 'activity' : 'activities'}`}
               >
-                <ActivityArt feature={feature} />
-                <div>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.purpose}</p>
-                  <p className="revision-note">
-                    {feature.evidence.status === 'demo'
-                      ? 'Illustrative fixture'
-                      : feature.evidence.status === 'uncertain'
-                        ? 'Uncertain evidence'
-                        : 'Source-supported'}
-                  </p>
-                  <span className="text-link">See the cases ↗</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ))
+                {group}
+              </h2>
+              <div className="collection-grid">
+                {features.map((feature) => (
+                  <Link
+                    className="activity-card collection-card"
+                    aria-label={feature.title}
+                    key={feature.id}
+                    to={featureLink(project.id, feature, 'explore', query)}
+                  >
+                    <AtlasActivityIcon feature={feature} />
+                    <div className="collection-card-copy">
+                      <h3>{feature.title}</h3>
+                      <p>{feature.purpose}</p>
+                      <span className="revision-note">
+                        {feature.evidence.status === 'demo'
+                          ? 'Illustrative fixture'
+                          : feature.evidence.status === 'uncertain'
+                            ? 'Uncertain evidence'
+                            : 'Source-supported'}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </>
       )}
     </section>
   )
@@ -170,16 +234,21 @@ export function MissingPage() {
     <section className="missing-page" aria-labelledby="page-title">
       <p className="eyebrow">Atlas / Unavailable</p>
       <h1 id="page-title">This guide is not here yet</h1>
-      <p className="intro">
-        This link does not point to an available activity or saved case.
-      </p>
-      <Link
-        className="primary-link"
-        to={returnPath}
-        state={{ restorePosition: true }}
-      >
-        Return to Explore <span aria-hidden="true">↗</span>
-      </Link>
+      <div className="collection-next-panel collection-unavailable">
+        <h2>
+          <AtlasIcon name="warning" /> Activity unavailable
+        </h2>
+        <p className="intro">
+          This link does not point to an available activity or saved case.
+        </p>
+        <Link
+          className="primary-link"
+          to={returnPath}
+          state={{ restorePosition: true }}
+        >
+          Return to Explore
+        </Link>
+      </div>
     </section>
   )
 }

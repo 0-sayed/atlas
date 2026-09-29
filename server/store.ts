@@ -25,7 +25,7 @@ export class DataError extends Error {
     super(message)
   }
 }
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3
 export class Store {
   readonly db!: Database.Database
   private lock: number | undefined
@@ -54,12 +54,15 @@ export class Store {
       if (migrate)
         this.db.transaction(() => {
           for (let n = version + 1; n <= SCHEMA_VERSION; n++) {
-            const file = n === 1 ? '001-initial.sql' : '002-history.sql'
+            const file =
+              n === 1
+                ? '001-initial.sql'
+                : n === 2
+                  ? '002-history.sql'
+                  : '003-current.sql'
             this.db.exec(readFileSync(resolve('migrations', file), 'utf8'))
             this.db.pragma(`user_version = ${n}`)
           }
-          if (version === 1)
-            for (const id of this.projectIds()) this.snapshot(this.read(id))
         })()
     } catch (error) {
       this.db?.close()
@@ -133,21 +136,6 @@ export class Store {
       assets,
     })
   }
-  history(id: string): ProjectDocument[] {
-    this.read(id)
-    return (
-      this.db
-        .prepare(
-          'SELECT snapshot FROM history WHERE project_id=? ORDER BY revision',
-        )
-        .all(id) as { snapshot: string }[]
-    ).map((r) => validateDocument(JSON.parse(r.snapshot)))
-  }
-  private snapshot(doc: ProjectDocument) {
-    this.db
-      .prepare('INSERT INTO history VALUES (?,?,?)')
-      .run(doc.id, doc.revision, JSON.stringify(doc))
-  }
   private save(doc: ProjectDocument) {
     this.db.prepare('DELETE FROM relations WHERE project_id=?').run(doc.id)
     this.db.prepare('DELETE FROM features WHERE project_id=?').run(doc.id)
@@ -171,7 +159,6 @@ export class Store {
     this.db
       .prepare('UPDATE projects SET title=?,revision=? WHERE id=?')
       .run(doc.title, doc.revision, doc.id)
-    this.snapshot(doc)
   }
   create(input: unknown) {
     const data = createSchema.parse(input)

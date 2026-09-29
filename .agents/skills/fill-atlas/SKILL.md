@@ -16,7 +16,7 @@ Do not create implementation plans, modify application code, design screens, sel
 ## 1. Establish scope
 
 - Resolve the source repository and requested PR, commit range, or initial project overview from the user and available session context. Ask only for genuinely missing scope or access; do not select an unrelated change.
-- Use authorized, read-only access to source evidence. Record source identity, inspected revision, baseline/head for a change when known, and known PR status. Do not infer deployment from a merge. If only one revision is available, describe supported current behavior and mark the comparison gap rather than invent a before-state.
+- Use authorized, read-only access to source evidence. Record source identity, inspected revision, baseline/head for a change when known, and known PR status. Do not infer deployment from a merge. Describe the supported current behavior; if only one revision is available, do not invent a prior state.
 - If the evidence is unavailable, request it instead of inventing a product description. Partial evidence may produce clearly labelled partial context.
 - No access to an Atlas repository, existing Atlas files, or another workflow is required. Source behavior and evidence are sufficient; do not infer current product truth from an old context file alone.
 
@@ -34,7 +34,7 @@ Do not create implementation plans, modify application code, design screens, sel
 Use [assets/context.template.md](assets/context.template.md) as a writing aid, not a requirement to fill every section. Omit irrelevant sections.
 
 - Lead with a short product-level explanation, then preserve the exact rules and conditions that make it true.
-- For a change, describe before/after only where supported. For initial discovery, use current behavior rather than inventing history.
+- For a change, use the diff to identify facts that need updating, then describe the supported current behavior. Mention removed behavior only when needed to prevent a misleading current claim; do not create a change timeline.
 - Include a small number of useful cases where supported. Mark illustrative values and derived examples as illustrative, not observed executions. Keep other stated conditions fixed when contrasting an exception; do not invent real customers, transactions, or observed outcomes.
 - Attach evidence IDs to important claims and map them to inspected source paths/symbols and revisions, or verified PR/document references. Include line numbers only when verified.
 - Keep the file self-contained without copying whole source files or the entire conversation. Preserve meaningful detail; shorten repetition, not essential restrictions.

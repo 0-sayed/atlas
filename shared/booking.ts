@@ -63,54 +63,17 @@ export function bookingView(feature: BookingFeature) {
     assetIds: feature.assetIds,
   }
   const bookingCases = feature.cases.map((c) => explain(c, feature.noticeHours))
-  const input: SavedCase = {
-    id: 'change-now',
-    label: `${feature.comparison.hours} hours · Current rule`,
-    hours: feature.comparison.hours,
-    owner: 'you',
-    confirmed: true,
-    slot: 'free',
-  }
-  const after = explain(input, feature.noticeHours)
-  const before = explain(
-    { ...input, id: 'change-before', label: 'Previous rule' },
-    feature.comparison.beforeNoticeHours,
-  )
-  const bookingChange = {
-    title: feature.comparison.title,
-    before: {
-      revision: feature.comparison.beforeRevision,
-      noticeHours: feature.comparison.beforeNoticeHours,
-      example: {
-        ...before,
-        result:
-          before.outcome === 'allowed'
-            ? 'Previously allowed'
-            : 'Previously blocked',
-      },
-    },
-    after: {
-      revision: `${feature.revisionLabel} · Current`,
-      noticeHours: feature.noticeHours,
-      example: {
-        ...after,
-        result: after.outcome === 'allowed' ? 'Now allowed' : 'Now blocked',
-      },
-    },
-  }
   return {
     booking,
-    defaultCaseId: bookingCases[0]?.id ?? bookingChange.after.example.id,
+    defaultCaseId: bookingCases[0]?.id ?? '',
     bookingCases,
-    bookingChange,
     bookingRestrictions: [
       'Your own booking',
       'Confirmed booking',
       `At least ${feature.noticeHours} hours before the original start`,
       'Replacement slot must be free',
     ],
-    getBookingCase: (id: string) =>
-      [...bookingCases, bookingChange.after.example].find((c) => c.id === id),
+    getBookingCase: (id: string) => bookingCases.find((c) => c.id === id),
     isBelowNoticeRequirement: (item: Pick<BookingCase, 'hours'>) =>
       item.hours < feature.noticeHours,
     matchesBooking: (query: string) =>

@@ -28,7 +28,7 @@ function post(path: string, data: object) {
     .set('Authorization', `Bearer ${token}`)
     .send(data)
 }
-it('serves readiness, create/read/update/history with real persistence', async () => {
+it('serves readiness, create/read/update with real persistence', async () => {
   await api().get('/api/v1/ready').set('Host', '127.0.0.1:4317').expect(200)
   await post('/projects', seed).expect(201)
   const saved = await api()
@@ -45,11 +45,10 @@ it('serves readiness, create/read/update/history with real persistence', async (
     contractVersion: 1,
     expectedRevision: 1,
   }).expect(409)
-  const history = await api()
+  await api()
     .get(`/api/v1/projects/${seed.id}/history`)
     .set('Host', '127.0.0.1:4317')
-    .expect(200)
-  expect(history.body).toHaveLength(2)
+    .expect(404)
 })
 it('rejects credentials, hostile sites and DNS rebinding before writes', async () => {
   await api()

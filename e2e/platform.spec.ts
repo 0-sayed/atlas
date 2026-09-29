@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-test('an API rule edit updates current views on refresh, preserving history', async ({
+test('an API rule edit updates current views on refresh', async ({
   page,
   request,
 }) => {
@@ -29,13 +29,6 @@ test('an API rule edit updates current views on refresh, preserving history', as
     )
     await expect(
       page.getByRole('heading', { name: 'Too late to move', exact: true }),
-    ).toBeVisible()
-    await page.getByRole('link', { name: 'What changed', exact: true }).click()
-    await expect(
-      page.getByText('At least 48 hours’ notice', { exact: true }),
-    ).toBeVisible()
-    await expect(
-      page.getByText('At least 30 hours’ notice', { exact: true }),
     ).toBeVisible()
   } finally {
     const current = await (

@@ -22,10 +22,6 @@
 - Exceptions: <supported differences or explicitly unknown behavior> [E2; identify the evidence gap for unknowns]
 - Connections: <specific requires / blocks / triggers meaning, when established> [E2]
 
-## What changed
-
-<Supported before → after, including important unchanged context. Omit for initial discovery or no-change findings. Cite evidence for each side of the comparison.> [E1 → E2]
-
 ## Examples
 
 | Conditions                                                   | Outcome            | Evidence or limitation                                     |

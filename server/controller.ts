@@ -26,9 +26,6 @@ export class ApiController {
   @Get('projects/:id') read(@Param('id') id: string) {
     return this.store.read(idSchema.parse(id))
   }
-  @Get('projects/:id/history') history(@Param('id') id: string) {
-    return this.store.history(idSchema.parse(id))
-  }
   @Post('projects') create(@Body() body: unknown) {
     return this.store.create(body)
   }

@@ -1,7 +1,6 @@
 import { expect, it } from 'vitest'
-import { featureSchema, type ProjectDocument } from './contracts.js'
-import { featureChanges } from './changes.js'
-import { navigationFeature, navigationSeed } from '../fixtures/navigation.js'
+import { featureSchema } from './contracts.js'
+import { navigationFeature } from '../fixtures/navigation.js'
 import { seed } from '../fixtures/booking.js'
 import { approvalFeature } from '../fixtures/approval.js'
 
@@ -33,24 +32,4 @@ it('rejects arbitrary visual code, incomplete settings, and unknown choices', ()
     expect(
       featureSchema.safeParse({ ...navigationFeature, presentation }).success,
     ).toBe(false)
-})
-
-it('does not describe an artwork-only update as a product behavior change', () => {
-  const before: ProjectDocument = {
-    ...navigationSeed,
-    revision: 1,
-    assets: [],
-  }
-  const changed = featureSchema.parse({
-    ...navigationFeature,
-    presentation: { illustration: 'people', accent: 'sage' },
-  })
-  const after = { ...before, revision: 2, features: [changed] }
-  expect(featureChanges(before, after)).toEqual([])
-  expect(
-    featureChanges(before, {
-      ...after,
-      features: [{ ...changed, title: 'Choose a different destination' }],
-    }),
-  ).toMatchObject([{ kind: 'changed' }])
 })

@@ -47,12 +47,6 @@ export const bookingFeatureSchema = z.strictObject({
   scene: z.strictObject({ kind: z.literal('booking'), version: z.literal(1) }),
   noticeHours: z.number().min(0).max(876000),
   cases: z.array(caseSchema).max(100),
-  comparison: z.strictObject({
-    title: short,
-    hours: z.number().min(0).max(876000),
-    beforeNoticeHours: z.number().min(0).max(876000),
-    beforeRevision: short,
-  }),
 })
 export const approvalCaseSchema = z.strictObject({
   id: idSchema,
@@ -168,8 +162,6 @@ export function validateDocument(input: unknown): ProjectDocument {
   const assets = new Set(doc.assets.map((a) => a.id))
   for (const f of doc.features) {
     uniqueIds(f.cases)
-    if (isBookingFeature(f) && f.cases.some((c) => c.id === 'change-now'))
-      throw new Error('Reserved case ID')
     if (
       new Set(f.assetIds).size !== f.assetIds.length ||
       f.assetIds.some((id) => !assets.has(id))

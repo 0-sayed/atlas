@@ -1,0 +1,88 @@
+.knowledge-state > p {
+  margin-top: 8px;
+  color: var(--atlas-muted);
+}
+.knowledge-state-badge {
+  display: inline-block;
+  margin: 24px 0;
+  padding: 6px 12px;
+  border-radius: var(--atlas-radius-pill);
+  background: var(--atlas-warning);
+  font-size: 13px;
+}
+.knowledge-state-card {
+  padding: 24px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-card);
+  background: var(--atlas-paper);
+}
+.knowledge-state-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.knowledge-state-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding-top: 24px;
+  text-align: center;
+}
+.knowledge-state-island {
+  position: relative;
+  width: min(300px, 100%);
+}
+.knowledge-state-island > img:first-child {
+  display: block;
+  width: 100%;
+}
+.knowledge-state-island > .atlas-icon {
+  position: absolute;
+  width: 20%;
+  height: 30%;
+  top: 26%;
+  left: 40%;
+}
+.knowledge-state-loading h3 {
+  font-size: 30px;
+}
+.knowledge-state-loading > p {
+  color: var(--atlas-muted);
+}
+.knowledge-skeleton {
+  width: min(660px, 100%);
+  display: grid;
+  gap: 12px;
+}
+.knowledge-skeleton span {
+  height: 16px;
+  border-radius: 8px;
+  background: var(--atlas-secondary);
+}
+.knowledge-skeleton span:nth-child(2) {
+  width: 85%;
+}
+.knowledge-skeleton span:nth-child(3) {
+  width: 70%;
+}
+.knowledge-state-error {
+  background: var(--atlas-surface-warning);
+}
+.knowledge-state-error > p {
+  margin: 24px 0;
+  font: 24px/1.4 var(--atlas-font-label);
+}
+.knowledge-state > .atlas-button {
+  margin-top: 24px;
+}
+.workspace-refresh-notice {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-card);
+  background: var(--atlas-surface-warning);
+}

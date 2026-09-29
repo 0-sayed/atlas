@@ -9,7 +9,6 @@ This reference travels with `update-atlas`; it does not require an Atlas checkou
 | `GET /ready`                        | Readiness and contract version.                                                                           |
 | `GET /projects?after=<id>`          | Array of up to 100 `{id,title,revision}` summaries, ordered by ID. Continue with the last ID when needed. |
 | `GET /projects/:id`                 | Full project document or 404. Read before changing a project.                                             |
-| `GET /projects/:id/history`         | Full immutable document snapshots, ascending revision.                                                    |
 | `GET /projects/:id/assets/:assetId` | Registered image bytes; 404 for unavailable image.                                                        |
 | `POST /projects`                    | Create a new project; returns its full document at revision 1.                                            |
 | `POST /projects/:id/changes`        | Scoped change batch; returns the full document at the next revision.                                      |
@@ -35,11 +34,11 @@ Every feature has `id`, `title`, `actor`, `purpose`, optional `group`, optional 
 
 Scene-specific strict shapes:
 
-| Scene                           | Additional feature fields                                                                                                                                                    | Case fields                                                                                                                                                             |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `{kind:"booking",version:1}`    | `noticeHours` number 0–876000; `comparison:{title,hours,beforeNoticeHours,beforeRevision}` with nonnegative hours up to 876000 and short titles/revision; `cases` up to 100. | `{id,label,hours,owner,confirmed,slot}`; owner `you` or `other`; confirmed is boolean; slot `free`, `occupied`, or `unknown`; hours 0–876000. `change-now` is reserved. |
-| `{kind:"approval",version:1}`   | `requiredApprovals` integer 1–10; `cases` up to 100.                                                                                                                         | `{id,label,role,state,approvals}`; role `reviewer` or `requester`; state `pending` or `closed`; approvals integer 0–10 or null.                                         |
-| `{kind:"navigation",version:1}` | `rules` up to 20 nonempty text strings; `cases` up to 100.                                                                                                                   | `{id,label,start,action,result,reason,outcome}`; outcome `available`, `unavailable`, or `unknown`.                                                                      |
+| Scene                           | Additional feature fields                                  | Case fields                                                                                                                                   |
+| ------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{kind:"booking",version:1}`    | `noticeHours` number 0–876000; `cases` up to 100.          | `{id,label,hours,owner,confirmed,slot}`; owner `you` or `other`; confirmed is boolean; slot `free`, `occupied`, or `unknown`; hours 0–876000. |
+| `{kind:"approval",version:1}`   | `requiredApprovals` integer 1–10; `cases` up to 100.       | `{id,label,role,state,approvals}`; role `reviewer` or `requester`; state `pending` or `closed`; approvals integer 0–10 or null.               |
+| `{kind:"navigation",version:1}` | `rules` up to 20 nonempty text strings; `cases` up to 100. | `{id,label,start,action,result,reason,outcome}`; outcome `available`, `unavailable`, or `unknown`.                                            |
 
 Feature IDs, relation IDs, asset IDs, and case IDs within each feature must be unique. A relation is `{id,from,to,kind}` with kind `requires | related`; both endpoints must be in the project. `related` must not be used to conceal a specific unsupported rule. Scene fit is a product decision: navigation records a real start, action, result, reason, and outcome; it cannot simulate arbitrary stateful interaction.
 
@@ -142,4 +141,4 @@ For a previously created/read project at revision `R`, register an inspected PNG
 }
 ```
 
-The placeholder is explanatory, not a valid upload. Actual canonical base64 must match the declared file signature; decoded bytes must be at most **1 MiB** (base64 string at most 1,400,000 characters). SVG, code, data URLs, remote URLs, and arbitrary file paths are not accepted. Asset ID and metadata are immutable; changed art gets a new ID. If registration returns revision `R+1`, use `expectedRevision:R+1` in the next change and upsert the _full_ feature with the new asset ID in `assetIds`. Existing referenced assets remain registered for old snapshots. Keep the new ID out of `assetIds` if registration failed or could not be confirmed by read-back.
+The placeholder is explanatory, not a valid upload. Actual canonical base64 must match the declared file signature; decoded bytes must be at most **1 MiB** (base64 string at most 1,400,000 characters). SVG, code, data URLs, remote URLs, and arbitrary file paths are not accepted. Asset ID and metadata are immutable; changed art gets a new ID. If registration returns revision `R+1`, use `expectedRevision:R+1` in the next change and upsert the _full_ feature with the new asset ID in `assetIds`. Keep the new ID out of `assetIds` if registration failed or could not be confirmed by read-back.

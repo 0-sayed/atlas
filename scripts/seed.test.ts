@@ -9,6 +9,7 @@ import { promisify } from 'node:util'
 import { afterEach, beforeEach, expect, it } from 'vitest'
 import { createApp } from '../server/app.js'
 import { publishingStudioSeed } from '../fixtures/publishing-studio.js'
+import { isApprovalFeature } from '../shared/contracts.js'
 import { seedPublishingStudioApi } from './seed.js'
 
 const run = promisify(execFile)
@@ -58,29 +59,17 @@ async function cli(...args: string[]) {
   )
 }
 
-it('creates one project with the reviewed change as revision 2', async () => {
+it('creates one project with current review rules at revision 1', async () => {
   const saved = await seedPublishingStudioApi(port, token)
   expect(saved.id).toBe(publishingStudioSeed.id)
-  expect(saved.revision).toBe(2)
+  expect(saved.revision).toBe(1)
   expect(await get('/projects')).toEqual([
-    { id: saved.id, title: saved.title, revision: 2 },
+    { id: saved.id, title: saved.title, revision: 1 },
   ])
-  const history = await get(`/projects/${saved.id}/history`)
-  expect(history.map((entry: { revision: number }) => entry.revision)).toEqual([
-    1, 2,
-  ])
-  expect(history[0].features).toEqual(publishingStudioSeed.features)
-  expect(
-    history[0].features.find(
-      (feature: { id: string }) => feature.id === 'approve-article',
-    ).requiredApprovals,
-  ).toBe(1)
-  expect(
-    history[1].features.find(
-      (feature: { id: string }) => feature.id === 'approve-article',
-    ).requiredApprovals,
-  ).toBe(2)
-  expect(history[1]).toEqual(saved)
+  expect(saved.features.find(isApprovalFeature)?.requiredApprovals).toBe(2)
+  expect(saved.features).toEqual(
+    [...publishingStudioSeed.features].sort((a, b) => a.id.localeCompare(b.id)),
+  )
 })
 
 it('rejects reseeding without changing a later custom edit', async () => {
@@ -95,21 +84,17 @@ it('rejects reseeding without changing a later custom edit', async () => {
       },
       body: JSON.stringify({
         contractVersion: 1,
-        expectedRevision: 2,
+        expectedRevision: 1,
         title: 'My edited title',
       }),
     },
   )
   expect(response.status).toBe(201)
   const edited = await get(`/projects/${publishingStudioSeed.id}`)
-  const history = await get(`/projects/${publishingStudioSeed.id}/history`)
   await expect(seedPublishingStudioApi(port, token)).rejects.toThrow(
     'Seed create rejected (409)',
   )
   expect(await get(`/projects/${publishingStudioSeed.id}`)).toEqual(edited)
-  expect(await get(`/projects/${publishingStudioSeed.id}/history`)).toEqual(
-    history,
-  )
 })
 
 it('rejects a bad token before writing', async () => {
@@ -123,9 +108,9 @@ it.each([[], ['publishing-studio']])(
   'CLI accepts the default or explicit Publishing Studio seed: %j',
   async (...args) => {
     const result = await cli(...args)
-    expect(result.stdout).toContain('revision 2')
+    expect(result.stdout).toContain('revision 1')
     expect(await get('/projects')).toEqual([
-      expect.objectContaining({ id: publishingStudioSeed.id, revision: 2 }),
+      expect.objectContaining({ id: publishingStudioSeed.id, revision: 1 }),
     ])
   },
 )

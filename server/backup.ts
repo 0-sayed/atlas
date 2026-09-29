@@ -83,10 +83,7 @@ export async function restore(source: string, destination: string) {
         (store.db.pragma('foreign_key_check') as unknown[]).length
       )
         throw new Error('Invalid backup database')
-      for (const id of store.projectIds()) {
-        store.read(id)
-        store.history(id)
-      }
+      for (const id of store.projectIds()) store.read(id)
       for (const row of store.db
         .prepare('SELECT storage_key AS key FROM assets')
         .all() as { key: string }[])

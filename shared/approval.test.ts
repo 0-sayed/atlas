@@ -49,7 +49,7 @@ it('accepts old booking data and rejects mixed or unsupported scenes', () => {
   ).toBe(false)
 })
 
-it('persists distinct scenes, scoped overlapping IDs and immutable approval history', () => {
+it('persists distinct scenes and scoped overlapping IDs', () => {
   const dir = mkdtempSync(join(tmpdir(), 'atlas-approval-'))
   let store = new Store(dir)
   try {
@@ -65,9 +65,6 @@ it('persists distinct scenes, scoped overlapping IDs and immutable approval hist
     expect(store.read(created.id).features[0]).toMatchObject({
       requiredApprovals: 2,
     })
-    expect(store.history(created.id)[0].features[0]).toMatchObject({
-      requiredApprovals: 1,
-    })
     expect(store.read(seed.id)).toMatchObject({
       revision: 1,
       features: seed.features,
@@ -78,11 +75,11 @@ it('persists distinct scenes, scoped overlapping IDs and immutable approval hist
   }
 })
 
-it('allows approval cases named change-now while reserving it for booking', () => {
+it('allows authored case IDs across independent scenes', () => {
   const approval = structuredClone({ ...approvalSeed, revision: 1, assets: [] })
   approval.features[0].cases[0].id = 'change-now'
   expect(() => validateDocument(approval)).not.toThrow()
   const booking = structuredClone({ ...seed, revision: 1, assets: [] })
   booking.features[0].cases[0].id = 'change-now'
-  expect(() => validateDocument(booking)).toThrow('Reserved')
+  expect(() => validateDocument(booking)).not.toThrow()
 })

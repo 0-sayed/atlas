@@ -67,12 +67,6 @@ export const seed: CreateRequest & { features: BookingFeature[] } = {
           slot: 'unknown',
         },
       ],
-      comparison: {
-        title: 'More time to change your plans',
-        hours: 36,
-        beforeNoticeHours: 48,
-        beforeRevision: 'Booking fixture v1 · Historical',
-      },
     },
   ],
 }

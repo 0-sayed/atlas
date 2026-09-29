@@ -1,4 +1,42 @@
 import { expect, test } from '@playwright/test'
+import { seed } from '../fixtures/booking'
+
+test('booking with no saved cases shows its current rule without inventing an outcome', async ({
+  page,
+  request,
+}) => {
+  const id = `booking-no-cases-${Date.now()}`
+  const response = await request.post('/api/v1/projects', {
+    headers: {
+      authorization: 'Bearer e2e-only-token-not-a-production-secret',
+    },
+    data: {
+      ...seed,
+      id,
+      title: 'Booking guide with no saved cases',
+      features: [{ ...seed.features[0], cases: [] }],
+    },
+  })
+  expect(response.ok()).toBe(true)
+  await page.goto(`/#/projects/${id}/explore/booking`)
+  await expect(
+    page.getByRole('heading', { name: 'No saved cases' }),
+  ).toBeVisible()
+  await expect(page.getByLabel('Essential restrictions')).toContainText(
+    'At least 24 hours before the original start',
+  )
+  await expect(
+    page.getByRole('heading', { name: 'Booking moved' }),
+  ).toHaveCount(0)
+  await page.getByRole('button', { name: 'More detail' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Evidence for this activity' }),
+  ).toBeVisible()
+  await page.goto(`/#/projects/${id}/explore/booking?case=missing`)
+  await expect(
+    page.getByRole('heading', { name: 'This guide is not here yet' }),
+  ).toBeVisible()
+})
 
 test('saved cases change the scene and explain isolated conditions', async ({
   page,
@@ -65,10 +103,10 @@ test('search opens the activity directly and return preserves the query', async 
   await expect(search).toHaveValue('MOVE')
   await search.fill('refund')
   await expect(
-    page.getByText('No matching activity', { exact: true }),
+    page.getByRole('heading', { name: 'No activity matched “refund”' }),
   ).toBeVisible()
   await expect(search).toHaveValue('refund')
-  await page.getByRole('button', { name: 'Clear search' }).click()
+  await page.getByRole('button', { name: 'Return to all activities' }).click()
   await expect(
     page.getByRole('link', { name: 'Reschedule a booking', exact: true }),
   ).toBeVisible()
@@ -84,8 +122,6 @@ test('browser Back restores the selected case and earlier search', async ({
   await page
     .getByRole('button', { name: 'Less than 24 hours', exact: true })
     .click()
-  await page.getByRole('link', { name: 'What changed', exact: true }).click()
-  await page.goBack()
   await expect(
     page.getByRole('heading', { name: 'Too late to move' }),
   ).toBeVisible()
@@ -130,55 +166,6 @@ test('missing activity and case links cannot show a successful booking', async (
   }
 })
 
-test('a historical comparison keeps the same 36-hour booking and links to its current case', async ({
-  page,
-}) => {
-  await page.goto('/#/projects/booking-demo/changes')
-  await expect(
-    page.getByRole('heading', { name: 'Previously blocked' }),
-  ).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Now allowed' })).toBeVisible()
-  await expect(
-    page.getByText('Booking fixture v1 · Historical', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    page.getByText('Booking fixture v2 · Current', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    page.getByText('At least 48 hours’ notice', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    page.getByText('At least 24 hours’ notice', { exact: true }),
-  ).toBeVisible()
-  await page
-    .getByRole('link', { name: 'Explore this change', exact: true })
-    .click()
-  await expect(
-    page.getByText('36 hours remaining', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    page.getByRole('heading', { name: 'Now allowed', exact: true }),
-  ).toBeVisible()
-  await page
-    .getByRole('button', { name: 'Less than 24 hours', exact: true })
-    .click()
-  await expect(
-    page.getByRole('button', { name: '36 hours · Current rule', exact: true }),
-  ).toBeVisible()
-  await page
-    .getByRole('button', { name: '36 hours · Current rule', exact: true })
-    .click()
-  await expect(
-    page.getByRole('heading', { name: 'Now allowed', exact: true }),
-  ).toBeVisible()
-  await page
-    .getByRole('link', { name: 'Back to What changed', exact: true })
-    .click()
-  await expect(
-    page.getByRole('heading', { name: 'Previously blocked' }),
-  ).toBeVisible()
-})
-
 test('the learning loop works by keyboard, at narrow widths and with reduced motion', async ({
   page,
 }) => {
@@ -209,7 +196,7 @@ test('the learning loop works by keyboard, at narrow widths and with reduced mot
   await page.keyboard.press('Enter')
   await expect(reason).toBeFocused()
   const transitionDuration = await page
-    .locator('.outcome-banner')
+    .locator('.recorded-case-outcome')
     .evaluate((element) =>
       Number.parseFloat(getComputedStyle(element).transitionDuration),
     )
@@ -224,24 +211,13 @@ test('the learning loop works by keyboard, at narrow widths and with reduced mot
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true)
-  await page.getByRole('link', { name: 'What changed', exact: true }).click()
-  await expect(
-    page.getByRole('heading', { name: 'Now allowed', exact: true }),
-  ).toBeVisible()
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
-    ),
-  ).toBe(true)
 })
 
-test('return restores the actual Explore position and new destinations start at the top', async ({
-  page,
-}) => {
+test('return restores the actual Explore position', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 600 })
   await page.goto('/#/projects/booking-demo/explore?q=move')
   await expect(
-    page.getByRole('heading', { name: 'Explore', exact: true }),
+    page.getByRole('heading', { name: 'Browse recorded activities' }),
   ).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 220))
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
@@ -260,28 +236,6 @@ test('return restores the actual Explore position and new destinations start at 
   await expect
     .poll(() => page.evaluate(() => window.scrollY))
     .toBe(explorePosition)
-  await page
-    .getByRole('link', { name: 'Reschedule a booking', exact: true })
-    .click()
-  const reason = page.getByRole('button', { name: 'Why this outcome?' })
-  await reason.scrollIntoViewIfNeeded()
-  const previousPosition = await page.evaluate(() => window.scrollY)
-  expect(previousPosition).toBeGreaterThan(0)
-  expect(
-    await reason.evaluate((element) => {
-      const rect = element.getBoundingClientRect()
-      return rect.top >= 0 && rect.bottom <= window.innerHeight
-    }),
-  ).toBe(true)
-  await reason.click()
-  await page
-    .getByRole('link', { name: 'See what changed', exact: true })
-    .click()
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
-  await page.goBack()
-  await expect
-    .poll(() => page.evaluate(() => window.scrollY))
-    .toBe(previousPosition)
 })
 
 test('unavailable guide return restores the actual Explore position', async ({
@@ -290,7 +244,7 @@ test('unavailable guide return restores the actual Explore position', async ({
   await page.setViewportSize({ width: 375, height: 600 })
   await page.goto('/#/projects/booking-demo/explore?q=move')
   await expect(
-    page.getByRole('heading', { name: 'Explore', exact: true }),
+    page.getByRole('heading', { name: 'Browse recorded activities' }),
   ).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 220))
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(220)
@@ -322,10 +276,13 @@ test('changing a saved case preserves the viewport position', async ({
     page.getByRole('heading', { name: 'Booking moved', exact: true }),
   ).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 450))
+  const choice = page.getByRole('button', {
+    name: 'Less than 24 hours',
+    exact: true,
+  })
+  await choice.scrollIntoViewIfNeeded()
   const previousPosition = await page.evaluate(() => window.scrollY)
-  await page
-    .getByRole('button', { name: 'Less than 24 hours', exact: true })
-    .click()
+  await choice.click()
   await expect(page).toHaveURL(/case=too-late/)
   await expect
     .poll(() => page.evaluate(() => window.scrollY))

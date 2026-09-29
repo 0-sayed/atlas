@@ -1,19 +1,27 @@
 # Atlas design reference
 
-**Verified:** 2026-09-29 against the owner-supplied local Penpot export; design content unchanged. File **New File 1**, ID `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`, revision **227**. This is the shared lookup for design context, not a new design specification or permission to implement features.
+**Verified:** 2026-09-29 against the owner-supplied updated local Penpot export. File **New File 1**, ID `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`, revision **235**. This is the shared lookup for design context, not a new design specification or permission to implement features.
+
+**Product scope update — 2026-09-29:** Atlas describes current reviewed project knowledge only. Recent Changes, historical comparisons and added/removed-behavior timeline screens in r227 are retired and must not be implemented. Live Penpot cleanup is complete at revision 232: four desktop history boards, the deferred history board, navigation entries and prototype links were removed. Visible-label and retired-target checks passed across all three pages; Start Here and Review Workspace were visually inspected. The owner supplied the revision 235 native export; the local snapshot now includes these removals. Archive integrity, file identity and retired-shape absence were verified.
+
+**Owner visual adjustment — 2026-09-29:** The live desktop design and shared shell now omit the sidebar tagline and keep the island 24px from the bottom. Decorative arrows between the feature explanation steps and request/check/response cards are removed; ordered labels and the app’s numbered steps communicate sequence. Meaningful map relationship connectors remain. These adjustments are included in the local revision 235 snapshot.
 
 ## Start here
 
-The approved visual source is **`.local/design/atlas.penpot`**, relative to the repository root. It is ignored by Git and is **not included in a fresh clone**. The owner-supplied revision 227 export was copied unchanged; the original download remains intact.
+The approved visual source is **`.local/design/atlas.penpot`**, relative to the repository root. It is ignored by Git and is **not included in a fresh clone**. The owner-supplied revision 235 export was copied unchanged; the original download remains intact. An extracted inspection copy is available at `.local/design/extracted/`. The superseded r227 file is archived under `.local/archive/current-state-only/`; it is not the implementation reference.
 
-- File ID: `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`; revision: **227**.
-- SHA-256: `c2473a7f266e70f028e469f00694a9b2ddc200434cd00e28a1d3d3c7380d11f1`.
+- File ID: `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`; revision: **235**.
+- SHA-256: `c879344609d80bbdec32bfd0fed1012e77c2a4397e22ab34b1fd3d1733dcc796`.
 
 1. Read [DESIGN](business/DESIGN.md), especially the [compact component rules](business/DESIGN.md#compact-content-driven-component-rules), and the task mapping below.
 2. Locate the local file. If it is absent, ask the owner for the approved `.penpot` path and copy that file here. Do not silently select a download or recreate unseen designs from memory. If its identity differs, establish which snapshot the owner intends before replacing this reference.
 3. Inspect the relevant system components, tokens, screen states and desktop boards. The native file is a ZIP archive: `manifest.json` identifies the export, `files/FILE_ID.json` records file metadata, `files/FILE_ID/pages/` contains page/shape JSON, and `objects/` contains embedded assets. Read directly or extract a working copy under `.local/design/`; preserve the native file.
 4. Open/import the file in Penpot for visual inspection when needed. Reading JSON alone is not visual verification. Extract only the assets and reference views needed by the selected implementation task; there is no gallery or full-board export prerequisite.
 5. Keep inspection material under ignored local storage. Put only assets actually used by the application in its asset directories, with provenance and required license notices. Demo Shop and Review Workspace illustrate layouts, not source-product facts.
+
+**Implementation fidelity:** reuse the approved scenery, vector masters, font families/roles and shared component styling. Changing project facts is not permission to retain the earlier prototype's art, fonts or palette. Inspect extracted assets visually as well as checking hashes: an export can be a valid but blank image. The current runtime subset and source identities are recorded in `public/art/penpot/PROVENANCE.md` and `public/fonts/SOURCES.md`; these do not replace this design reference or the native file.
+
+Before describing a visual task as implemented, compare screenshots of the running desktop screens with the exact relevant r235 boards. Record the board IDs, asset/font checks, and deliberate adaptations for supported facts. Browser assertions must cover loaded images and actual font roles as well as layout/interaction. Passing automated checks is not design approval. Keep the owner visual gate pending until the owner accepts the result.
 
 The links below identify boards in the live Penpot file and are optional navigation aids. They can drift; the approved local snapshot is the visual authority. An imported copy may receive new IDs, so use the recorded board titles to locate it. Penpot is not the source of saved project behavior: reviewed API/SQLite knowledge supplies those facts.
 
@@ -23,7 +31,7 @@ Atlas is a reusable guide for different web projects, not an ecommerce applicati
 
 | Shared Atlas design | Supplied by reviewed project data |
 |---|---|
-| Tokens, typography, controls, shell and seven destination types | Project title/purpose, domain vocabulary and optional area groups |
+| Tokens, typography, controls, shell and six destination types | Project title/purpose, domain vocabulary and optional area groups |
 | Reusable activity, case, relationship and map compositions | Activities, actors, rules, ordered journeys, cases/outcomes, glossary and supported artwork choices |
 | Content-fitting layout, focus, Back and empty/error behavior | Item counts, text lengths, missing optional facts and evidence status |
 
@@ -35,7 +43,7 @@ Do not hard-code commerce categories, a fixed island count, shop-specific routes
 
 ## Version and scope
 
-- Desktop page: **Atlas · Illustrated experience**, ID `b06c7e1e-1498-8079-8008-b2c660ae456d` — **50 boards**.
+- Desktop page: **Atlas · Illustrated experience**, ID `b06c7e1e-1498-8079-8008-b2c660ae456d` — **46 boards**.
 - System page: **Atlas · Design system**, ID `e2cc1aab-2416-803a-8008-b3d2364d2f47` — **9 boards**.
 - Captured named checkpoint: **T007 desktop implementation baseline — 2026-09-28 — r227**, saved **2026-09-28T18:06:17.171Z**.
 - The native local file above is the implementation reference. Earlier generated exports are preserved under `.local/archive/t007-export-package-2026-09-29/` for optional historical inspection; they are not a delivery prerequisite.
@@ -127,7 +135,6 @@ All entries below were found on the verified desktop page. Board names describe 
 | [05 · Cancel order — typed relationships](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2d4502feb06&index=0) |
 | [06 · Cancel order — rule conditions](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2d452cd3083&index=0) |
 | [12 · Cancellation unavailable — explain the outcome](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2d456155802&index=0) |
-| [08 · Recent Changes — source to product meaning](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2d4ac16080a&index=0) |
 | [09 · Actors — roles and participation](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2d4af73ff2f&index=0) |
 | [10 · Rules — conditions across the project](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2d4b219ea03&index=0) |
 | [11 · Glossary — product language in context](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2d4b4bb71c8&index=0) |
@@ -151,9 +158,6 @@ All entries below were found on the verified desktop page. Board names describe 
 | [Browse · Filtered activity results](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e87acb501a&index=0) |
 | [Detail · Allowed case and evidence](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e88138fe53&index=0) |
 | [Detail · Unavailable case and evidence](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e88833902c&index=0) |
-| [Change · New behavior](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e88f8ba4eb&index=0) |
-| [Change · Removed behavior](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e894b252b0&index=0) |
-| [Change · Reviewed work without product impact](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e89a2ac97c&index=0) |
 | [Project proof · Review Workspace](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e8a11a4eb9&index=0) |
 | [State · Project with scaffolding only](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e8b09b15ee&index=0) |
 | [State · Conflicting evidence](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b2e8b868b099&index=0) |
@@ -176,9 +180,9 @@ All entries below were found on the verified desktop page. Board names describe 
 |---|---|---|
 | T007 — local design handoff | Approved native file; this reference and board mapping | Verify source identity and retrieval instructions. No bulk export or generated gallery is required. |
 | T008 — two-screen proof | Foundations, Core components, Navigation patterns, Application shell, Artwork; Start Here, compact project, feature explanation, Review Workspace, loading/empty/failure states | Adapt the composition to the existing labelled Publishing Studio overview and supported navigation activity. Do not invent commerce facts or force unsupported actions into navigation. |
-| T009 — cross-domain knowledge | Content boundaries; Review Workspace; rule conditions, typed relationships, allowed/unavailable detail, conflicting evidence and change examples | Define reviewed facts and supported reusable renderers; visuals are not evidence and do not authorize arbitrary layouts. |
-| T010 — desktop destinations | All seven destination examples; area/detail pages; whole-product/Orders/Manage orders maps, search/list, camera A/B and connection examples; Map composition | Implement saved-data views, shared controls, direct links/Back, meaningful map behavior and honest states. Camera screenshots illustrate states, not a working continuous canvas implementation. |
-| T011 — acceptance | Approved local Penpot file; sparse/compact project, all empty/recovery states, Review Workspace, map and changes | Verify real variable content and three distinct domains in the same build. Do not use static Penpot examples as proof of source accuracy. |
+| T009 — cross-domain knowledge | Content boundaries; Review Workspace; rule conditions, typed relationships, allowed/unavailable detail, conflicting evidence | Define reviewed facts and supported reusable renderers; visuals are not evidence and do not authorize arbitrary layouts. |
+| T010 — desktop destinations | All six current-state destination examples; area/detail pages; whole-product/Orders/Manage orders maps, search/list, camera A/B and connection examples; Map composition | Implement saved-data views, shared controls, direct links/Back, meaningful map behavior and honest states. Camera screenshots illustrate states, not a working continuous canvas implementation. |
+| T011 — acceptance | Approved local Penpot file; sparse/compact project, all empty/recovery states, Review Workspace and map | Verify real variable content and three distinct domains in the same build. Do not use static Penpot examples as proof of source accuracy. |
 
 ## Implementation notes
 
@@ -189,4 +193,4 @@ All entries below were found on the verified desktop page. Board names describe 
 - `.local/audits/`, `.local/penpot-design/` and the archived T007 export package are historical supporting material, not prerequisites or competing sources of truth. Original concept images under `planning/context/business/references/` are inspiration, not current screen specifications.
 - When the owner approves a new design snapshot, update the native file identity/hash and affected board references together. Penpot component/token edits do not automatically update React or CSS. Verify the rendered implementation against the approved design.
 
-See the [T007 validation record](../roadmap/t007-validation.md) for this handoff's checks. T008 remains the next application task; this document does not authorize it.
+See the [T007 validation record](../roadmap/t007-validation.md) for this handoff's checks. See the [T008 validation record](../roadmap/t008-validation.md) for the current implementation evidence and pending owner visual acceptance; T009/T010 remain separate work.

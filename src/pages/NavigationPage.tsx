@@ -3,8 +3,9 @@ import { Link, useLocation, useSearchParams } from 'react-router'
 import type { NavigationFeature } from '../../shared/contracts'
 import { projectPath, useProject } from '../content/knowledge'
 import { NavigationScene } from '../scenes/NavigationScene'
-import { ActivitySubject } from '../scenes/ActivityArt'
+import { AtlasActivityIcon, AtlasIcon } from '../components/AtlasIcon'
 import { FeatureEvidence } from '../components/FeatureDetail'
+import { AtlasBadge, AtlasPanel } from '../components/AtlasPrimitives'
 import { RegisteredArt } from '../components/RegisteredArt'
 import { FixtureLabel, MissingPage } from './GuidePages'
 import './feature-explanation.css'
@@ -16,7 +17,7 @@ const outcomeLabel = {
 } as const
 
 export function NavigationPage({ feature }: { feature: NavigationFeature }) {
-  const sceneRef = useRef<HTMLElement>(null)
+  const sceneRef = useRef<HTMLDivElement>(null)
   const project = useProject()
   const base = projectPath(project.id)
   const [params, setParams] = useSearchParams()
@@ -29,11 +30,9 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
   const returnPath =
     from === 'start'
       ? base
-      : from === 'changes'
-        ? `${base}/changes`
-        : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
+      : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
   const relatedParams = new URLSearchParams()
-  if (from) relatedParams.set('from', from)
+  if (from === 'start' || from === 'explore') relatedParams.set('from', from)
   const query = params.get('q')
   if (query) relatedParams.set('q', query)
   const related = project.relations.flatMap((relation) => {
@@ -67,81 +66,101 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
         to={returnPath}
         state={{ restorePosition: true }}
       >
-        <span aria-hidden="true">← </span>Back to{' '}
-        {from === 'start'
-          ? 'Start here'
-          : from === 'changes'
-            ? 'What changed'
-            : 'Explore'}
+        Back to {from === 'start' ? 'Start here' : 'Explore'}
       </Link>
       <FixtureLabel feature={feature} />
 
       <header className="navigation-hero">
+        <div className="navigation-title-icon">
+          <AtlasActivityIcon feature={feature} />
+        </div>
         <div className="navigation-hero-copy">
           <p className="eyebrow">
             {feature.group ?? 'Activity'} / Feature explanation
           </p>
           <h1 id="page-title">{feature.title}</h1>
-          <dl className="navigation-meta">
-            <div>
-              <dt>Actor</dt>
-              <dd>{feature.actor}</dd>
-            </div>
-            <div>
-              <dt>Goal</dt>
-              <dd>{feature.purpose}</dd>
-            </div>
-          </dl>
+          <p className="navigation-purpose">{feature.purpose}</p>
         </div>
-        <div className="navigation-hero-art">
-          <img
-            className="navigation-terrain"
-            src="/art/atlas-island.png"
-            alt=""
-          />
-          <ActivitySubject feature={feature} />
+        <div className="navigation-hero-scenery" aria-hidden="true">
+          <img src="/art/penpot/island.png" alt="" />
+          <AtlasActivityIcon feature={feature} />
         </div>
       </header>
+      <nav className="navigation-sections" aria-label="Feature sections">
+        {[
+          ['how-heading', 'Overview'],
+          ['rules-heading', 'Rules'],
+          ['related-heading', 'Relationships'],
+          ['cases-heading', 'Cases & evidence'],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => document.getElementById(id)?.focus()}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+      <dl className="navigation-meta">
+        <div>
+          <dt>
+            <AtlasIcon name="people" />
+            <span>Actor</span>
+          </dt>
+          <dd>{feature.actor}</dd>
+        </div>
+        <div>
+          <dt>
+            <AtlasIcon name="book" />
+            <span>Evidence</span>
+          </dt>
+          <dd>
+            {feature.evidence.status === 'demo'
+              ? 'Illustrative fixture'
+              : feature.evidence.status === 'uncertain'
+                ? 'Uncertain evidence'
+                : 'Source-supported'}
+          </dd>
+        </div>
+        <div>
+          <dt>
+            <AtlasIcon name="clock" />
+            <span>Revision</span>
+          </dt>
+          <dd>{feature.revisionLabel}</dd>
+        </div>
+      </dl>
 
       <div className="navigation-content-grid">
-        <section
-          className="navigation-panel navigation-how"
-          ref={sceneRef}
-          aria-labelledby="how-heading"
-        >
-          <div className="navigation-panel-heading">
-            <span className="navigation-panel-icon" aria-hidden="true">
-              ✦
-            </span>
-            <div>
-              <p className="eyebrow">Selected saved case</p>
-              <h2 id="how-heading">How it works</h2>
-              <p>Starting point, action, and recorded result.</p>
-            </div>
-          </div>
-          {example ? (
-            <NavigationScene example={example} />
-          ) : (
-            <div className="navigation-empty">
-              <h3>No saved cases</h3>
-              <p>No saved cases have been incorporated for this activity.</p>
-            </div>
-          )}
-        </section>
+        <div className="navigation-how-anchor" ref={sceneRef}>
+          <AtlasPanel
+            id="how-heading"
+            title="How it works"
+            description="Starting point, action, and recorded result."
+            icon={<AtlasIcon name="spark" />}
+            tone="info"
+            className="navigation-how"
+          >
+            <p className="navigation-selected-label">Selected saved case</p>
+            {example ? (
+              <NavigationScene example={example} />
+            ) : (
+              <div className="navigation-empty">
+                <h3>No saved cases</h3>
+                <p>No saved cases have been incorporated for this activity.</p>
+              </div>
+            )}
+          </AtlasPanel>
+        </div>
 
-        <section
-          className="navigation-panel navigation-rules"
-          aria-labelledby="rules-heading"
+        <AtlasPanel
+          id="rules-heading"
+          title="Business rules"
+          icon={<AtlasIcon name="rule" />}
+          tone="success"
+          className="navigation-rules"
         >
-          <div className="navigation-panel-heading">
-            <span className="navigation-panel-icon" aria-hidden="true">
-              ≡
-            </span>
-            <div>
-              <p className="eyebrow">Recorded constraints</p>
-              <h2 id="rules-heading">Business rules</h2>
-            </div>
-          </div>
           {feature.rules.length > 0 ? (
             <ol className="navigation-rule-list">
               {feature.rules.map((rule, index) => (
@@ -156,21 +175,15 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
               No business rules have been recorded.
             </p>
           )}
-        </section>
+        </AtlasPanel>
 
-        <section
-          className="navigation-panel navigation-cases"
-          aria-labelledby="cases-heading"
+        <AtlasPanel
+          id="cases-heading"
+          title="Saved examples and edge cases"
+          icon={<AtlasIcon name="warning" />}
+          tone="warning"
+          className="navigation-cases"
         >
-          <div className="navigation-panel-heading">
-            <span className="navigation-panel-icon" aria-hidden="true">
-              ◇
-            </span>
-            <div>
-              <p className="eyebrow">Compare recorded outcomes</p>
-              <h2 id="cases-heading">Saved examples and edge cases</h2>
-            </div>
-          </div>
           {feature.cases.length > 0 ? (
             <div className="case-picker" role="group" aria-label="Saved cases">
               <div className="navigation-case-grid">
@@ -191,11 +204,9 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
                     }}
                   >
                     <span className="navigation-case-title">{item.label}</span>
-                    <span
-                      className={`navigation-case-outcome outcome-${item.outcome}`}
-                    >
+                    <AtlasBadge tone={item.outcome}>
                       {outcomeLabel[item.outcome]}
-                    </span>
+                    </AtlasBadge>
                   </button>
                 ))}
               </div>
@@ -203,21 +214,15 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
           ) : (
             <p className="navigation-empty">No saved examples are available.</p>
           )}
-        </section>
+        </AtlasPanel>
 
-        <section
-          className="navigation-panel navigation-related"
-          aria-labelledby="related-heading"
+        <AtlasPanel
+          id="related-heading"
+          title="Related features"
+          icon={<AtlasIcon name="link" />}
+          tone="related"
+          className="navigation-related"
         >
-          <div className="navigation-panel-heading">
-            <span className="navigation-panel-icon" aria-hidden="true">
-              ↗
-            </span>
-            <div>
-              <p className="eyebrow">Saved relationships</p>
-              <h2 id="related-heading">Related features</h2>
-            </div>
-          </div>
           {related.length > 0 ? (
             <ul className="navigation-related-list">
               {related.map((relation) => (
@@ -229,7 +234,6 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
                       <small>{relation.label}</small>
                       <strong>{relation.feature.title}</strong>
                     </span>
-                    <span aria-hidden="true">→</span>
                   </Link>
                 </li>
               ))}
@@ -239,7 +243,7 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
               No related features have been recorded.
             </p>
           )}
-        </section>
+        </AtlasPanel>
       </div>
 
       {feature.assetIds.map((id) => (
@@ -254,9 +258,6 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
         <summary>Source and evidence</summary>
         <FeatureEvidence feature={feature} />
       </details>
-      <div className="scene-actions">
-        <Link to={`${base}/changes`}>See what changed ↗</Link>
-      </div>
     </section>
   )
 }

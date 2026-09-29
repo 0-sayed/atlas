@@ -1,16 +1,16 @@
 # Atlas — Living Project Context
 
-**Version:** 0.12\
-**Last updated:** 2026-09-28\
+**Version:** 0.13\
+**Last updated:** 2026-09-29\
 **Owner:** Sayed  
-**Stage:** The local API/database, project-scoped exploration, independent source skill, and limited shared visual foundation exist. T006 is committed at `ac10c83`. The seven-destination desktop design has been reviewed in Penpot, but most destination views and general authored-activity support are not implemented. Browser visual acceptance and human usefulness evaluation remain pending.\
+**Stage:** The local API/database, project-scoped exploration, independent source skill, and limited shared visual foundation exist. T006 is committed at `ac10c83`. The original desktop Penpot reference was reviewed; its live six-destination current-state cleanup is complete; local revision 235 snapshot is verified. Most destination views and general authored-activity support are not implemented. Browser visual acceptance and human usefulness evaluation remain pending.\
 **Project name:** Atlas — confirmed by Sayed on 2026-09-24. Use Atlas in product titles, documentation, and future UI copy.
 
 > **North star:** Make it enjoyable to understand and remember what I built, without making me read documentation.
 
 This is a working record of the decisions, constraints, reasoning, V1 defaults, and prototype checks from the project conversation. It is not a transcript, a frozen specification, or an instruction to implement every idea below. The complete document is for preserving context; its length is not a template for the application's UI.
 
-**Design companion:** [DESIGN.md](DESIGN.md) v0.12 records the approved seven-destination direction, reviewed desktop reference, and proposed implementation architecture. Penpot review is not browser acceptance. This document continues to own product requirements and scope.
+**Design companion:** [DESIGN.md](DESIGN.md) v0.13 records the approved six-destination direction, the reviewed original desktop reference, and proposed implementation architecture. The local Penpot snapshot is refreshed; owner browser visual acceptance remains open. This document continues to own product requirements and scope.
 
 **Technical companion:** [TECHNICAL.md](../technical/TECHNICAL.md) records the React interface, small local backend, one SQLite database, validated data updates, and implementation checks. [README.md](../README.md) provides the shortest entry into this pack and states what has actually been reviewed.
 
@@ -56,11 +56,11 @@ agent reads context + existing Atlas project data
 
 The second step is not embedded in the skill. Sayed chooses his development tools independently. The backend does not interpret Markdown or run a coding agent. JSON may carry API requests/responses; it is not a second saved project store.
 
-**What changed from v0.9:** the handcrafted, frontend-only guide with facts compiled into TypeScript is superseded. Keep the React/art foundation; move each project's meaning, history, and visual configuration into SQLite. Routine data changes need no app rebuild. New reusable renderer code still does.
+**Current platform:** the handcrafted, frontend-only guide with facts compiled into TypeScript is superseded. Keep the React/art foundation; store each project's current meaning and visual configuration in SQLite. Routine data changes need no app rebuild. New reusable renderer code still does.
 
 ### Current implementation and next work
 
-The earlier booking fixture and second-project checks proved the initial data path; the three-place shell was a historical starting point. T006 adds a limited shared visual foundation and Publishing Studio demo, committed at `ac10c83`. The approved product has seven fixed destinations, but their desktop Penpot designs are reference work, not seven working application views. T007–T011 are the proposed path from that foundation to a tested, reusable guide; writing this architecture does not authorize implementation.
+The earlier booking fixture and second-project checks proved the initial data path; the three-place shell was a historical starting point. T006 adds a limited shared visual foundation and Publishing Studio demo, committed at `ac10c83`. The approved product has six fixed destinations, but their desktop Penpot designs are reference work, not six working application views. T007–T011 are the proposed path from that foundation to a tested, reusable guide; writing this architecture does not authorize implementation.
 
 ---
 
@@ -125,7 +125,6 @@ The useful content includes:
 - Who is allowed to do what.
 - Outcomes and important exceptions.
 - Product terms that need explanation.
-- What changed recently in that behavior.
 
 Do not lead with frameworks, modules, service boundaries, file trees, infrastructure diagrams, or implementation details. Supporting code/test references may be available on demand without becoming the main explanation.
 
@@ -153,11 +152,11 @@ The MVP should not bake in commerce-specific categories. A booking application, 
 
 ### MVP features
 
-This is the consolidated feature list for Atlas itself, not the features of the source app it explains. It reflects the reusable-platform correction; the learning experience itself is unchanged. **Stored projects, validated database writes and project-scoped exploration are implemented; broad source coverage and human usefulness are not established by those tests.** Use the seven fixed destinations below as the full-product navigation. Normal storage starts empty; fixture projects are optional test data. Refine exact visual treatments during the prototype; these defaults are not test results.
+This is the consolidated feature list for Atlas itself, not the features of the source app it explains. It reflects the reusable-platform correction; the learning experience itself is unchanged. **Stored projects, validated database writes and project-scoped exploration are implemented; broad source coverage and human usefulness are not established by those tests.** Use the six fixed destinations below as the full-product navigation. Normal storage starts empty; fixture projects are optional test data. Refine exact visual treatments during the prototype; these defaults are not test results.
 
 | Feature | What the user gets |
 |---|---|
-| **Stored projects** | Open a saved project from a small project list or switcher. Each project has its own facts, evidence, history, assets, and scene settings in the shared local database. |
+| **Stored projects** | Open a saved project from a small project list or switcher. Each project has its own current facts, evidence, assets, and scene settings in the shared local database. |
 | **Start Here** | A curated illustrated landscape of main activities and essential concepts, not a literal 20% usage ranking. |
 | **Feature Map** | A searchable, grouped map of recorded activities and typed evidenced relationships. |
 | **User Journeys** | Explicit ordered paths through recorded activities, with goals and cautions where supported. |
@@ -166,7 +165,6 @@ This is the consolidated feature list for Atlas itself, not the features of the 
 | **Glossary** | Saved product terms, definitions, references and evidence. |
 | **Explore a feature** | A visual explanation of who can do what, what happens, and the essential restrictions. Select recorded examples to understand the main case and important exceptions; no real business action is executed. |
 | **Find and go deeper** | Search and grouped navigation to incorporated activities, with optional rules, clearly labelled relationships, and source evidence. Everything recorded remains reachable without drawing a giant graph. |
-| **Recent Changes** | Visual explanations of added, changed, or removed behavior. Show before/after only when supported. Updates appear after a validated database write and a refresh/refetch, not from a runtime PR feed or raw context-file import. |
 | **Honest knowledge states** | An empty guide when no behavior has been incorporated, clear gaps for unknown/partial evidence, and honest no-result or unavailable-feature states. No fictional features or live-analysis indicators. |
 
 The complete guide needs authored behavior steps, multiple actors and their participation, identifiable rules, typed evidenced relationships, optional domains, explicit journeys, and glossary definitions. These are project data with optional sections and variable lengths, not fixed counts or a mandatory glossary entry for every concept. The current booking, approval and navigation scene types cover selected examples, not every web app. Unsupported behavior requires a reviewed contract and renderer addition; do not force it into a navigation case or invent a universal taxonomy.
@@ -246,7 +244,7 @@ The user called this the “20/80” mode: the important concepts that help expl
 
 “Everything accessible” does not mean “everything drawn simultaneously.” A complete feature collection can be searchable and grouped, with scoped relationships and more detail on request. Completeness of the collection remains limited by what the system has actually discovered.
 
-**APPROVED DIRECTION:** Start Here, Feature Map, User Journeys, Actors, Rules, Glossary, and Recent Changes are fixed project destinations. Feature-local tabs/cases remain within a selected activity. Search and map filters derive from saved project facts; they do not add destinations. Each section reports missing knowledge honestly.
+**APPROVED DIRECTION:** Start Here, Feature Map, User Journeys, Actors, Rules, and Glossary are fixed project destinations. Feature-local tabs/cases remain within a selected activity. Search and map filters derive from saved project facts; they do not add destinations. Each section reports missing knowledge honestly.
 
 ### Relationships
 
@@ -293,7 +291,6 @@ The overview and map use a shared illustrated water-and-island vocabulary. Group
 | Permissions | Small, readable matrix or role comparison |
 | A rule or exception | Side-by-side documented cases |
 | Product concept | Annotated illustration or screenshot |
-| Recent change | Before/after or a short visual explanation |
 | Relevant connections | Small, labeled local relationship view |
 
 These are composition options within the fixed destinations, not a replacement for them.
@@ -314,9 +311,9 @@ Start with the light, warm illustrated style in DESIGN.md. Tune the palette and 
 
 ## 10. V1 navigation and experience
 
-The [MVP feature list](#mvp-features) owns scope. [DESIGN.md](DESIGN.md#2-v1-screens-and-interactions) owns the seven-destination frame, shared layout, and interactions. Its section 8 separates the T006 foundation from the proposed desktop proof and later acceptance.
+The [MVP feature list](#mvp-features) owns scope. [DESIGN.md](DESIGN.md#2-v1-screens-and-interactions) owns the six-destination frame, shared layout, and interactions. Its section 8 separates the T006 foundation from the proposed desktop proof and later acceptance.
 
-A project switcher selects the project; the same seven destinations remain inside it. Feature explanations can have local tabs and cases. Map grouping and filters come from saved facts. Start Here, authored journeys, and focused relationships answer different questions and should have different compositions. Source preparation remains outside Atlas; an empty or partial guide is a content state. The restaurant annotated-menu reference supplies art inspiration only, not the sidebar. The supplied sidebar image establishes seven destinations. No separate layout document is required.
+A project switcher selects the project; the same six destinations remain inside it. Feature explanations can have local tabs and cases. Map grouping and filters come from saved facts. Start Here, authored journeys, and focused relationships answer different questions and should have different compositions. Source preparation remains outside Atlas; an empty or partial guide is a content state. The restaurant annotated-menu reference supplies art inspiration only, not the sidebar. The supplied sidebar image establishes the original sidebar reference; the current product has six destinations. No separate layout document is required.
 
 ---
 
@@ -359,7 +356,7 @@ Any external art/icon assets will need a checked license before use or redistrib
 | Item | Responsibility |
 |---|---|
 | Source-context Markdown | Bounded source facts and evidence. Preparation input, not the accumulated project database. |
-| `.local/atlas.sqlite` | One SQLite database for all projects: features, rules, cases, relationships, evidence, incorporated revisions, history, and visual configuration. |
+| `.local/atlas.sqlite` | One SQLite database for all projects: features, rules, cases, relationships, evidence, current revisions and visual configuration. |
 | `.local/assets/` | Project-specific image files, referenced by database records. These are binary assets, not a competing knowledge store. |
 | Tracked Atlas source | UI, renderer patterns, strict request schemas, backend code, SQL migrations, and harmless demo seeds. No private project facts. |
 
@@ -373,7 +370,7 @@ Validation covers types, required fields, supported scene kinds/settings, stable
 
 ### Dynamic rendering and customization
 
-The target frontend renders saved facts using a bounded set of reviewed illustrated activity patterns: authored starting state, action or steps, conditions, actor participation, recorded outcome, and optional comparisons. Names, actors, cases, step counts, order, assets, and supported visual settings are data. Shared rule IDs prevent a threshold from drifting across views. Atlas selects and composes supported patterns; it does not execute the source product's decisions or accept an arbitrary UI description language.
+The target frontend renders saved facts using a bounded set of reviewed illustrated activity patterns: authored starting state, action or steps, conditions, actor participation, and recorded outcome. Names, actors, cases, step counts, order, assets, and supported visual settings are data. Shared rule IDs prevent a threshold from drifting across views. Atlas selects and composes supported patterns; it does not execute the source product's decisions or accept an arbitrary UI description language.
 
 Different projects can use different combinations and assets. A genuinely new interaction requires adding a reusable renderer component and declaring its authoring capability. Do not store or execute project-supplied React, JavaScript, arbitrary HTML/SVG markup, or generated expressions to fake unlimited customization. The authoring workflow must report an unsupported behavior as a gap; it cannot silently turn it into a supported case. This is a bounded web-app guide, not a guarantee that any application can be rendered unchanged.
 
@@ -393,7 +390,7 @@ Runtime model analysis, automatic Markdown ingestion, source watchers, memory se
 
 Source preparation and agent-authored data updates use the user's separately chosen coding workflow. Browsing and switching saved cases require no model calls. The local backend reads saved data; it does not request a new analysis.
 
-Fix facts through a validated database update with source evidence and a correction reason. A user-facing feedback editor is not required. Preserve old values only in labelled history, and preserve corrections when later evidence conflicts. Store coverage/revision at the affected-feature level; one recent PR cannot establish whole-project freshness.
+Fix facts through a validated database update with source evidence and a correction reason. A user-facing feedback editor is not required. Correct the current value when later evidence conflicts; keep the supporting evidence and reason. Store coverage/revision at the affected-feature level; one recent PR cannot establish whole-project freshness.
 
 ---
 
@@ -455,7 +452,7 @@ Earlier rejected projects—benchmarks, patch optimizers, synthetic customers, a
 
 This planning context retains **13 visual references** in `business/references/inspiration/` and `business/references/concepts/`. The links below resolve in this repository. Superseded onboarding, scanner, dark-UI, and visual-engine experiments are not included in this build pack.
 
-**These are style and explanation references, not a production asset library.** The approved seven destinations come from the user's supplied sidebar reference, not the restaurant menu. Example business rules, statistics, extra controls, and older branding are not requirements. Use **Atlas** in implemented UI copy. Pick one main visual reference for a scene instead of combining every pictured style or widget.
+**These are style and explanation references, not a production asset library.** The six current destinations adapt the user's supplied sidebar reference. Example business rules, statistics, extra controls, and older branding are not requirements. Use **Atlas** in implemented UI copy. Pick one main visual reference for a scene instead of combining every pictured style or widget.
 
 ### Overview and visual tone
 
@@ -489,15 +486,15 @@ The current direction supersedes the earlier three-place default. T006 is a limi
 
 | Area | V1 default |
 |---|---|
-| First interaction | Open a visual feature explanation, select an important alternate case, and see why its outcome changes. A before/after example explains one change. No mandatory quiz or slideshow. |
-| Navigation | Choose a saved project, then **Start Here / Feature Map / User Journeys / Actors / Rules / Glossary / Recent Changes**. Feature-local tabs, cases, and data-driven filters are separate navigation levels. Search, cache keys, and return paths retain project identity. |
+| First interaction | Open a visual feature explanation, select an important alternate case, and see why its outcome changes. No mandatory quiz or slideshow. |
+| Navigation | Choose a saved project, then **Start Here / Feature Map / User Journeys / Actors / Rules / Glossary**. Feature-local tabs, cases, and data-driven filters are separate navigation levels. Search, cache keys, and return paths retain project identity. |
 | Visual grammar | Illustrated actions and walkthroughs for behavior; timelines for sequences; comparisons for conditions; compact tables for permissions. Only show scoped relationships that help the selected question. |
 | Test content | The clearly labelled **Reschedule a booking** fixture remains a historical behavior test. Publishing Studio is labelled demo content for the visual foundation. Neither is a real source-product claim or a chosen domain. |
-| Knowledge and evidence | One SQLite database, separate from app source. Strict backend writes preserve shared facts, project-scoped relationships, source/revision references, and labelled history. Unknown remains unknown. |
+| Knowledge and evidence | One SQLite database, separate from app source. Strict backend writes preserve shared facts, project-scoped relationships, source/revision references. Unknown remains unknown. |
 | Platform/storage | React UI + a small local backend. All projects in `.local/atlas.sqlite`; assets in `.local/assets/`; `.local/` is ignored and not statically served. No project JSON files or app rebuild for ordinary data updates. |
 | Essentials | Introduce supported product purpose, main user journeys, prerequisites, and essential restrictions. Save the selection with its project; no literal top-20% ranking or usage analytics. |
 | Artwork and renderer | Reuse a small art kit with React/SVG and meaningful reduced-motion-safe transitions. Rich illustration may be raster. Choose and license-check actual assets while building the first scene; no full 3D or per-feature painting service. |
-| Evaluation | Check understanding, voluntary return, visual usability, and a correct before/after. Test source-context accuracy separately against real evidence and observe actual development cost; do not add a benchmark platform. |
+| Evaluation | Check understanding, voluntary return, visual usability, and accurate current behavior. Test source-context accuracy separately against real evidence and observe actual development cost; do not add a benchmark platform. |
 
 ### Still to select or test—not missing product features
 
@@ -534,8 +531,8 @@ Synthetic feature records can test navigation and rendering. Reviewed real sourc
 |---|---|
 | T007 | Approved native `.penpot` file under ignored `.local/design/atlas.penpot`, with source identity, retrieval instructions and task-to-board mapping in the [design reference](../design-reference.md). No bulk export or gallery requirement. |
 | T008 | Running Start Here and one feature explanation visually checked against the desktop reference, including variable content and accessibility basics. |
-| T009 | Strict, versioned project knowledge for authored activities, actors, rules, cases/outcomes, typed relationships, explicit journeys and glossary, plus a capability-aware `update-atlas` workflow. Preserve existing data and history. |
-| T010 | Working Feature Map, User Journeys, Actors, Rules, Glossary and Recent Changes desktop destinations using the shared design system and honest empty/unknown states. |
+| T009 | Strict, versioned project knowledge for authored activities, actors, rules, cases/outcomes, typed relationships, explicit journeys and glossary, plus a capability-aware `update-atlas` workflow. Preserve existing current data. |
+| T010 | Working Feature Map, User Journeys, Actors, Rules and Glossary desktop destinations using the shared design system and honest empty/unknown states. |
 | T011 | Same-build acceptance with three distinct domain datasets, at least two from reviewed authorized real sources; no per-project application edits. |
 
 This is a proposed roadmap for review, not implementation authorization. Desktop is the current design scope. Existing responsive behavior must not regress; tablet and mobile design completion is deferred.
@@ -550,7 +547,7 @@ Start with this context README.md, this section 1, the [V1 defaults](#16-v1-defa
 
 Preserve the user's constraints. Do not silently promote a proposal, mockup widget, or plausible product convention into a requirement. Ask about consequential unresolved choices when necessary rather than filling them with enterprise defaults.
 
-Preserve the existing T006 foundation. The recorded roadmap sequence is T007 for the local Penpot handoff, T008 for the running two-screen visual proof, T009 for supported knowledge and authoring, and T010 for the six destinations beyond Start Here and the full desktop experience. Start one of these only when separately instructed to implement that task. This documentation refresh does not initiate feature planning or execution.
+Preserve the existing T006 foundation. The recorded roadmap sequence is T007 for the local Penpot handoff, T008 for the running two-screen visual proof, T009 for supported knowledge and authoring, and T010 for the five destinations beyond Start Here and the full desktop experience. Start one of these only when separately instructed to implement that task. This documentation refresh does not initiate feature planning or execution.
 
 ### Updating this document
 
@@ -586,6 +583,7 @@ For another conversation or a coding session, supply the latest document and the
 | 0.10 | 2026-09-24 | Replaced code-bundled project knowledge with one Git-ignored SQLite database, validated local backend writes, and data-driven rendering across projects. Preserved the visual experience, context-only skill, and 13 references. No application implementation or tests claimed. |
 | 0.11 | 2026-09-25 | Superseded the historical three-place recommendation with seven fixed destinations, specified full-product knowledge needs, and limited the active visual milestone to the overview plus one feature explanation. Visual acceptance remains pending. |
 | 0.12 | 2026-09-28 | Distinguished committed T006 and reviewed desktop references from target behavior; bounded authored activities and specified T007–T011 same-build acceptance. Documentation proposal only. |
+| 0.13 | 2026-09-29 | Approved a current-state-only guide with six destinations. Removed product-history, Recent Changes, and historical-comparison requirements while retaining revision-safe updates, browser Back, and historical development evidence. Live current-state Penpot cleanup is complete; local revision 235 snapshot is verified. |
 
 ---
 

@@ -1,0 +1,40 @@
+/* Semantic values from the approved Atlas Penpot r227 atlas/core tokens. */
+:root {
+  --atlas-water-detail: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='160' viewBox='0 0 220 160'%3E%3Cpath d='M20 42q10 6 20 0t20 0M130 120q10 6 20 0t20 0' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  --atlas-ink: #192d58;
+  --atlas-muted: #5e7091;
+  --atlas-paper: #fff;
+  --atlas-canvas: #f4fbff;
+  --atlas-line: #d7e7f2;
+  --atlas-control-border: #d8e3f0;
+  --atlas-primary: #2864fa;
+  --atlas-primary-hover: #214fad;
+  --atlas-secondary: #e6f0ff;
+  --atlas-secondary-hover: #dce9ff;
+  --atlas-secondary-text: #214fad;
+  --atlas-selected: #dfebff;
+  --atlas-info: #ddf4ff;
+  --atlas-success: #ddf5e9;
+  --atlas-warning: #fff0bf;
+  --atlas-danger: #ffe1e8;
+  --atlas-lavender: #ece4ff;
+  --atlas-success-strong: #c8eedd;
+  --atlas-surface-info: #ecf8ff;
+  --atlas-surface-success: #f0faf5;
+  --atlas-surface-warning: #fff8e9;
+  --atlas-surface-related: #f5f1ff;
+  --atlas-radius-control: 10px;
+  --atlas-radius-card: 18px;
+  --atlas-radius-scene: 24px;
+  --atlas-radius-pill: 999px;
+  --atlas-space-1: 4px;
+  --atlas-space-2: 8px;
+  --atlas-space-3: 12px;
+  --atlas-space-4: 16px;
+  --atlas-space-6: 24px;
+  --atlas-space-8: 32px;
+  --atlas-control-height: 44px;
+  --atlas-font-body: 'Nunito', sans-serif;
+  --atlas-font-label: 'Patrick Hand', cursive;
+  --atlas-font-heading: 'Kalam', 'Trebuchet MS', sans-serif;
+}

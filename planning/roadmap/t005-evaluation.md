@@ -1,6 +1,6 @@
 # T005 — first real-source guide
 
-Status: runtime and local incorporation implemented; human comprehension and voluntary-return evaluation inconclusive. This is not a claim of production deployment or broad source-extraction accuracy.
+Status: runtime and local incorporation implemented; human comprehension and voluntary-return evaluation inconclusive. This is a historical evaluation record. Its former history read and comparison checks are superseded by the current-state-only contract; this is not a claim of current API behavior, production deployment, or broad source-extraction accuracy.
 
 ## What was evaluated
 
@@ -21,7 +21,7 @@ A versioned `navigation` scene records authored starting points, actions, result
 
 This first non-commerce source required one new scene. It therefore proves reuse within that bounded scene, not that arbitrary web applications need no UI changes.
 
-## Private incorporation and repeat procedure
+## Historical incorporation and repeat procedure (superseded)
 
 Local guide: `http://127.0.0.1:5173/#/projects/atlas-reader-guide`.
 
@@ -37,7 +37,7 @@ Context, `baseline.json`, `update.json`, payload hashes, API observations, and s
 
 Observed on 2026-09-25: initial GET returned 404; create produced Atlas revision 1; update produced revision 2 with exactly two activities. Read-back matched submitted features/evidence, history contained exactly two snapshots, and the baseline was unchanged. Both no-change decisions made zero POSTs and left revision/history unchanged. Source commit IDs, Atlas storage revisions, and deployment status are separate concepts.
 
-## Verification and effort
+## Historical verification and effort (pre-removal)
 
 - Strict contract tests reject unsupported versions, mixed-scene fields, and invalid outcomes. Real SQLite tests cover restart persistence, immutable history, preservation of unrelated scenes, and stale/invalid-write rollback.
 - Browser tests exercise case selection, direct links, Back/search restoration, unknown and missing cases, empty cases, evidence, current/history outcomes, and keyboard/mobile use. Existing booking/approval coverage stays active.

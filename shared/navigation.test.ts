@@ -25,7 +25,7 @@ it('accepts authored navigation cases and rejects unsupported or mixed data', ()
     expect(featureSchema.safeParse(invalid).success).toBe(false)
 })
 
-it('persists navigation history while preserving other scenes and rolling back invalid writes', () => {
+it('persists current navigation while preserving other scenes and rolling back invalid writes', () => {
   const dir = mkdtempSync(join(tmpdir(), 'atlas-navigation-'))
   let store = new Store(dir)
   try {
@@ -70,12 +70,6 @@ it('persists navigation history while preserving other scenes and rolling back i
     expect(
       current.features.find((f) => f.id === navigationFeature.id)!.cases[0],
     ).toMatchObject({ result: 'Updated destination' })
-    expect(store.history(navigationSeed.id)).toHaveLength(2)
-    expect(
-      store
-        .history(navigationSeed.id)[0]
-        .features.find((f) => f.id === navigationFeature.id),
-    ).toEqual(navigationFeature)
   } finally {
     store.close()
     rmSync(dir, { recursive: true, force: true })

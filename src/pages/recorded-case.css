@@ -1,0 +1,204 @@
+.recorded-case-page .feature-heading {
+  margin: 4px 0 22px;
+}
+.recorded-case-page .feature-heading h1 {
+  margin: 8px 0;
+}
+.recorded-case-page .restrictions {
+  margin: 16px 0 24px;
+}
+.recorded-case-page .recorded-case-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.86fr) minmax(0, 1.14fr);
+  align-items: start;
+  gap: 28px;
+  margin: 24px 0 0;
+}
+.recorded-case-page .recorded-case-picker,
+.recorded-case-page .recorded-case-outcome {
+  min-width: 0;
+  margin: 0;
+  padding: 24px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-card);
+  overflow-wrap: anywhere;
+}
+.recorded-case-page .recorded-case-picker {
+  background: var(--atlas-paper);
+}
+.recorded-case-picker h2,
+.recorded-outcome-title,
+.recorded-evidence h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.recorded-case-picker h2,
+.recorded-outcome-title {
+  font: 700 27px/1.25 var(--atlas-font-heading);
+}
+.recorded-evidence h3 {
+  font: 400 27px/1.25 var(--atlas-font-label);
+}
+.recorded-case-picker h2 .atlas-icon,
+.recorded-outcome-title .atlas-icon {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+}
+.recorded-case-page .recorded-case-options {
+  display: grid;
+  gap: 14px;
+  margin-top: 32px;
+}
+.recorded-case-page .recorded-case-options button {
+  display: flex;
+  align-items: start;
+  gap: 16px;
+  width: 100%;
+  min-height: 106px;
+  padding: 18px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-control);
+  background: var(--atlas-paper);
+  color: var(--atlas-ink);
+  text-align: left;
+}
+.recorded-case-page .recorded-case-options button:hover {
+  background: var(--atlas-secondary);
+}
+.recorded-case-page .recorded-case-options button[aria-pressed='true'] {
+  border-color: #88abff;
+  background: var(--atlas-secondary);
+  color: var(--atlas-ink);
+}
+.recorded-case-options button > .atlas-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+}
+.recorded-case-options button span {
+  min-width: 0;
+}
+.recorded-case-options button strong,
+.recorded-case-options button small {
+  display: block;
+}
+.recorded-case-options button strong {
+  font: 400 23px/1.25 var(--atlas-font-label);
+}
+.recorded-case-options button small {
+  margin-top: 12px;
+  color: var(--atlas-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.recorded-case-page .recorded-case-outcome {
+  display: flex;
+  flex-direction: column;
+  background: var(--atlas-surface-success);
+}
+.recorded-case-page .recorded-case-outcome[data-outcome='blocked'] {
+  background: var(--atlas-surface-warning);
+}
+.recorded-case-page .recorded-case-outcome[data-outcome='unknown'] {
+  background: var(--atlas-surface-info);
+}
+.recorded-outcome-result {
+  margin: 30px 0 24px;
+}
+.recorded-outcome-result h3 {
+  font: 400 clamp(25px, 2.4vw, 31px)/1.3 var(--atlas-font-label);
+}
+.recorded-outcome-result p {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.recorded-condition {
+  margin-top: 24px;
+}
+.recorded-condition-label {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: var(--atlas-radius-pill);
+  background: var(--atlas-success);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.recorded-case-outcome[data-outcome='blocked'] .recorded-condition-label {
+  background: var(--atlas-warning);
+}
+.recorded-case-outcome[data-outcome='unknown'] .recorded-condition-label {
+  background: var(--atlas-info);
+}
+.recorded-condition > p {
+  margin: 16px 0;
+  color: var(--atlas-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.recorded-case-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+}
+.recorded-case-facts > div {
+  min-width: 0;
+}
+.recorded-case-facts dt {
+  color: var(--atlas-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.recorded-case-facts dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.recorded-case-page .recorded-evidence {
+  margin-top: 28px;
+  padding: 18px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-control);
+  background: var(--atlas-paper);
+}
+.recorded-evidence h3 {
+  font-size: 22px;
+}
+.recorded-evidence h3 .atlas-icon {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+}
+.recorded-evidence p {
+  margin-top: 10px;
+  color: var(--atlas-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.recorded-case-page .scene-actions {
+  margin-top: 24px;
+}
+.recorded-case-page .registered-art {
+  max-width: 100%;
+}
+@media (max-width: 1020px) {
+  .recorded-case-page .recorded-case-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .recorded-case-page .recorded-case-picker,
+  .recorded-case-page .recorded-case-outcome {
+    padding: 18px;
+  }
+  .recorded-case-page .recorded-case-options {
+    margin-top: 22px;
+  }
+  .recorded-case-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,8 +1,8 @@
 # Atlas — Experience & Visual Design
 
-**Version:** 0.12\
-**Updated:** 2026-09-28\
-**Status:** Seven-destination desktop direction approved and reviewed in Penpot. T006 is a committed, limited application foundation; full destination support, browser visual acceptance and human usefulness remain pending. This architecture refresh is proposed for owner review, not implementation authorization.\
+**Version:** 0.13\
+**Updated:** 2026-09-29\
+**Status:** Six-destination current-state direction approved; live Penpot cleanup for that direction is complete; local revision 235 snapshot is verified. The original desktop reference was reviewed. T006 is a committed, limited application foundation; full destination support, browser visual acceptance and human usefulness remain pending. \
 **Scope:** A reusable visual guide for saved web projects, rendered from SQLite through a small local backend; source context is prepared independently.
 
 **Penpot lookup:** [Design reference](../design-reference.md) contains verified page/board links, shared component IDs, task mappings and export status. Start there to inspect the actual design; this document owns experience rules.
@@ -19,11 +19,11 @@
 
 **Clarified boundary:** `fill-atlas` inspects source evidence and creates a standalone context file only. No downstream tool, planner, or implementation instruction belongs in that skill or its output. Separately, the user's agent can turn that context into validated Atlas data updates. The file is not automatically interpreted or imported by the app; the skill never calls the database/API.
 
-**The fixed seven-destination frame is the approved direction.** Case switching remains a useful feature interaction. The booking fixture is optional historical test content. See [V1 defaults and prototype checks](PROJECT.md#16-v1-defaults-and-prototype-checks). The API, SQLite platform, project-scoped exploration and source skill exist. T006 adds a limited shared visual foundation, while the reviewed desktop Penpot design is a reference rather than working application behavior. [TECHNICAL.md](../technical/TECHNICAL.md) owns the backend baseline.
+**The fixed six-destination frame is the approved direction.** Case switching remains a useful feature interaction. The booking fixture is optional historical test content. See [V1 defaults and prototype checks](PROJECT.md#16-v1-defaults-and-prototype-checks). The API, SQLite platform, project-scoped exploration and source skill exist. T006 adds a limited shared visual foundation, while running application acceptance remains open; the local Penpot snapshot is refreshed. [TECHNICAL.md](../technical/TECHNICAL.md) owns the backend baseline.
 
 ### Shared frame, project-specific explanation
 
-Atlas starts with no projects. The target design keeps seven sidebar destinations, design tokens, reusable components and interaction rules consistent. Saved project titles, activities, authored steps, actor participation, identifiable rules, cases/outcomes, typed evidenced relationships, explicit journeys, glossary entries and artwork choices vary through the API. The desktop sidebar holds project navigation. Feature-local tabs belong to the selected explanation; search filters and grouping derive from saved project data. Neither changes the seven destinations. No project-specific navigation is invented when no project is selected. Tablet and mobile design completion is deferred; existing responsive behavior must not regress.
+Atlas starts with no projects. The target design keeps six sidebar destinations, design tokens, reusable components and interaction rules consistent. Saved project titles, activities, authored steps, actor participation, identifiable rules, cases/outcomes, typed evidenced relationships, explicit journeys, glossary entries and artwork choices vary through the API. The desktop sidebar holds project navigation. Feature-local tabs belong to the selected explanation; search filters and grouping derive from saved project data. Neither changes the six destinations. No project-specific navigation is invented when no project is selected. Tablet and mobile design completion is deferred; existing responsive behavior must not regress.
 
 The overview curates saved essentials in an illustrated landscape, with all activities reachable through Feature Map. Without an authored selection, show a stable unprioritized subset and label it honestly. Grouping and responsive layout set visible complexity; there is no universal island count or page size. Terrain is a reusable visual surface, not a claim that each feature is an isolated island or that decorative paths imply dependencies. Actual relationships retain explicit saved meanings.
 
@@ -41,17 +41,16 @@ The companion `update-atlas` skill owns preparation and incorporation under the 
 | **Actors** | Who participates in recorded activities? |
 | **Rules** | Which identifiable conditions govern behavior? |
 | **Glossary** | What do recorded product terms mean? |
-| **Recent Changes** | What can the product do differently now? |
 
-Source access and discovery happen outside Atlas. Use a saved-project list or header switcher, then keep these seven destinations inside the chosen project. Each destination has an honest empty state when its facts are absent. Feature details retain local tabs/cases and evidence; the map can use project-driven grouping and filters. Project selection must not require writing product descriptions manually.
+Source access and discovery happen outside Atlas. Use a saved-project list or header switcher, then keep these six destinations inside the chosen project. Each destination has an honest empty state when its facts are absent. Feature details retain local tabs/cases and evidence; the map can use project-driven grouping and filters. Project selection must not require writing product descriptions manually.
 
 ---
 
 ## 1. The first interaction to prototype
 
-A person returns after building a feature. Instead of receiving another PR-summary paragraph, they encounter a small visual explanation of the changed behavior. They can inspect an example, compare an important exception, and return to the product overview.
+A person opens a project guide and sees a small visual explanation of its current behavior. They can inspect an example, compare an important exception, and return to the product overview.
 
-`Notice a change → see the behavior → inspect a condition → understand its consequence`
+`Choose an activity → see its behavior → inspect a condition → understand its consequence`
 
 Exploration must be optional and self-directed. Do not require a quiz, complete a lesson, or earn points to access information. A walkthrough explains recorded behavior; it does not operate the real application or simulate its entire business.
 
@@ -77,8 +76,6 @@ The default scene shows **your confirmed booking → choose a free slot → book
 | Booking belongs to someone else | This customer cannot reschedule it |
 
 The first three cases assume the customer owns a confirmed booking; the last case varies ownership while the time and availability checks pass. Keep other conditions fixed when explaining one difference.
-
-**Illustrative update:** a prototype fixture changes the required notice from **48 hours to 24 hours**. With the same owned, confirmed booking, a free replacement slot, and **36 hours remaining**, show **Previously blocked → Now allowed**. Label both fixture versions. This supplies a precise before/after without inventing measured business impact.
 
 Do not shorten the headline to “Move any booking.” Do not invent an exception just to fill a visual template. Prototype fixtures may be curated for testing; that does **not** become manual onboarding for the end user.
 
@@ -108,13 +105,7 @@ A relationship needs a meaning: “requires,” “is blocked by,” or “trigg
 
 User Journeys display authored ordered steps and goals, never inferred dependency chains. Actors show recorded participation without invented biographies or permissions. Rules form a searchable index of identifiable, evidenced conditions linked to affected features and cases. Glossary entries provide saved definitions and relevant links when known; no entry is required to fill a screen. Optional domains may group a large project without imposing a universal taxonomy. These sections belong to the full desktop product after the two-screen visual proof; the current booking, approval and navigation scene types are not a universal web-app model.
 
-### Recent Changes
-
-Show meaningful product changes as visual differences or short behavior stories—not one decorated card for every PR. Where the behavior changed, show the relevant before/after. Where a capability is new, explain the new action and its important condition.
-
-Opening the change takes the user to the affected feature or scenario. PR and commit details remain secondary evidence. A refactor with no product-level behavior change need not create a learning item.
-
-The same database-backed facts supply Feature Map and Recent Changes. Historical comparisons retain explicit old snapshots. A separate validated data update changes the guide; a new source-context file alone does not. Refresh/refetch the selected project to load a coherent revision without rebuilding the app. “Merged” is not automatically “deployed.”
+A separate validated data update changes the current guide; a new source-context file alone does not. Refresh/refetch the selected project to load a coherent revision without rebuilding the app. “Merged” is not automatically “deployed.”
 
 ### Shared layout and navigation
 
@@ -123,7 +114,7 @@ The same database-backed facts supply Feature Map and Recent Changes. Historical
 | Region | Default behavior |
 |---|---|
 | Shared frame | Atlas home and saved-project selection; no implied live source connection |
-| Primary navigation | Fixed seven project destinations in the desktop sidebar; compact navigation on small screens. Feature-local tabs and data-driven map filters remain separate controls. |
+| Primary navigation | Fixed six project destinations in the desktop sidebar; compact navigation on small screens. Feature-local tabs and data-driven map filters remain separate controls. |
 | Focus area | One selected activity or a small overview; its illustration, action label, and essential conditions dominate |
 | Case controls | Clearly labelled alternatives adjacent to the affected scene; selecting one replaces the scenario, not the whole page |
 | Optional detail | One drawer or detail view for supporting rules, evidence, or scoped relationships; closed by default |
@@ -135,9 +126,7 @@ Keep feature and case identity stable during navigation. Opening evidence must n
 
 ### Arrival and return
 
-Use Start Here as the ordinary entry. Direct feature/case links open the selected explanation; Recent Changes remains directly reachable. A changed-behavior preview can be tried in the prototype, but do not force a tutorial, invent a live notification, or require visit tracking to begin.
-
-For the prototype, show one illustrative change. For later real updates, group related work by affected behavior since the prior visit rather than forcing one item per PR. A lightweight local last-visited/version marker is a possible implementation, not an analytics platform. Opening an item means **seen**, not **learned**; do not invent mastery scores or a backlog the user must clear.
+Use Start Here as the ordinary entry. Direct feature/case links open the selected current explanation. Do not force a tutorial or require visit tracking to begin.
 
 ---
 
@@ -173,7 +162,6 @@ Fixtures stay labelled. Corrections go through the same validated data-write pat
 | What happens next? | A short step-by-step scene or status sequence |
 | When does this behave differently? | A selectable or side-by-side case comparison |
 | Who is allowed? | A compact role comparison or permissions table |
-| What changed? | Before/after behavior with the changed condition highlighted |
 
 These are reusable patterns, not separate application modules. Islands may provide an attractive overview treatment; they are not the required shape of every feature.
 
@@ -221,7 +209,7 @@ The context skill does not specify or invoke the separate data-preparation proce
 
 The implementation should assemble a small set of consistent components. Product names, rules, captions, controls, and evidence links remain real interface content—not text baked into a generated full-screen image.
 
-Keep current facts in SQLite and pass validated API data to scenes. The proposed authored activity records a stable identity and purpose; actors and participation; ordered behavior steps; identifiable rules and conditions; recorded cases and outcomes; typed, evidenced relationships; and optional journey, term and artwork references. Absence remains absence. Short and long collections must reflow without a fixed three-item cap or a per-project code edit. Save supported presentation choices and bindings to fact/case IDs; do not repeat the same rule in several pieces of visual prose. Compose a small set of reviewed patterns rather than force every feature into identical cards. A timeline and a permissions comparison can have distinct compositions with the same navigation, typography, art vocabulary, and controls. A new kind of interaction needs a reusable component and a declared authoring capability.
+Keep current facts in SQLite and pass validated API data to scenes. The proposed authored activity records a stable identity and purpose; actors and participation; ordered behavior steps; identifiable rules and conditions; recorded cases and outcomes; typed, evidenced relationships; and optional journey, term and artwork references. Absence remains absence. Short and long collections must reflow without a fixed three-item cap or a per-project code edit. Save supported presentation choices and bindings to fact/case IDs; do not repeat the same rule in several pieces of visual prose. Compose a small set of reviewed patterns rather than force every feature into identical cards. An ordered journey and a permissions comparison can have distinct compositions with the same navigation, typography, art vocabulary, and controls. A new kind of interaction needs a reusable component and a declared authoring capability.
 
 This is a bounded, domain-neutral explanation model, not an arbitrary UI language or source-product simulator. A saved case reports an evidenced outcome under its recorded conditions; Atlas does not calculate unseen outcomes. If a source activity cannot be expressed accurately by a supported pattern, authoring reports the gap and the guide shows only supported facts. There is no guarantee that every web app fits the initial pattern set.
 
@@ -250,7 +238,7 @@ The desktop Penpot file supplies the reviewed visual reference: fixed navigation
 
 For the separately authorized T008 proof, refine the existing Publishing Studio overview and one supported navigation-feature explanation with a **small reusable asset set**. Use the approved local Penpot snapshot identified by the [design reference](../design-reference.md) and only facts supported by the existing dataset and contract. The booking art proof was historical; it is not the next screen to build.
 
-Compare the running result with the approved visual qualities—warmth, legibility, meaningful subjects, restrained texture—not every pixel of a generated screenshot. Critical text and controls stay in the UI; stable raster illustration can provide texture, while SVG/HTML/CSS can express changing elements. Keep an external-asset license record when choosing real assets.
+Implement the approved Penpot scenery, icon masters, typography roles, tokens and component compositions, then compare the running screens with their specific reference boards. Do not substitute the earlier prototype's art or styling under the label of reuse. Different project facts can change text, supported sections and content-fitting geometry; document these adaptations without inventing facts or silently changing the visual system. Critical text and controls stay in the UI. Verify extracted images are visibly correct and fonts actually load; retain provenance and required font notices. Historical generated concepts below are inspiration only and cannot override the approved Penpot design.
 
 The historical second-fixture check is not the final generality gate; T011 requires three distinct domains, including at least two reviewed real-source projects. Reusing templates does not mean forcing every behavior into the same diagram. If the selected pattern cannot express an important condition, use an honest compact comparison or another reviewed pattern rather than hide it. No runtime painting service, universal scene generator, or new diagram framework is required for this proof.
 
@@ -265,7 +253,6 @@ The visual links resolve within this planning context; this file does not embed 
 | [Menu inspiration](references/inspiration/annotated-menu.png) | Recognizable subject, brief annotations, whitespace | A fixed restaurant/menu layout for every feature |
 | [Original product map](references/concepts/original-overview.png) | Color, softness, inviting art direction | One island per feature or unlabeled relationships |
 | [Feature explanation](references/concepts/cancel-order.png) | Illustrated steps and concrete conditions | Fictional rules, duplicated panels, or the full screen density |
-| [Change visualization](references/concepts/changes.png) | The connection between work and new product meaning | Another PR feed, fake update timings, or inferred business benefits |
 
 The retained reference guide is in [PROJECT.md](PROJECT.md#15-visual-reference-guide). Superseded onboarding and scanner mockups are no longer packaged. No screenshot adds an unapproved feature or changes the source-context-only skill boundary.
 
@@ -273,9 +260,9 @@ The retained reference guide is in [PROJECT.md](PROJECT.md#15-visual-reference-g
 
 ## 8. Next design checkpoint
 
-**Review verdict:** the desktop Penpot reference has been reviewed, including final cleanup and interaction checks. Its static compositions do not prove that arbitrary short, long or missing project content reflows in the application. T006 remains a limited foundation (commit `ac10c83`); the running two-screen visual proof and seven working destinations remain to be accepted.
+**Review verdict:** the original desktop Penpot reference was reviewed; its live current-state cleanup is complete; local revision 235 snapshot is verified. Its static compositions do not prove that arbitrary short, long or missing project content reflows in the application. T006 remains a limited foundation (commit `ac10c83`); the running two-screen visual proof and six working destinations remain to be accepted.
 
-GOV.UK's design guidance recommends prototypes before committing to a full build and identifies coded prototypes as useful for realistic interaction testing [R1]. For Atlas, T008's next proof is **a running illustrated Start Here overview and one feature explanation using the existing API and SQLite path**, checked against the reviewed desktop design. The seven destinations are the full-product direction; this proof does not mean all seven views or their contracts are complete.
+GOV.UK's design guidance recommends prototypes before committing to a full build and identifies coded prototypes as useful for realistic interaction testing [R1]. For Atlas, T008's next proof is **a running illustrated Start Here overview and one feature explanation using the existing API and SQLite path**, checked against the reviewed desktop design. The six destinations are the full-product direction; this proof does not mean all six views or their contracts are complete.
 
 ### Historical booking learning loop and current visual proof
 
@@ -285,7 +272,7 @@ The illustrative **Reschedule a booking** fixture above was the earlier end-to-e
 
 The booking loop remains a historical fixture test. T006 uses labelled Publishing Studio demo data for the overview and navigation-feature explanation. T008 must evaluate these running screens against the reviewed desktop design. Additional destinations may have honest empty states until their authored data and views are implemented. No real booking or publishing action occurs in Atlas.
 
-The historical booking fixture demonstrates allowed, time-blocked, occupied-slot and ownership cases from section 1; one uncertain outcome; and the 48-to-24-hour rule update. The explanation displays recorded examples, not computed booking outcomes. Empty, partial, no-result and unknown states must never imply a live source connection.
+The historical booking fixture demonstrated allowed, time-blocked, occupied-slot and ownership cases from section 1, plus one uncertain outcome. The explanation displays recorded examples, not computed booking outcomes. Empty, partial, no-result and unknown states must never imply a live source connection.
 
 ### Internal explanation content—not a skill output contract
 
@@ -296,7 +283,6 @@ The context skill outputs ordinary Markdown for independent use. Atlas stores ac
 | Stable activity ID, title, actor, purpose | Identify the activity and explain the allowed action |
 | Cases with conditions, steps, outcome, essential restrictions | Select precise documented behavior and render it consistently |
 | Source references and evidence status | Distinguish supported knowledge, fixtures, and uncertainty |
-| Revision and before/after references | Show a change without mixing historical and current behavior |
 | Typed links to relevant activities | Permit local exploration without a global graph |
 | Authored behavior steps, actor participation, identifiable rules | Explain varied web-app activities without squeezing every fact into the current three scene kinds |
 | Explicit journeys, glossary, optional domains | Support the other project destinations only where reviewed knowledge exists |
@@ -357,3 +343,4 @@ Accessed 2026-09-24. These sources support design/testing principles, not a clai
 | 0.9 | 2026-09-24 | Aligned the visual experience with saved project selection, SQLite-backed facts, validated updates, and no-rebuild rendering. Replaced obsolete frontend-only assumptions without changing the art direction or independent skill. |
 | 0.11 | 2026-09-25 | Superseded the earlier three-place recommendation with seven fixed project destinations; defined the first two-screen visual proof and deferred full-view contracts and visual acceptance. |
 | 0.12 | 2026-09-28 | Distinguished T006, reviewed desktop Penpot and target behavior; specified bounded authored activities, design-system choices and T007–T011 acceptance. Documentation proposal only. |
+| 0.13 | 2026-09-29 | Set the six-destination current-state direction; removed Recent Changes and before/after product-history screens. The original Penpot reference was reviewed; owner browser acceptance remains open; the local snapshot is refreshed. |

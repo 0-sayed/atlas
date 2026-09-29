@@ -1,160 +1,9 @@
 import { expect, test } from '@playwright/test'
 import { approvalSeed, approvalFeature } from '../fixtures/approval'
-import { seed } from '../fixtures/booking'
 
 const headers = {
   authorization: 'Bearer e2e-only-token-not-a-production-secret',
 }
-
-test('source-supported booking comparisons retain their evidence status', async ({
-  page,
-  request,
-}) => {
-  const id = 'supported-comparison'
-  expect(
-    (
-      await request.post('/api/v1/projects', {
-        headers,
-        data: {
-          ...seed,
-          id,
-          title: 'Supported comparison guide',
-          features: [
-            {
-              ...seed.features[0],
-              evidence: { ...seed.features[0].evidence, status: 'supported' },
-            },
-          ],
-        },
-      })
-    ).ok(),
-  ).toBeTruthy()
-  await page.goto(`/#/projects/${id}/changes`)
-  await expect(
-    page.getByRole('region', {
-      name: 'More time to change your plans',
-      exact: true,
-    }),
-  ).toBeVisible()
-  await expect(
-    page.getByText(
-      'A recorded historical comparison, not proof of a production release or measured business impact.',
-      { exact: true },
-    ),
-  ).toBeVisible()
-  await expect(page.getByText(/A recorded fixture comparison/)).toHaveCount(0)
-})
-
-test('history explains case-only edits, prerequisites and removed activities', async ({
-  page,
-  request,
-}) => {
-  const id = 'complete-history'
-  const other = {
-    ...approvalFeature,
-    id: 'moderation',
-    title: 'Moderate a draft',
-  }
-  expect(
-    (
-      await request.post('/api/v1/projects', {
-        headers,
-        data: {
-          ...approvalSeed,
-          id,
-          title: 'Historical publishing guide',
-          features: [approvalFeature, other],
-        },
-      })
-    ).ok(),
-  ).toBeTruthy()
-  expect(
-    (
-      await request.post(`/api/v1/projects/${id}/changes`, {
-        headers,
-        data: {
-          contractVersion: 1,
-          expectedRevision: 1,
-          upsertFeatures: [
-            {
-              ...approvalFeature,
-              cases: [{ ...approvalFeature.cases[0], approvals: 0 }],
-            },
-          ],
-          upsertRelations: [
-            {
-              id: 'requires-review',
-              from: 'approval',
-              to: 'moderation',
-              kind: 'requires',
-            },
-          ],
-        },
-      })
-    ).ok(),
-  ).toBeTruthy()
-  await page.goto(`/#/projects/${id}/changes`)
-  await expect(
-    page.getByText('Added relationship', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    page.getByText('Approve a publishing request requires Moderate a draft', {
-      exact: true,
-    }),
-  ).toBeVisible()
-  const history = page.locator('.saved-change').filter({
-    has: page.getByRole('heading', {
-      name: approvalFeature.title,
-      exact: true,
-    }),
-  })
-  await history
-    .getByText('Recorded rules, cases and evidence', { exact: true })
-    .first()
-    .click()
-  await history
-    .getByText('Recorded rules, cases and evidence', { exact: true })
-    .last()
-    .click()
-  await expect(
-    history.getByText('Ready for approval', { exact: true }).first(),
-  ).toBeVisible()
-  await expect(
-    history.getByText('More reviews needed', { exact: true }),
-  ).toBeVisible()
-  expect(
-    (
-      await request.post(`/api/v1/projects/${id}/changes`, {
-        headers,
-        data: {
-          contractVersion: 1,
-          expectedRevision: 2,
-          removeFeatureIds: ['moderation'],
-          removeRelationIds: ['requires-review'],
-        },
-      })
-    ).ok(),
-  ).toBeTruthy()
-  await page.getByRole('button', { name: 'Refresh guide' }).click()
-  const removed = page.locator('.saved-change').filter({
-    has: page.getByRole('heading', { name: 'Moderate a draft', exact: true }),
-  })
-  await removed
-    .getByText('Recorded rules, cases and evidence', { exact: true })
-    .click()
-  await expect(
-    removed.getByText('At least 1 independent approvals', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    removed.getByText('Atlas authored approval fixture', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    removed.getByRole('link', { name: 'Explore current activity' }),
-  ).toHaveCount(0)
-  await expect(
-    page.getByText('Removed relationship', { exact: true }),
-  ).toBeVisible()
-})
 
 test('creates a non-booking guide through the API and explores both projects in the same build', async ({
   page,
@@ -206,11 +55,11 @@ test('creates a non-booking guide through the API and explores both projects in 
   await expect(page.getByText(approvalFeature.title)).toHaveCount(0)
   await page.getByRole('searchbox').fill('publishing')
   await expect(
-    page.getByRole('heading', { name: 'No matching activity' }),
+    page.getByRole('heading', { name: 'No activity matched “publishing”' }),
   ).toBeVisible()
 })
 
-test('rule updates preserve selected cases and historical comparisons in one running build', async ({
+test('rule updates preserve selected cases in one running build', async ({
   page,
   request,
 }) => {
@@ -241,17 +90,9 @@ test('rule updates preserve selected cases and historical comparisons in one run
     page.getByRole('heading', { name: 'More reviews needed', exact: true }),
   ).toBeVisible()
   await expect(page).toHaveURL(/case=at-limit/)
-  await page.getByRole('link', { name: 'Start here', exact: true }).click()
-  await expect(
-    page.getByText('At least 2 independent approvals', { exact: true }),
-  ).toBeVisible()
-  await page.getByRole('link', { name: 'What changed', exact: true }).click()
-  await expect(
-    page.getByText('1 → 2 independent approvals', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    page.getByText('Ready for approval → More reviews needed', { exact: true }),
-  ).toBeVisible()
+  await expect(page.getByLabel('Essential restrictions')).toContainText(
+    'At least 2 independent approvals',
+  )
   expect(
     (
       await request.post(`/api/v1/projects/${id}/changes`, {
@@ -266,11 +107,8 @@ test('rule updates preserve selected cases and historical comparisons in one run
   ).toBeTruthy()
   await page.getByRole('button', { name: 'Refresh guide' }).click()
   await expect(
-    page.getByText('Removed from this guide', { exact: true }),
+    page.getByRole('heading', { name: 'This guide is not here yet' }),
   ).toBeVisible()
-  await expect(
-    page.getByRole('link', { name: 'Explore current activity' }),
-  ).toHaveCount(0)
   await page.goto(`/#/projects/${id}/explore/approval?case=at-limit`)
   await expect(
     page.getByRole('heading', { name: 'This guide is not here yet' }),
@@ -333,7 +171,7 @@ test('empty, unknown, incompatible and unavailable knowledge have distinct state
   await page.route('**/api/v1/projects', (route) => route.fulfill({ json: [] }))
   await page.goto('/#/')
   await expect(
-    page.getByRole('heading', { name: 'No saved projects yet' }),
+    page.getByRole('heading', { name: 'Your product’s story starts here.' }),
   ).toBeVisible()
   await page.unroute('**/api/v1/projects')
   expect(
@@ -352,7 +190,7 @@ test('empty, unknown, incompatible and unavailable knowledge have distinct state
   ).toBeTruthy()
   await page.goto('/#/projects/empty-guide')
   await expect(
-    page.getByRole('heading', { name: 'No activities incorporated yet' }),
+    page.getByRole('heading', { name: 'No implemented activities found' }),
   ).toBeVisible()
   await page.goto('/#/projects/not-saved')
   await expect(page.getByRole('alert')).toContainText('Project unavailable')
@@ -432,10 +270,10 @@ test('grouped search and related evidence stay scoped and work with keyboard at 
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto(`/#/projects/${id}/explore`)
   await expect(
-    page.getByRole('heading', { name: 'Publishing / 1 activity' }),
+    page.getByRole('heading', { name: 'Publishing, 1 activity' }),
   ).toBeVisible()
   await expect(
-    page.getByRole('heading', { name: 'Moderation / 1 activity' }),
+    page.getByRole('heading', { name: 'Moderation, 1 activity' }),
   ).toBeVisible()
   await page
     .getByRole('link', { name: approvalFeature.title, exact: true })
@@ -465,80 +303,13 @@ test('grouped search and related evidence stay scoped and work with keyboard at 
   await page.getByRole('button', { name: 'Why this outcome?' }).click()
   await page.getByRole('link', { name: related.title, exact: true }).click()
   await expect(page).toHaveURL(new RegExp(`/projects/${id}/explore/moderation`))
-  await expect(page.getByText(/Uncertain evidence/)).toBeVisible()
+  await expect(
+    page
+      .getByRole('status', { name: 'Selected outcome' })
+      .getByText(/Uncertain evidence/),
+  ).toBeVisible()
   await page.goBack()
   await expect(
     page.getByRole('button', { name: 'Own request', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true')
-})
-
-test('history is bounded by loaded revision and retries without claiming unavailable history is empty', async ({
-  page,
-  request,
-}) => {
-  const id = 'history-guide'
-  expect(
-    (
-      await request.post('/api/v1/projects', {
-        headers,
-        data: { ...approvalSeed, id },
-      })
-    ).ok(),
-  ).toBeTruthy()
-  await page.goto(`/#/projects/${id}`)
-  await expect(
-    page.getByRole('heading', { name: 'Start here', exact: true }),
-  ).toBeVisible()
-  expect(
-    (
-      await request.post(`/api/v1/projects/${id}/changes`, {
-        headers,
-        data: {
-          contractVersion: 1,
-          expectedRevision: 1,
-          upsertFeatures: [{ ...approvalFeature, requiredApprovals: 2 }],
-        },
-      })
-    ).ok(),
-  ).toBeTruthy()
-  await page.getByRole('link', { name: 'What changed', exact: true }).click()
-  await expect(
-    page.getByText('No recorded behavior changes between saved revisions.'),
-  ).toBeVisible()
-  await page.route(`**/api/v1/projects/${id}/history`, (route) => route.abort())
-  await page.getByRole('button', { name: 'Refresh guide' }).click()
-  await expect(page.getByRole('alert')).toContainText(
-    'Saved history unavailable',
-  )
-  await page.unroute(`**/api/v1/projects/${id}/history`)
-  await page.getByRole('button', { name: 'Retry history' }).click()
-  await expect(
-    page.getByText('1 → 2 independent approvals', { exact: true }),
-  ).toBeVisible()
-  await page.goto(`/#/projects/${id}/explore/approval?case=at-limit`)
-  await expect(
-    page.getByRole('heading', { name: 'More reviews needed', exact: true }),
-  ).toBeVisible()
-  expect(
-    (
-      await request.post(`/api/v1/projects/${id}/changes`, {
-        headers,
-        data: {
-          contractVersion: 1,
-          expectedRevision: 2,
-          upsertFeatures: [
-            {
-              ...approvalFeature,
-              requiredApprovals: 2,
-              cases: approvalFeature.cases.filter((c) => c.id !== 'at-limit'),
-            },
-          ],
-        },
-      })
-    ).ok(),
-  ).toBeTruthy()
-  await page.getByRole('button', { name: 'Refresh guide' }).click()
-  await expect(
-    page.getByRole('heading', { name: 'This guide is not here yet' }),
-  ).toBeVisible()
 })

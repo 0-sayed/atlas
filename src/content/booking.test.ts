@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { bookingView } from './booking'
 import { seed } from '../../fixtures/booking'
 const {
-  booking,
   bookingCases,
-  bookingChange,
   getBookingCase,
   isBelowNoticeRequirement,
   matchesBooking,
@@ -50,28 +48,13 @@ describe('recorded booking explanations', () => {
     })
     expect(getBookingCase('missing')).toBeUndefined()
     expect(getBookingCase('')).toBeUndefined()
+    expect(getBookingCase('change-now')).toBeUndefined()
+    expect(bookingCases.map((item) => item.id)).toEqual(
+      seed.features[0].cases.map((item) => item.id),
+    )
     expect(new Set(bookingCases.map((item) => item.id)).size).toBe(
       bookingCases.length,
     )
-  })
-  it('compares the same inputs against explicit historical and current snapshots', () => {
-    expect(bookingChange.before.noticeHours).toBe(48)
-    expect(bookingChange.after.noticeHours).toBe(booking.noticeHours)
-    expect(bookingChange.before.example).toMatchObject({
-      hours: 36,
-      owner: 'you',
-      confirmed: true,
-      slot: 'free',
-      outcome: 'blocked',
-    })
-    expect(bookingChange.after.example).toMatchObject({
-      hours: 36,
-      owner: 'you',
-      confirmed: true,
-      slot: 'free',
-      outcome: 'allowed',
-    })
-    expect(getBookingCase('change-now')).toEqual(bookingChange.after.example)
   })
   it('derives notice-blocked cases from hours instead of saved case ids', () => {
     const futureBelowNotice = { ...bookingCases[0], id: 'future', hours: 23 }

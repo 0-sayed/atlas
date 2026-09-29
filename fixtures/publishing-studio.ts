@@ -2,7 +2,6 @@ import type {
   ApprovalFeature,
   CreateRequest,
   NavigationFeature,
-  UpdateRequest,
 } from '../shared/contracts.js'
 
 // Entirely fictional editorial scenarios for an Atlas showcase.
@@ -122,9 +121,14 @@ const approveArticle: ApprovalFeature = {
   group: 'Field Notes · Editorial',
   essentialOrder: 1,
   scene: { kind: 'approval', version: 1 },
-  requiredApprovals: 1,
-  revisionLabel: 'Publishing Studio fixture v1',
-  evidence,
+  requiredApprovals: 2,
+  revisionLabel: 'Publishing Studio fixture v2',
+  evidence: {
+    ...evidence,
+    sourceRevision: 'publishing-studio-fixture-v2',
+    description:
+      'Invented example: the fictional review request requires two independent approvals. No source product behavior was inspected.',
+  },
   assetIds: [],
   presentation: { illustration: 'people', accent: 'sage' },
   cases: [
@@ -300,24 +304,6 @@ export const publishingStudioSeed: CreateRequest = {
       from: 'find-published-article',
       to: 'publish-article',
       kind: 'requires',
-    },
-  ],
-}
-
-export const publishingStudioReviewUpdate: UpdateRequest = {
-  contractVersion: 1,
-  expectedRevision: 1,
-  upsertFeatures: [
-    {
-      ...approveArticle,
-      requiredApprovals: 2,
-      revisionLabel: 'Publishing Studio fixture v2',
-      evidence: {
-        ...evidence,
-        sourceRevision: 'publishing-studio-fixture-v2',
-        description:
-          'Invented revision: the fictional review request now requires two independent approvals. No source product behavior was inspected.',
-      },
     },
   ],
 }

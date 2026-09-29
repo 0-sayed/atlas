@@ -143,11 +143,11 @@ test('navigation cases support scoped search, direct links, Back, evidence and k
   ).toBeVisible()
 })
 
-test('navigation snapshots preserve authored outcomes and handle empty or missing cases', async ({
+test('navigation updates preserve current outcomes and handle empty or missing cases', async ({
   page,
   request,
 }) => {
-  const id = 'navigation-history'
+  const id = 'navigation-current-update'
   expect(
     (
       await request.post('/api/v1/projects', {
@@ -181,42 +181,16 @@ test('navigation snapshots preserve authored outcomes and handle empty or missin
     ).ok(),
   ).toBe(true)
   await page.setViewportSize({ width: 375, height: 800 })
-  await page.goto(`/#/projects/${id}/changes`)
-  await expect(page.getByText('Source-supported', { exact: true })).toHaveCount(
-    0,
-  )
-  const history = page.locator('.saved-change').filter({
-    has: page.getByRole('heading', {
-      name: navigationFeature.title,
-      exact: true,
-    }),
-  })
-  const disclosures = history.getByText('Recorded rules, cases and evidence', {
-    exact: true,
-  })
-  await expect(disclosures).toHaveCount(2)
+  await page.goto(`/#/projects/${id}/explore/navigation`)
+  await expect(
+    page.getByRole('heading', { name: 'New guide opens', exact: true }),
+  ).toBeVisible()
+  await expect(page.getByText('A new saved destination is used.')).toBeVisible()
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true)
-  for (const disclosure of await disclosures.all()) await disclosure.click()
-  await expect(history.getByText('Guide opens', { exact: true })).toBeVisible()
-  await expect(
-    history.getByText('New guide opens', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    history.getByText('Only saved guides can be opened.', { exact: true }),
-  ).toBeVisible()
-  await expect(history.getByText(/Action: Open guide/).first()).toBeVisible()
-  await expect(history.getByText(/Outcome: unknown/)).toBeVisible()
-  await history.getByRole('link', { name: 'Explore current activity' }).click()
-  await expect(
-    page.getByRole('heading', { name: 'New guide opens', exact: true }),
-  ).toBeVisible()
-  await page
-    .getByRole('link', { name: 'Back to What changed', exact: true })
-    .click()
   expect(
     (
       await request.post(`/api/v1/projects/${id}/changes`, {
@@ -285,7 +259,7 @@ test('valid long navigation rules and case labels fit a narrow viewport', async 
   ).toBeVisible()
 })
 
-test('evidence corrections remain visible in history without claiming a behavior change', async ({
+test('evidence corrections appear in the current activity without changing its outcome', async ({
   page,
   request,
 }) => {
@@ -317,22 +291,13 @@ test('evidence corrections remain visible in history without claiming a behavior
       })
     ).ok(),
   ).toBe(true)
-  await page.goto(`/#/projects/${id}/changes`)
+  await page.goto(`/#/projects/${id}/explore/navigation`)
   await expect(
-    page.getByText('Evidence updated', { exact: true }),
+    page.getByRole('heading', { name: 'Guide opens', exact: true }),
   ).toBeVisible()
-  await expect(
-    page.getByText('Recorded behavior changed', { exact: true }),
-  ).toHaveCount(0)
-  const disclosures = page.getByText('Recorded rules, cases and evidence', {
-    exact: true,
-  })
-  await expect(disclosures).toHaveCount(2)
-  await disclosures.nth(0).click()
-  await disclosures.nth(1).click()
+  await page.locator('.navigation-evidence summary').click()
+  await expect(page.getByText(description, { exact: true })).toBeVisible()
   await expect(
     page.getByText(navigationFeature.evidence.description, { exact: true }),
-  ).toBeVisible()
-  await expect(page.getByText(description, { exact: true })).toBeVisible()
-  await expect(page.getByText('Guide opens', { exact: true })).toHaveCount(2)
+  ).toHaveCount(0)
 })

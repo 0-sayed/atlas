@@ -55,16 +55,16 @@ test('two saved projects share navigation but retain distinct live illustration 
     .first()
     .evaluate((hero) => {
       const frame = hero.getBoundingClientRect()
-      const svg = hero.querySelector('svg')!.getBoundingClientRect()
+      const subject = hero.querySelector('.atlas-icon')!.getBoundingClientRect()
       return {
         frameTop: frame.top,
         frameBottom: frame.bottom,
-        svgTop: svg.top,
-        svgBottom: svg.bottom,
+        subjectTop: subject.top,
+        subjectBottom: subject.bottom,
       }
     })
-  expect(artBounds.svgTop).toBeGreaterThanOrEqual(artBounds.frameTop)
-  expect(artBounds.svgBottom).toBeLessThanOrEqual(artBounds.frameBottom + 1)
+  expect(artBounds.subjectTop).toBeGreaterThanOrEqual(artBounds.frameTop)
+  expect(artBounds.subjectBottom).toBeLessThanOrEqual(artBounds.frameBottom + 1)
   await page.getByRole('link', { name: 'Explore', exact: true }).click()
   await expect(page).toHaveURL(new RegExp(`${skyId}/explore$`))
   await page.goBack()
@@ -125,7 +125,7 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
   await page.route('**/api/v1/projects', (route) => route.fulfill({ json: [] }))
   await page.goto('/#/')
   await expect(
-    page.getByRole('heading', { name: 'No saved projects yet' }),
+    page.getByRole('heading', { name: 'Your product’s story starts here.' }),
   ).toBeVisible()
   await expect(page.getByRole('link', { name: 'Start here' })).toHaveCount(0)
   await page.unroute('**/api/v1/projects')
@@ -166,14 +166,16 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
   await expect(page.locator('.island-link')).toHaveCount(6)
   await page.getByRole('button', { name: /Show more activities/ }).click()
   await expect(page.locator('.island-link')).toHaveCount(12)
-  await expect(page.getByRole('link', { name: 'What changed' })).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Explore', exact: true }),
+  ).toBeVisible()
   expect(
     await page
       .locator('.hero-art')
       .first()
       .evaluate(
         (hero) =>
-          hero.querySelector('svg')!.getBoundingClientRect().bottom <=
+          hero.querySelector('.atlas-icon')!.getBoundingClientRect().bottom <=
           hero.getBoundingClientRect().bottom + 1,
       ),
   ).toBe(true)
