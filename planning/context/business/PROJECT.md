@@ -532,7 +532,7 @@ Synthetic feature records can test navigation and rendering. Reviewed real sourc
 
 | Task | Reviewable result |
 |---|---|
-| T007 | Synchronized Penpot desktop/system package with a named version, exports, tokens/assets, component states, interactions and data bindings, reconciled with current T006. |
+| T007 | Approved native `.penpot` file under ignored `.local/design/atlas.penpot`, with source identity, retrieval instructions and task-to-board mapping in the [design reference](../design-reference.md). No bulk export or gallery requirement. |
 | T008 | Running Start Here and one feature explanation visually checked against the desktop reference, including variable content and accessibility basics. |
 | T009 | Strict, versioned project knowledge for authored activities, actors, rules, cases/outcomes, typed relationships, explicit journeys and glossary, plus a capability-aware `update-atlas` workflow. Preserve existing data and history. |
 | T010 | Working Feature Map, User Journeys, Actors, Rules, Glossary and Recent Changes desktop destinations using the shared design system and honest empty/unknown states. |
@@ -550,7 +550,7 @@ Start with this context README.md, this section 1, the [V1 defaults](#16-v1-defa
 
 Preserve the user's constraints. Do not silently promote a proposal, mockup widget, or plausible product convention into a requirement. Ask about consequential unresolved choices when necessary rather than filling them with enterprise defaults.
 
-Preserve the existing T006 foundation. The recorded roadmap sequence is T007 for the synchronized design package, T008 for the running two-screen visual proof, T009 for supported knowledge and authoring, and T010 for the six destinations beyond Start Here and the full desktop experience. Start one of these only when separately instructed to implement that task. This documentation refresh does not initiate feature planning or execution.
+Preserve the existing T006 foundation. The recorded roadmap sequence is T007 for the local Penpot handoff, T008 for the running two-screen visual proof, T009 for supported knowledge and authoring, and T010 for the six destinations beyond Start Here and the full desktop experience. Start one of these only when separately instructed to implement that task. This documentation refresh does not initiate feature planning or execution.
 
 ### Updating this document
 

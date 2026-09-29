@@ -1,15 +1,21 @@
 # Atlas design reference
 
-**Verified:** 2026-09-28 through the connected Penpot MCP plugin, read-only. File **New File 1**, ID `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`, revision **226**. This is the shared lookup for design context, not a new design specification or permission to implement features.
+**Verified:** 2026-09-29 against the owner-supplied local Penpot export; design content unchanged. File **New File 1**, ID `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`, revision **227**. This is the shared lookup for design context, not a new design specification or permission to implement features.
 
 ## Start here
 
-1. Read [DESIGN](business/DESIGN.md) for behavior and [compact component rules](business/DESIGN.md#compact-content-driven-component-rules).
-2. Open the [design review hub](https://design.penpot.app/#/view?file-id=a5ac146a-5787-80fa-8008-b2b1c7b55d1f&page-id=b06c7e1e-1498-8079-8008-b2c660ae456d&section=interactions&frame-id=b06c7e1e-1498-8079-8008-b317f2f5d6f0&index=0), then the relevant desktop boards below.
-3. Inspect the shared foundations, components and application shell on the Design system page before implementing a screen.
-4. Use the task mapping below and the [delivery brief](../roadmap/desktop-delivery.md) to separate design intent from current data capabilities. Demo Shop and Review Workspace illustrate layouts; they are not source-product facts.
+The approved visual source is **`.local/design/atlas.penpot`**, relative to the repository root. It is ignored by Git and is **not included in a fresh clone**. The owner-supplied revision 227 export was copied unchanged; the original download remains intact.
 
-Access requires permission to the Penpot file. Viewer links identify the live file/page/frame, **not an immutable revision**. The board IDs were checked against the connected file; this pass did not browser-click every viewer link. If a viewer opens the wrong frame, verify its displayed title and locate the recorded board ID in the editor rather than assuming the first frame is correct.
+- File ID: `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`; revision: **227**.
+- SHA-256: `c2473a7f266e70f028e469f00694a9b2ddc200434cd00e28a1d3d3c7380d11f1`.
+
+1. Read [DESIGN](business/DESIGN.md), especially the [compact component rules](business/DESIGN.md#compact-content-driven-component-rules), and the task mapping below.
+2. Locate the local file. If it is absent, ask the owner for the approved `.penpot` path and copy that file here. Do not silently select a download or recreate unseen designs from memory. If its identity differs, establish which snapshot the owner intends before replacing this reference.
+3. Inspect the relevant system components, tokens, screen states and desktop boards. The native file is a ZIP archive: `manifest.json` identifies the export, `files/FILE_ID.json` records file metadata, `files/FILE_ID/pages/` contains page/shape JSON, and `objects/` contains embedded assets. Read directly or extract a working copy under `.local/design/`; preserve the native file.
+4. Open/import the file in Penpot for visual inspection when needed. Reading JSON alone is not visual verification. Extract only the assets and reference views needed by the selected implementation task; there is no gallery or full-board export prerequisite.
+5. Keep inspection material under ignored local storage. Put only assets actually used by the application in its asset directories, with provenance and required license notices. Demo Shop and Review Workspace illustrate layouts, not source-product facts.
+
+The links below identify boards in the live Penpot file and are optional navigation aids. They can drift; the approved local snapshot is the visual authority. An imported copy may receive new IDs, so use the recorded board titles to locate it. Penpot is not the source of saved project behavior: reviewed API/SQLite knowledge supplies those facts.
 
 ## Dynamic projects, illustrative ecommerce screens
 
@@ -31,8 +37,8 @@ Do not hard-code commerce categories, a fixed island count, shop-specific routes
 
 - Desktop page: **Atlas · Illustrated experience**, ID `b06c7e1e-1498-8079-8008-b2c660ae456d` — **50 boards**.
 - System page: **Atlas · Design system**, ID `e2cc1aab-2416-803a-8008-b3d2364d2f47` — **9 boards**.
-- Latest named checkpoint found: **Center cancellation outcome arrows between cards**, saved **2026-09-28T09:39:55.322Z**.
-- The live revision is recorded separately; do not assume that checkpoint and revision 226 have identical content. T007 must choose and capture a synchronized baseline before visual implementation acceptance.
+- Captured named checkpoint: **T007 desktop implementation baseline — 2026-09-28 — r227**, saved **2026-09-28T18:06:17.171Z**.
+- The native local file above is the implementation reference. Earlier generated exports are preserved under `.local/archive/t007-export-package-2026-09-29/` for optional historical inspection; they are not a delivery prerequisite.
 - Mobile/tablet studies remain deferred. Do not use old desktop copies of system boards or historical page/board IDs from transcripts.
 - System boards, the review hub and shell template are design documentation, not extra application routes. The shell's central placeholder is for composed screen content.
 - Penpot component/token changes can affect linked design instances; they do not automatically update React components or CSS. Inspect instance overrides and scene siblings before assuming propagation.
@@ -53,7 +59,7 @@ Do not hard-code commerce categories, a fixed island count, shop-specific routes
 
 ### Tokens, typography and component lookup
 
-The local library contains **46 components** and the **atlas/core** token set with **46 tokens** at this inspection. Resolve color, spacing, radius, sizing and control/badge font-size values from the library; the Foundations board explains their use. Do not sample a screenshot or substitute library defaults. Typography assets use Kalam, Patrick Hand and Nunito; confirm the specific shared typography and font rights for each role during T007.
+The local library contains **46 components** and the **atlas/core** token set with **46 tokens** at this inspection. Resolve color, spacing, radius, sizing and control/badge font-size values from the library; the Foundations board explains their use. Do not sample a screenshot or substitute library defaults. Typography assets use Kalam, Patrick Hand and Nunito; inspect exact roles and weights in the approved file and retain upstream font notices for any fonts shipped with the app.
 
 Use the following main-instance IDs with Penpot inspection/export tools; these are shape IDs, not library component IDs. Names are a convenience; IDs distinguish repeated Default/Selected labels. Icon masters use the `Atlas / Icons /` prefix and are indexed on the Icons board.
 
@@ -168,32 +174,19 @@ All entries below were found on the verified desktop page. Board names describe 
 
 | Task | Read or inspect | Boundary |
 |---|---|---|
-| T007 — design package | Review hub; all nine System boards; desktop index and state boards | Capture one named version, matching exports, token values, assets/provenance, component states and data bindings. This reference is only the lookup, not completion of that package. |
+| T007 — local design handoff | Approved native file; this reference and board mapping | Verify source identity and retrieval instructions. No bulk export or generated gallery is required. |
 | T008 — two-screen proof | Foundations, Core components, Navigation patterns, Application shell, Artwork; Start Here, compact project, feature explanation, Review Workspace, loading/empty/failure states | Adapt the composition to the existing labelled Publishing Studio overview and supported navigation activity. Do not invent commerce facts or force unsupported actions into navigation. |
 | T009 — cross-domain knowledge | Content boundaries; Review Workspace; rule conditions, typed relationships, allowed/unavailable detail, conflicting evidence and change examples | Define reviewed facts and supported reusable renderers; visuals are not evidence and do not authorize arbitrary layouts. |
 | T010 — desktop destinations | All seven destination examples; area/detail pages; whole-product/Orders/Manage orders maps, search/list, camera A/B and connection examples; Map composition | Implement saved-data views, shared controls, direct links/Back, meaningful map behavior and honest states. Camera screenshots illustrate states, not a working continuous canvas implementation. |
-| T011 — acceptance | T007's captured baseline; sparse/compact project, all empty/recovery states, Review Workspace, map and changes | Verify real variable content and three distinct domains in the same build. Do not use static Penpot examples as proof of source accuracy. |
+| T011 — acceptance | Approved local Penpot file; sparse/compact project, all empty/recovery states, Review Workspace, map and changes | Verify real variable content and three distinct domains in the same build. Do not use static Penpot examples as proof of source accuracy. |
 
-## Existing exports and assets
+## Implementation notes
 
-These paths are relative to the repository. Ignored local files are supplementary and are **not included in a fresh clone**.
+- T008 uses the existing isolated, labelled Publishing Studio overview and `prepare-article` activity, including `draft-complete`, `credit-missing` and `rights-unchecked` cases. Adapt the approved composition to supported facts and routes; do not seed commerce examples into normal storage.
+- Some Penpot Section backgrounds/titles have body text or actions as scene siblings. In React, the card must contain its complete body and actions and fit their content. Do not copy only the background height and strand content outside it.
+- Preserve token opacity, including `color.hotspot`; a resolved color without its alpha can change the intended appearance.
+- `public/art/` and `public/fonts/` are existing implementation assets, not the full design library. Check provenance and required notices before shipping assets; possessing a Penpot file does not itself grant a license.
+- `.local/audits/`, `.local/penpot-design/` and the archived T007 export package are historical supporting material, not prerequisites or competing sources of truth. Original concept images under `planning/context/business/references/` are inspiration, not current screen specifications.
+- When the owner approves a new design snapshot, update the native file identity/hash and affected board references together. Penpot component/token edits do not automatically update React or CSS. Verify the rendered implementation against the approved design.
 
-| Location | Status and use |
-|---|---|
-| `.local/audits/desktop-2026-09-28/inventory.json` and `NN-BOARD_ID.png` in the same directory | Existing desktop inventory and 50 PNGs. Cached audit exports; not asserted to match live revision 226. |
-| `.local/audits/desktop-2026-09-28/system/inventory.json` and `NN-BOARD_ID.png` | Existing System inventory and nine PNGs, also historical audit exports. |
-| `.local/audits/desktop-2026-09-28/final-cleanup.md` | Dated contrast/sidebar cleanup evidence, not a synchronized final export manifest. |
-| `.local/penpot-design/` | Earlier scripts and mixed-date exports. Historical working material, not the current design baseline. |
-| `public/art/` and `public/fonts/` | Existing app assets; an incomplete implementation asset set, not an export of the entire Penpot library. Check provenance and font notices before reuse. |
-| `planning/context/business/references/` | Original concept/inspiration images; not current implementation screenshots. |
-
-T007 remains pending until a synchronized, accessible design package exists, including token values, component states, typography/assets/provenance, interactions and data bindings. Record approved export locations here when that work is authorized and verified; do not mark it complete because live links now exist.
-
-## How an agent retrieves context
-
-For read-only MCP inspection, open this file in Penpot with its MCP plugin connected. Read the tool's high-level overview, check `penpot.currentFile.id`, and discover pages with `penpotUtils.getPages()`. Look up recorded IDs with `penpotUtils.findShapeById(id)`, inspect library tokens/components, and export only the boards needed for the selected task. A disconnected or suspended plugin is an access issue, not evidence that a design is absent.
-
-When live access is unavailable, use the synchronized T007 package if one has been completed and made accessible. Today's local audit exports are historical; report missing access or baseline artifacts before claiming visual fidelity. Do not recreate unseen designs from memory. Do not mutate Penpot merely to gather implementation context.
-
-When the design changes, refresh this file's revision/checkpoint, affected board references and captured artifact locations together. Keep [DESIGN](business/DESIGN.md) authoritative for experience rules and [TECHNICAL](technical/TECHNICAL.md) authoritative for implemented versus proposed capabilities.
-
+See the [T007 validation record](../roadmap/t007-validation.md) for this handoff's checks. T008 remains the next application task; this document does not authorize it.

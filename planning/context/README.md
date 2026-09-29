@@ -10,7 +10,7 @@ Start with [the planning entry point](../README.md), then read these documents i
 | File | Purpose |
 |---|---|
 | [PROJECT.md](business/PROJECT.md) | Product purpose, seven destinations, dynamic reuse, scope, and human evaluation. |
-| [Design reference](design-reference.md) | Verified Penpot board links, shared component IDs, task mapping, access instructions and export freshness. |
+| [Design reference](design-reference.md) | Approved local Penpot file, shared component IDs, task mapping and missing-file retrieval instructions. |
 | [DESIGN.md](business/DESIGN.md) | Illustrated desktop composition, shared components, content sizing, interactions, and honest knowledge states. |
 | [TECHNICAL.md](technical/TECHNICAL.md) | Implemented architecture, proposed contract/rendering extensions, library choices, and technical acceptance. |
 | [Desktop delivery brief](../roadmap/desktop-delivery.md) | T007–T011 deliverables, prerequisites, acceptance gates, and handoff requirements. |
@@ -30,4 +30,4 @@ The v0.10 pack was incorporated into this folder; maintain these files instead o
 
 The older local, untracked `docs/superpowers/specs/2026-09-25-reference-experience-correction-design.md` records the earlier reference correction. This refreshed context and the delivery brief supersede its conflicting status, scope, and library assumptions. The private `.local/handoffs/2026-09-27-atlas-design-session-handoff.md` contains historical design-session detail; it is supplementary and is not required to understand the public plan. Do not copy its embedded conversation or private content into tracked documentation.
 
-T007 must capture one synchronized final desktop design package. Mixed-date local exports and a list of passed visual audits do not constitute that package. Mobile/tablet design work remains deferred.
+T007 establishes the approved native file at ignored `.local/design/atlas.penpot` and the tracked design reference. If absent, ask the owner for its path. No gallery or bulk export is required; extract only what the selected task needs. Mobile/tablet design work remains deferred.

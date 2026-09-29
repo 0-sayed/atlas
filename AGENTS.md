@@ -1,5 +1,7 @@
 # Atlas agent guidance
 
+- Before frontend work, read `planning/context/design-reference.md`. The approved visual source is ignored `.local/design/atlas.penpot`; if absent, ask the owner for its local path. Extract only assets needed by the selected task; no gallery or full export is required. Reviewed API/SQLite knowledge, not design examples, supplies product facts.
+
 - Atlas is one React/TypeScript/Vite frontend with a local NestJS API and SQLite knowledge store. Keep `planning/` as development context; do not import its raw briefs or reference images into the app or `public/`.
 - The app displays reviewed, implemented knowledge only. Do not infer current source-product behavior from fixture content, old Atlas content, or a passing build. Keep fixtures and historical snapshots explicitly labelled.
 - The independent `fill-atlas` skill and template are maintained in `.agents/skills/fill-atlas/`. It produces source-context Markdown and stops; it does not modify Atlas source or run in the browser.
