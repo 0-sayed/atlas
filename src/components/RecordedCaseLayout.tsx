@@ -14,7 +14,7 @@ function outcomeIcon(outcome: RecordedOutcome) {
   return outcome === 'allowed'
     ? 'check'
     : outcome === 'blocked'
-      ? 'warning'
+      ? 'close'
       : 'warning'
 }
 

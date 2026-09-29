@@ -39,7 +39,7 @@ Proof data uses isolated temporary storage. Fixtures remain explicitly labelled 
 
 ## Verification and independent review
 
-Final `npm run validate` passed after all source changes: formatting, lint, typecheck, 60 unit/integration tests, 48 browser tests, production build, artifact isolation and production restart/shutdown smoke checks. `git diff --check` also passed.
+Pre-removal `npm run validate` passed after the visual repair changes: formatting, lint, typecheck, 60 unit/integration tests, 48 browser tests, production build, artifact isolation and production restart/shutdown smoke checks. `git diff --check` also passed. The current-state-only verification below supersedes these test counts.
 
 Initial browser failures came from assumptions about the replaced layout and a duplicate fixture title. Assertions now exercise the selected historical detail, native scrolling to moved controls, current accessible headings and both empty-state images while retaining the underlying behavior checks. A new regression covers history selection through a related activity and explicit return.
 

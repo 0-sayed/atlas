@@ -547,7 +547,7 @@ Start with this context README.md, this section 1, the [V1 defaults](#16-v1-defa
 
 Preserve the user's constraints. Do not silently promote a proposal, mockup widget, or plausible product convention into a requirement. Ask about consequential unresolved choices when necessary rather than filling them with enterprise defaults.
 
-Preserve the existing T006 foundation. The recorded roadmap sequence is T007 for the local Penpot handoff, T008 for the running two-screen visual proof, T009 for supported knowledge and authoring, and T010 for the six destinations beyond Start Here and the full desktop experience. Start one of these only when separately instructed to implement that task. This documentation refresh does not initiate feature planning or execution.
+Preserve the existing T006 foundation. The recorded roadmap sequence is T007 for the local Penpot handoff, T008 for the running two-screen visual proof, T009 for supported knowledge and authoring, and T010 for the five destinations beyond Start Here and the full desktop experience. Start one of these only when separately instructed to implement that task. This documentation refresh does not initiate feature planning or execution.
 
 ### Updating this document
 

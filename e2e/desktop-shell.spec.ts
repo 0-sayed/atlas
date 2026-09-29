@@ -4,8 +4,8 @@ import { approvalFeature, approvalSeed } from '../fixtures/approval'
 test('desktop shell fills the viewport and navigation stays pinned while content scrolls', async ({
   page,
   request,
-}) => {
-  const id = 'desktop-shell-proof'
+}, testInfo) => {
+  const id = `desktop-shell-proof-${testInfo.parallelIndex}-${testInfo.retry}`
   const response = await request.post('/api/v1/projects', {
     headers: { authorization: 'Bearer e2e-only-token-not-a-production-secret' },
     data: {

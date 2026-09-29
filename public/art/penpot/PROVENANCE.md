@@ -1,6 +1,8 @@
 # Approved Atlas artwork
 
-Source: owner-supplied Atlas Penpot file `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`, revision 227. Native archive SHA-256: `c2473a7f266e70f028e469f00694a9b2ddc200434cd00e28a1d3d3c7380d11f1`. See `planning/context/design-reference.md` for the private source lookup; this runtime subset is not a design-source replacement or full export index.
+Original extraction source: owner-supplied Atlas Penpot file `a5ac146a-5787-80fa-8008-b2b1c7b55d1f`, revision 227. Native archive SHA-256: `c2473a7f266e70f028e469f00694a9b2ddc200434cd00e28a1d3d3c7380d11f1`. See `planning/context/design-reference.md` for the private source lookup; this runtime subset is not a design-source replacement or full export index.
+
+The approved design source is now revision 235, SHA-256 `c879344609d80bbdec32bfd0fed1012e77c2a4397e22ab34b1fd3d1733dcc796`. The r227 attribution records extraction provenance, not an alternative implementation reference. Island and panorama bytes were checked against r235 and are unchanged.
 
 Island and panorama are the original embedded PNG bytes, extracted without modification. Media IDs are `24d9d841-759d-81bc-8008-b2c954008cc5` and `a5ac146a-5787-80fa-8008-b2d63c473a95`. Blank historical component PNG exports were rejected after visual inspection. SVG icons preserve the r227 master geometry and colors; screen/rule were exported by Penpot, others serialized from native shape records and visually checked against the Icons board. They are not a new icon pack.
 
