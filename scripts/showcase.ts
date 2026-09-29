@@ -9,29 +9,36 @@ import { seedPublishingStudioApi } from './seed.js'
 const dir = mkdtempSync(join(tmpdir(), 'atlas-showcase-'))
 const token = randomUUID()
 const port = 4176
-const app = await createApp({
-  dir,
-  token,
-  port,
-  frontendPort: port,
-  staticDir: resolve('dist'),
-})
+let app: Awaited<ReturnType<typeof createApp>> | undefined
 try {
+  app = await createApp({
+    dir,
+    token,
+    port,
+    frontendPort: port,
+    staticDir: resolve('dist'),
+  })
   await app.listen(port, '127.0.0.1')
   await seedPublishingStudioApi(port, token)
   console.log(`Publishing Studio showcase: http://127.0.0.1:${port}`)
 } catch (error) {
-  await app.close()
-  rmSync(dir, { recursive: true, force: true })
+  await cleanup()
   throw error
+}
+
+async function cleanup() {
+  try {
+    await app?.close()
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
 }
 
 let stopping = false
 async function stop() {
   if (stopping) return
   stopping = true
-  await app.close()
-  rmSync(dir, { recursive: true, force: true })
+  await cleanup()
 }
 process.on('SIGTERM', () => void stop())
 process.on('SIGINT', () => void stop())

@@ -53,7 +53,6 @@ Local evidence is under `.local/t008/composition-rebuild/`: validation log, 18 d
 - [Feature explanation](http://127.0.0.1:4176/#/projects/publishing-studio/explore/prepare-article?case=draft-complete&from=start)
 - [Browse](http://127.0.0.1:4176/#/projects/publishing-studio/explore)
 - [Recorded cases](http://127.0.0.1:4176/#/projects/publishing-studio/explore/approve-article?case=one-review)
-- [Changes](http://127.0.0.1:4176/#/projects/publishing-studio/changes)
 
 Links require the isolated local proof process to remain running. Owner visual acceptance remains outstanding. T009 retains authored knowledge, compatible storage/API, capability discovery and authoring-skill work. T010 retains the six current desktop destinations and interactive Feature Map. This repair does not claim those capabilities or full-product completion.
 
