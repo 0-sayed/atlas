@@ -22,9 +22,7 @@ export function ApprovalScene({
 }) {
   const outcome = approvalOutcome(feature, example)
   const stateLabel =
-    example.state === 'pending'
-      ? 'A draft is waiting'
-      : 'This request is closed'
+    example.state === 'pending' ? 'Pending request' : 'Closed request'
   const roleLabel =
     example.role === 'reviewer'
       ? 'Acting as an independent reviewer'
@@ -40,7 +38,7 @@ export function ApprovalScene({
           aria-label="Recorded case conditions"
         >
           <div>
-            <dt>The review desk</dt>
+            <dt>Request state</dt>
             <dd>{stateLabel}</dd>
           </div>
           <div>
