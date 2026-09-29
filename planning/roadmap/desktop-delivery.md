@@ -1,11 +1,11 @@
 # Dynamic desktop delivery specification
 
-**Date:** 2026-09-28\
+**Date:** 2026-09-29\
 **Stage:** Written specification for owner review. The direction is agreed; this document defines delivery outcomes and acceptance, not permission to start application changes. This refresh updates project context and roadmap only. Future feature implementation requires a separate task instruction; roadmap entries do not authorize execution.
 
 Read [PROJECT](../context/business/PROJECT.md), [DESIGN](../context/business/DESIGN.md), and [TECHNICAL](../context/technical/TECHNICAL.md) together. This brief owns task boundaries; those documents own product, visual, and architecture decisions respectively.
 
-Use the [Penpot design reference and task mapping](../context/design-reference.md#task-to-design-mapping) to locate the exact system and desktop boards. Its live-verified index is available; the synchronized T007 export package is still pending.
+Use the [Penpot design reference and task mapping](../context/design-reference.md#task-to-design-mapping) to locate the exact system and desktop boards. The approved native file is available under ignored `.local/design/atlas.penpot`; the reference records its identity and retrieval instructions.
 
 ## Acceptance contract
 
@@ -17,21 +17,19 @@ Use the [Penpot design reference and task mapping](../context/design-reference.m
 - Known renderer gaps remain visible and must not be recast as navigation examples. Capability negotiation prevents the portable authoring skill from submitting content a target cannot render.
 - Source truth, storage revision, deployment, visual acceptance, and human usefulness are separate claims. No passing test or design screenshot establishes the others.
 
-## T007 — synchronized desktop design baseline
+## T007 — local Penpot design handoff
 
-**Depends on:** T006. **Outcome:** one usable design-to-implementation package, not another redesign.
+**Depends on:** T006. **Outcome:** an approved local native design file and a small tracked agent reference.
 
-Capture a named final Penpot file version and its desktop/system page and board IDs. Export matching desktop screens, shared token values, fonts/icons/art assets with provenance, component states, and interaction notes. Record an artifact manifest with capture date, source version, and missing exports. Keep source-product/private material under ignored local storage; track only safe specifications and approved shared application assets in appropriate locations.
+Keep the approved `.penpot` file at `.local/design/atlas.penpot`. The [design reference](../context/design-reference.md) records its identity, task-to-board mapping, dynamic-content boundaries and access instructions. On a fresh clone, ask the owner for the file path when absent. Extract only the assets/reference views needed during each implementation task; no offline gallery, mass screen export or duplicated generated library is required.
 
-Map each displayed item to static Atlas UI, existing persisted data, or a missing contract capability. Include navigation/Back, case selection, map camera behavior, selected/hover/focus/disabled controls, and empty/unknown/conflicting states. Distinguish design-reference pages and shell templates from runtime product routes. Do not implement all reference boards as application pages.
-
-**Exit gate:** a reviewer can reproduce the intended two-screen proof without needing old chat messages or live Penpot access. All package items come from the recorded version; no unresolved export is presented as complete. Document static Section compositions whose bodies are scene siblings so implementation contains all card content in the actual component. Include the [compact component rules](../context/business/DESIGN.md#compact-content-driven-component-rules): content-fitting surfaces, padded/wrapping controls, grouped actions, and meaningful connectors. Mobile/tablet remains excluded.
+**Exit gate:** the native archive opens and its recorded identity matches; a new agent can locate the relevant design without old chat context, knows how to request a missing file, and distinguishes visual examples from reviewed product facts. Carry forward the [compact component rules](../context/business/DESIGN.md#compact-content-driven-component-rules), including complete card containment when Penpot bodies/actions are scene siblings. Mobile/tablet remains excluded.
 
 ## T008 — shared components and two-screen visual proof
 
 **Depends on:** T007. **Outcome:** approved Start Here and one feature explanation in the running shared frame.
 
-Implement semantic tokens and the small set of shared controls/layouts needed by these screens. Keep appearance aligned with the packaged Penpot version. Use native controls and selective Radix primitives where composite behavior needs them; install only dependencies required by the proof. Preserve the existing routes and API behavior.
+Implement semantic tokens and the small set of shared controls/layouts needed by these screens. Keep appearance aligned with the approved local Penpot snapshot. Use native controls and selective Radix primitives where composite behavior needs them; install only dependencies required by the proof. Preserve the existing routes and API behavior.
 
 Use an isolated, labelled existing Publishing Studio dataset and a supported navigation activity to prove the visual composition. Do not invent unsupported commerce behavior or add fields rejected by the current contract to match a design example. The proof can display only the facts its source dataset actually supplies. Other routes retain their existing behavior; unfinished destinations must not appear complete.
 
@@ -71,7 +69,7 @@ Build once, then incorporate three distinct domain datasets through the API: at 
 
 Demonstrate additions, changes, explicit removals, evidence corrections, supporting-art updates, and a reviewed no-behavior-change scope. Check unaffected records remain, no-op preparation makes no POST, history retains the correct prior facts, failed writes roll back, and switching projects preserves scope. A newly unsupported activity must produce a recorded capability gap without misleading content or per-project UI edits.
 
-Exercise sparse content, no facts, absent optional art, multiple actors, long names/text, changed/deleted links, conflicting evidence, and the dense map. Run `npm run validate` in isolated test storage, plus a desktop visual/accessibility review against the packaged design. Retain existing automated responsive checks while further mobile/tablet design remains deferred. Verify normal startup still has no demo knowledge and build artifacts contain no private material.
+Exercise sparse content, no facts, absent optional art, multiple actors, long names/text, changed/deleted links, conflicting evidence, and the dense map. Run `npm run validate` in isolated test storage, plus a desktop visual/accessibility review against the approved local Penpot design. Retain existing automated responsive checks while further mobile/tablet design remains deferred. Verify normal startup still has no demo knowledge and build artifacts contain no private material.
 
 **Exit gate:** a concise tracked validation report identifies build revision, source coverage, dataset labels, checks and outcomes, remaining gaps, and actual end-to-end authoring effort. Private payloads and source data stay private. This technical gate does not close T005's human comprehension/voluntary-return evaluation; collect that evidence separately.
 

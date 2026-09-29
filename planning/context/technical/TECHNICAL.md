@@ -118,7 +118,7 @@ For the proposed expansion, test strict scene/version and capabilities discovery
 
 The proposed sequence for owner review is:
 
-1. **T007 — package the desktop baseline:** capture one named Penpot version with matching desktop/system exports, tokens, assets, component states, interactions and data bindings. Record missing contract capabilities and verify the package is usable without live Penpot access.
+1. **T007 — local Penpot design handoff:** preserve the approved native file at ignored `.local/design/atlas.penpot`. Record its identity, relevant boards and missing-file retrieval in the [design reference](../design-reference.md). Extract assets only as required by implementation tasks; no generated gallery or full export prerequisite.
 2. **T008 — two-screen visual proof:** review the illustrated Start Here and one activity explanation in the current shared frame before expanding the guide.
 3. **T009 — models, capabilities and authoring:** design and test the versioned authored-activity scene, supporting records, evidence granularity, migration and capabilities response; update `update-atlas` references/tests with the same contract change.
 4. **T010 — desktop views and map:** implement the remaining seven-destination views, grouped map and relevant relationship exploration against saved data.

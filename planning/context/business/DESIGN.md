@@ -248,7 +248,7 @@ The desktop Penpot file supplies the reviewed visual reference: fixed navigation
 
 ### Prove the art in code before scaling
 
-For the separately authorized T008 proof, refine the existing Publishing Studio overview and one supported navigation-feature explanation with a **small reusable asset set**. Use the synchronized desktop package from T007 and only facts supported by the existing dataset and contract. The booking art proof was historical; it is not the next screen to build.
+For the separately authorized T008 proof, refine the existing Publishing Studio overview and one supported navigation-feature explanation with a **small reusable asset set**. Use the approved local Penpot snapshot identified by the [design reference](../design-reference.md) and only facts supported by the existing dataset and contract. The booking art proof was historical; it is not the next screen to build.
 
 Compare the running result with the approved visual qualities—warmth, legibility, meaningful subjects, restrained texture—not every pixel of a generated screenshot. Critical text and controls stay in the UI; stable raster illustration can provide texture, while SVG/HTML/CSS can express changing elements. Keep an external-asset license record when choosing real assets.
 
