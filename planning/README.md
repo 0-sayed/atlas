@@ -36,7 +36,7 @@ The inspected branch is `docs/t007-desktop-design-baseline`, based on merged T00
 - Keep React/TypeScript/Vite/Router/Tailwind and one NestJS API with SQLite, `better-sqlite3`, tracked SQL migrations, and shared strict Zod schemas.
 - Build Atlas components from the Penpot design system. Native controls first; use Radix primitives for complex focus/keyboard interactions when required. Neither Radix nor shadcn is currently installed; a shadcn baseline is not selected.
 - Add a bounded, versioned authored-activity explanation for common cross-domain behavior. Keep reviewed specialized scenes where useful. Do not accept executable layouts or build a universal rules engine.
-- Complete the fixed seven destinations using explicit saved knowledge. Missing facts produce honest empty/gap states; a mockup never establishes a source fact.
+- Complete the fixed six destinations using explicit saved current knowledge. Missing facts produce honest empty/gap states; a mockup never establishes a source fact.
 - Desktop is the delivery focus. Mobile/tablet design expansion is deferred; preserve existing basic responsiveness, keyboard navigation, and reduced-motion behavior.
 - Keep `fill-atlas` independent. Update API capabilities, `update-atlas` references, and their verification together when supported content expands.
 

@@ -2,6 +2,11 @@ import { createContext, useContext } from 'react'
 import { bookingView } from '../../shared/booking'
 import type { ProjectDocument } from '../../shared/contracts'
 export const ProjectContext = createContext<ProjectDocument | null>(null)
+export const RefreshContext = createContext<{
+  refresh: () => void
+  loading: boolean
+  error: string
+} | null>(null)
 export function useProject() {
   const value = useContext(ProjectContext)
   if (!value) throw new Error('Project provider required')

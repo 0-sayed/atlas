@@ -1,6 +1,6 @@
 export type Destination = {
-  id: 'start' | 'explore' | 'changes'
-  path: '/' | '/explore' | '/changes'
+  id: 'start' | 'explore'
+  path: '/' | '/explore'
   label: string
   description: string
   state: 'fixture'
@@ -20,13 +20,6 @@ export const destinations: readonly Destination[] = [
     label: 'Explore',
     description:
       'Explore the illustrative booking activity and its saved cases.',
-    state: 'fixture',
-  },
-  {
-    id: 'changes',
-    path: '/changes',
-    label: 'What changed',
-    description: 'Compare historical and current booking fixture behavior.',
     state: 'fixture',
   },
 ]

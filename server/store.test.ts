@@ -16,7 +16,7 @@ afterEach(() => {
   store?.close()
   rmSync(dir, { recursive: true, force: true })
 })
-it('preserves optional artwork settings across restart and immutable history', () => {
+it('preserves optional artwork settings across restart', () => {
   store.create(seed)
   const feature = {
     ...seed.features[0],
@@ -38,10 +38,13 @@ it('preserves optional artwork settings across restart and immutable history', (
   store = new Store(dir)
   expect(store.read(seed.id).revision).toBe(2)
   expect(store.read(seed.id).features[0]).toEqual(feature)
-  expect(store.history(seed.id)[0].features[0]).toEqual(seed.features[0])
-  expect(store.history(seed.id)).toHaveLength(2)
+  expect(
+    store.db
+      .prepare("SELECT name FROM sqlite_master WHERE name='history'")
+      .get(),
+  ).toBeUndefined()
 })
-it('persists create/update across restart and keeps immutable history', () => {
+it('persists the current update across restart', () => {
   store.create(seed)
   const changed = { ...seed.features[0], noticeHours: 30 }
   store.apply(seed.id, {
@@ -53,9 +56,6 @@ it('persists create/update across restart and keeps immutable history', () => {
   store = new Store(dir)
   expect(store.read(seed.id).features[0]).toMatchObject({ noticeHours: 30 })
   expect(store.read(seed.id).revision).toBe(2)
-  expect(store.history(seed.id)[0].features[0]).toMatchObject({
-    noticeHours: 24,
-  })
 })
 it('rejects unknown fields, scene versions, duplicate ids and stale revisions', () => {
   expect(() => store.create({ ...seed, sql: 'DROP TABLE projects' })).toThrow()
@@ -107,7 +107,6 @@ it('preserves omitted features and rolls back a batch with broken scoped referen
     }),
   ).toThrow()
   expect(store.read(seed.id)).toEqual(before)
-  expect(store.history(seed.id)).toHaveLength(2)
   expect(() =>
     store.apply(seed.id, {
       contractVersion: 1,
@@ -137,11 +136,16 @@ it('upgrades a nonempty v1 database and rejects a future schema', () => {
   store.create(seed)
   store.close()
   const old = new Database(join(dir, 'atlas.sqlite'))
-  old.exec('DROP TABLE history; PRAGMA user_version = 1;')
+  old.pragma('user_version = 1')
   old.close()
   store = new Store(dir)
   expect(store.read(seed.id).features).toEqual(seed.features)
-  expect(store.history(seed.id)).toHaveLength(1)
+  expect(store.db.pragma('user_version', { simple: true })).toBe(3)
+  expect(
+    store.db
+      .prepare("SELECT name FROM sqlite_master WHERE name='history'")
+      .get(),
+  ).toBeUndefined()
   store.close()
   const future = new Database(join(dir, 'atlas.sqlite'))
   future.pragma('user_version = 99')
@@ -153,10 +157,10 @@ it('upgrades every project beyond a public page and paginates without loss', () 
     store.create({ ...seed, id: `p-${String(n).padStart(3, '0')}` })
   store.close()
   const old = new Database(join(dir, 'atlas.sqlite'))
-  old.exec('DROP TABLE history; PRAGMA user_version = 1')
+  old.pragma('user_version = 1')
   old.close()
   store = new Store(dir)
-  expect(store.history('p-100')).toHaveLength(1)
+  expect(store.read('p-100').revision).toBe(1)
   expect(store.list()).toHaveLength(100)
   expect(store.list('p-099').map((p) => p.id)).toEqual(['p-100'])
 })

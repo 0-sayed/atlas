@@ -1,24 +1,36 @@
 import { Link, Navigate, Route, Routes, useParams } from 'react-router'
+import { useContext } from 'react'
+import { AtlasIcon } from './components/AtlasIcon'
+import { AtlasHeader } from './components/AtlasHeader'
 import { AtlasSidebar } from './components/AtlasSidebar'
 import { NavigationScroll } from './components/NavigationScroll'
 import { KnowledgeProvider } from './content/KnowledgeProvider'
-import { useProject } from './content/knowledge'
+import { RefreshContext, useProject } from './content/knowledge'
 import { StartPage, ExplorePage, MissingPage } from './pages/GuidePages'
-import { ChangesPage } from './pages/ChangesPage'
 import { FeaturePage } from './pages/FeaturePage'
 import { ProjectPicker } from './pages/ProjectPicker'
 
 function ProjectWorkspace() {
   const project = useProject()
+  const refresh = useContext(RefreshContext)
   return (
     <div className="atlas-workspace">
+      <AtlasHeader project={project} />
       <AtlasSidebar project={project} />
       <div className="workspace-content" id="workspace-content" tabIndex={-1}>
+        {refresh?.error && (
+          <div className="workspace-refresh-notice">
+            <AtlasIcon name="warning" />
+            <p role="alert">
+              {refresh.error} Showing last-loaded revision {project.revision}.
+            </p>
+          </div>
+        )}
+        {refresh?.loading && <p role="status">Loading saved guide…</p>}
         <Routes>
           <Route index element={<StartPage />} />
           <Route path="explore" element={<ExplorePage />} />
           <Route path="explore/:featureId" element={<FeaturePage />} />
-          <Route path="changes" element={<ChangesPage />} />
           <Route path="*" element={<MissingPage />} />
         </Routes>
       </div>
@@ -36,6 +48,7 @@ function ProjectGuide() {
 function ProjectSelection() {
   return (
     <div className="atlas-workspace">
+      <AtlasHeader />
       <AtlasSidebar />
       <div className="workspace-content" id="workspace-content" tabIndex={-1}>
         <ProjectPicker />
@@ -65,7 +78,6 @@ export default function App() {
           <Route path="/" element={<ProjectSelection />} />
           <Route path="/projects/:projectId/*" element={<ProjectGuide />} />
           <Route path="/explore/*" element={<Navigate replace to="/" />} />
-          <Route path="/changes" element={<Navigate replace to="/" />} />
           <Route
             path="*"
             element={

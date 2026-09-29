@@ -3,14 +3,18 @@ import { Link, useLocation, useSearchParams } from 'react-router'
 import { useBooking, useProject, projectPath } from '../content/knowledge'
 import { FeatureEvidence } from '../components/FeatureDetail'
 import { RegisteredArt } from '../components/RegisteredArt'
+import {
+  RecordedCaseEvidence,
+  RecordedCaseLayout,
+} from '../components/RecordedCaseLayout'
 import { BookingScene } from '../scenes/BookingScene'
 import { FixtureLabel, MissingPage } from './GuidePages'
+import './recorded-case.css'
 
 export function BookingPage() {
   const {
     booking,
     bookingCases,
-    bookingChange,
     bookingRestrictions,
     getBookingCase,
     defaultCaseId,
@@ -20,32 +24,30 @@ export function BookingPage() {
   const feature = project.features.find((f) => f.id === booking.id)!
   const [params, setParams] = useSearchParams()
   const location = useLocation()
-  const example = getBookingCase(params.get('case') ?? defaultCaseId)
+  const requestedCaseId = params.get('case')
+  const selectedId = requestedCaseId ?? defaultCaseId
+  const example = selectedId ? getBookingCase(selectedId) : undefined
   const [detailOpen, setDetailOpen] = useState(false)
   const detailTrigger = useRef<HTMLButtonElement>(null)
-  if (!example) return <MissingPage />
+  if (!example && (requestedCaseId !== null || bookingCases.length > 0))
+    return <MissingPage />
   const origin = params.get('from')
   const returnPath =
     origin === 'start'
       ? base
-      : origin === 'changes'
-        ? `${base}/changes`
-        : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
+      : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
   const returnLabel =
-    origin === 'start'
-      ? 'Back to Start here'
-      : origin === 'changes'
-        ? 'Back to What changed'
-        : 'Back to Explore'
-  const cases = [...bookingCases, bookingChange.after.example]
+    origin === 'start' ? 'Back to Start here' : 'Back to Explore'
   return (
-    <section className="booking-page" aria-labelledby="page-title">
+    <section
+      className="booking-page recorded-case-page"
+      aria-labelledby="page-title"
+    >
       <Link
         className="back-link"
         to={returnPath}
         state={{ restorePosition: true }}
       >
-        <span aria-hidden="true">← </span>
         {returnLabel}
       </Link>
       <FixtureLabel feature={feature} />
@@ -55,36 +57,12 @@ export function BookingPage() {
           <h1 id="page-title">{booking.title}</h1>
           <p className="intro">{booking.purpose}</p>
         </div>
-        <span className="scene-note">
-          Same story.
-          <br />
-          Different conditions.
-        </span>
       </div>
       <ul className="restrictions" aria-label="Essential restrictions">
         {bookingRestrictions.map((restriction) => (
           <li key={restriction}>{restriction}</li>
         ))}
       </ul>
-      <div className="case-picker" role="group" aria-label="Saved cases">
-        <span>Try a saved case</span>
-        <div>
-          {cases.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={example.id === item.id}
-              onClick={() => {
-                const next = new URLSearchParams(params)
-                next.set('case', item.id)
-                setParams(next, { state: location.state })
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </div>
       {booking.assetIds.map((id) => (
         <RegisteredArt
           key={id}
@@ -93,11 +71,36 @@ export function BookingPage() {
           title={booking.title}
         />
       ))}
-      <BookingScene
-        example={example}
-        noticeHours={booking.noticeHours}
-        actor={booking.actor}
-      />
+      {example ? (
+        <RecordedCaseLayout
+          cases={bookingCases.map((item) => ({
+            id: item.id,
+            label: item.label,
+            outcome: item.outcome,
+          }))}
+          selectedId={example.id}
+          onSelect={(id) => {
+            const next = new URLSearchParams(params)
+            next.set('case', id)
+            setParams(next, { state: location.state })
+          }}
+        >
+          <BookingScene
+            example={example}
+            noticeHours={booking.noticeHours}
+            actor={booking.actor}
+            evidence={<RecordedCaseEvidence feature={feature} />}
+          />
+        </RecordedCaseLayout>
+      ) : (
+        <div className="empty-search">
+          <h2>No saved cases</h2>
+          <p>
+            The recorded rule is available, but no example outcome has been
+            incorporated.
+          </p>
+        </div>
+      )}
       <div className="scene-actions">
         <button
           className="reason-trigger"
@@ -107,12 +110,9 @@ export function BookingPage() {
           aria-controls="booking-detail"
           onClick={() => setDetailOpen(!detailOpen)}
         >
-          Why this outcome?{' '}
+          {example ? 'Why this outcome?' : 'More detail'}{' '}
           <span aria-hidden="true">{detailOpen ? '−' : '+'}</span>
         </button>
-        <Link to={`${base}/changes`}>
-          See what changed <span aria-hidden="true">↗</span>
-        </Link>
       </div>
       {detailOpen && (
         <aside
@@ -121,9 +121,11 @@ export function BookingPage() {
           aria-labelledby="reason-title"
         >
           <div>
-            <p className="eyebrow">The reason</p>
-            <h2 id="reason-title">{example.result}</h2>
-            <p>{example.reason}</p>
+            <h2 id="reason-title">
+              {example
+                ? 'Evidence for this outcome'
+                : 'Evidence for this activity'}
+            </h2>
             <FeatureEvidence feature={feature} />
           </div>
           <button

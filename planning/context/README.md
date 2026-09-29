@@ -1,6 +1,6 @@
 # Atlas planning context
 
-**Updated:** 2026-09-28\
+**Updated:** 2026-09-29\
 **Current state:** React/TypeScript/Vite, the local NestJS API, SQLite persistence, project-scoped exploration, and the source-context skill are implemented. The current working foundation is not the final Penpot desktop experience. Broader knowledge contracts and the remaining desktop views are planned work.
 
 ## Start here
@@ -9,7 +9,7 @@ Start with [the planning entry point](../README.md), then read these documents i
 
 | File | Purpose |
 |---|---|
-| [PROJECT.md](business/PROJECT.md) | Product purpose, seven destinations, dynamic reuse, scope, and human evaluation. |
+| [PROJECT.md](business/PROJECT.md) | Product purpose, six destinations, dynamic reuse, scope, and human evaluation. |
 | [Design reference](design-reference.md) | Approved local Penpot file, shared component IDs, task mapping and missing-file retrieval instructions. |
 | [DESIGN.md](business/DESIGN.md) | Illustrated desktop composition, shared components, content sizing, interactions, and honest knowledge states. |
 | [TECHNICAL.md](technical/TECHNICAL.md) | Implemented architecture, proposed contract/rendering extensions, library choices, and technical acceptance. |
@@ -22,7 +22,7 @@ Start with [the planning entry point](../README.md), then read these documents i
 
 One local SQLite database stores all projects; private registered image files live alongside it. The frontend reads validated saved knowledge. Normal storage starts empty; fixtures and Penpot examples are explicitly illustrative. Ordinary supported project additions and fact/art updates must work without changing or rebuilding the app. Unsupported semantics require a reviewed reusable contract/renderer addition.
 
-The running model currently accepts booking, approval, and navigation scenes. The domain-neutral authored activity, full seven-view knowledge model, and capability-aware authoring described in the refreshed specification are **targets**, not installed capabilities.
+The running model currently accepts booking, approval, and navigation scenes. The domain-neutral authored activity, full six-view knowledge model, and capability-aware authoring described in the refreshed specification are **targets**, not installed capabilities.
 
 ## Source material and freshness
 

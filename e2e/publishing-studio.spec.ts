@@ -3,7 +3,7 @@ import { seedPublishingStudioApi } from '../scripts/seed'
 import { publishingStudioSeed } from '../fixtures/publishing-studio'
 import { isNavigationFeature } from '../shared/contracts'
 
-test('Publishing Studio explains a connected journey and its changed approval rule', async ({
+test('Publishing Studio explains a connected journey and its current approval rule', async ({
   page,
   baseURL,
 }, testInfo) => {
@@ -64,7 +64,7 @@ test('Publishing Studio explains a connected journey and its changed approval ru
   await expect(
     page.getByRole('heading', { name: 'Business rules', exact: true }),
   ).toBeVisible()
-  await expect(page.locator('.navigation-scene svg')).toHaveCount(3)
+  await expect(page.locator('.navigation-scene .atlas-icon')).toHaveCount(3)
   await page.getByRole('button', { name: /credit/i }).click()
   await expect(page.locator('.navigation-result .eyebrow')).toHaveText(
     'Unavailable',
@@ -120,17 +120,6 @@ test('Publishing Studio explains a connected journey and its changed approval ru
   await page.locator('a[href$="/explore/request-review"]').click()
   await expect(page).toHaveURL(/\/explore\/request-review$/)
 
-  await page.getByRole('link', { name: 'What changed', exact: true }).click()
-  await expect(
-    page.getByText('1 → 2 independent approvals', { exact: true }),
-  ).toBeVisible()
-  await expect(
-    page.getByText('Ready for approval → More reviews needed', { exact: true }),
-  ).toBeVisible()
-  await page.screenshot({
-    path: testInfo.outputPath('publishing-studio-history.png'),
-    fullPage: true,
-  })
   await page.setViewportSize({ width: 375, height: 812 })
   await page.goto(base)
   await expect(page.locator('.activity-hero')).toHaveCount(3)

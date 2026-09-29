@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { Link } from 'react-router'
+import { KnowledgeState } from '../components/KnowledgeState'
 import { validateDocument, type ProjectDocument } from '../../shared/contracts'
-import { ProjectContext } from './knowledge'
+import { ProjectContext, RefreshContext } from './knowledge'
 export function KnowledgeProvider({
   children,
   projectId,
@@ -59,36 +59,22 @@ export function KnowledgeProvider({
     void load()
     return () => controller.abort()
   }, [request, projectId])
-  return (
-    <>
-      <div className="knowledge-status">
-        {error && (
-          <p role="alert">
-            {error}
-            {document
-              ? ` Showing last-loaded revision ${document.revision}.`
-              : ''}
-          </p>
-        )}
-        {loading && <p role="status">Loading saved guide…</p>}
-        {error && !document && <Link to="/">Choose a project</Link>}
-        {!loading && (
-          <button
-            type="button"
-            onClick={() => {
-              setLoading(true)
-              setRequest((n) => n + 1)
-            }}
-          >
-            {document ? 'Refresh guide' : 'Retry'}
-          </button>
-        )}
-      </div>
-      {document ? (
-        <ProjectContext.Provider value={document}>
-          {children}
-        </ProjectContext.Provider>
-      ) : null}
-    </>
+  const refresh = () => {
+    setLoading(true)
+    setRequest((n) => n + 1)
+  }
+  return document ? (
+    <ProjectContext.Provider value={document}>
+      <RefreshContext.Provider value={{ refresh, loading, error }}>
+        {children}
+      </RefreshContext.Provider>
+    </ProjectContext.Provider>
+  ) : (
+    <KnowledgeState
+      projectId={projectId}
+      loading={loading}
+      error={error}
+      retry={refresh}
+    />
   )
 }

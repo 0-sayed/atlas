@@ -1,6 +1,6 @@
 # T005 — first real-source guide
 
-Status: runtime and local incorporation implemented; human comprehension and voluntary-return evaluation inconclusive. This is not a claim of production deployment or broad source-extraction accuracy.
+Status: runtime and local incorporation implemented; human comprehension and voluntary-return evaluation inconclusive. This is a historical evaluation record. Its former history read and comparison checks are superseded by the current-state-only contract; this is not a claim of current API behavior, production deployment, or broad source-extraction accuracy.
 
 ## What was evaluated
 

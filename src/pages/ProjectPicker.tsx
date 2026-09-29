@@ -3,6 +3,9 @@ import { Link } from 'react-router'
 import { z } from 'zod'
 import { idSchema } from '../../shared/contracts'
 import { projectPath } from '../content/knowledge'
+import { AtlasIcon } from '../components/AtlasIcon'
+import { DecorativeIsland } from './DecorativeIsland'
+import './collection-states.css'
 
 const listSchema = z
   .array(
@@ -21,6 +24,7 @@ export function ProjectPicker() {
   const [request, setRequest] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const empty = !loading && !error && projects.length === 0
   useEffect(() => {
     const controller = new AbortController()
     async function load() {
@@ -55,12 +59,17 @@ export function ProjectPicker() {
     return () => controller.abort()
   }, [after, request])
   return (
-    <section className="start-page project-picker" aria-labelledby="page-title">
-      <p className="eyebrow">Your shelf of discoveries</p>
-      <h1 id="page-title">Choose a project</h1>
-      <p className="intro">
-        Open a guide. Follow a question. See what matters.
-      </p>
+    <section
+      className={`start-page project-picker${empty ? ' project-picker--empty' : ''}`}
+      aria-labelledby="page-title"
+    >
+      {!empty && <p className="eyebrow">Your shelf of discoveries</p>}
+      {!empty && <h1 id="page-title">Choose a project</h1>}
+      {!empty && (
+        <p className="intro">
+          Open a guide. Follow a question. See what matters.
+        </p>
+      )}
       {error && (
         <p role="alert">
           {error}
@@ -68,10 +77,17 @@ export function ProjectPicker() {
         </p>
       )}
       {loading && <p role="status">Loading projects…</p>}
-      {!loading && !error && projects.length === 0 && (
-        <div className="empty-search">
-          <h2>No saved projects yet</h2>
-          <p>No project knowledge has been incorporated.</p>
+      {empty && (
+        <div className="project-picker-empty-body">
+          <DecorativeIsland withMap />
+          <h1 id="page-title">Your product’s story starts here.</h1>
+          <p className="project-picker-empty-deck">
+            Add reviewed project knowledge to see its activities and
+            relationships come to life.
+          </p>
+          <p className="project-picker-empty-note">
+            No projects yet. Your workspace starts empty.
+          </p>
         </div>
       )}
       <div className="project-grid">
@@ -82,9 +98,9 @@ export function ProjectPicker() {
             to={projectPath(p.id)}
             aria-label={p.title}
           >
-            <span aria-hidden="true">✦</span>
+            <AtlasIcon name="map" />
             <h2>{p.title}</h2>
-            <p>Open guide ↗</p>
+            <p>Open guide</p>
           </Link>
         ))}
       </div>

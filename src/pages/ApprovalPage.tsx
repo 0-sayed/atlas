@@ -1,11 +1,17 @@
 import { useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
+import { approvalOutcome } from '../../shared/approval'
 import type { ApprovalFeature } from '../../shared/contracts'
 import { useProject, projectPath } from '../content/knowledge'
 import { ApprovalScene } from '../scenes/ApprovalScene'
 import { FeatureEvidence } from '../components/FeatureDetail'
 import { RegisteredArt } from '../components/RegisteredArt'
+import {
+  RecordedCaseEvidence,
+  RecordedCaseLayout,
+} from '../components/RecordedCaseLayout'
 import { FixtureLabel, MissingPage } from './GuidePages'
+import './recorded-case.css'
 
 export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
   const project = useProject()
@@ -22,22 +28,18 @@ export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
   const returnPath =
     from === 'start'
       ? base
-      : from === 'changes'
-        ? `${base}/changes`
-        : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
+      : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
   return (
-    <section className="booking-page" aria-labelledby="page-title">
+    <section
+      className="booking-page recorded-case-page"
+      aria-labelledby="page-title"
+    >
       <Link
         className="back-link"
         to={returnPath}
         state={{ restorePosition: true }}
       >
-        <span aria-hidden="true">← </span>Back to{' '}
-        {from === 'start'
-          ? 'Start here'
-          : from === 'changes'
-            ? 'What changed'
-            : 'Explore'}
+        Back to {from === 'start' ? 'Start here' : 'Explore'}
       </Link>
       <FixtureLabel feature={feature} />
       <div className="feature-heading">
@@ -56,24 +58,6 @@ export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
       </ul>
       {example ? (
         <>
-          <div className="case-picker" role="group" aria-label="Saved cases">
-            <span>Try a saved case</span>
-            <div>
-              {feature.cases.map((c) => (
-                <button
-                  key={c.id}
-                  aria-pressed={example.id === c.id}
-                  onClick={() => {
-                    const next = new URLSearchParams(params)
-                    next.set('case', c.id)
-                    setParams(next, { state: location.state })
-                  }}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
           {feature.assetIds.map((id) => (
             <RegisteredArt
               key={id}
@@ -82,7 +66,25 @@ export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
               title={feature.title}
             />
           ))}
-          <ApprovalScene feature={feature} example={example} />
+          <RecordedCaseLayout
+            cases={feature.cases.map((item) => ({
+              id: item.id,
+              label: item.label,
+              outcome: approvalOutcome(feature, item).outcome,
+            }))}
+            selectedId={example.id}
+            onSelect={(id) => {
+              const next = new URLSearchParams(params)
+              next.set('case', id)
+              setParams(next, { state: location.state })
+            }}
+          >
+            <ApprovalScene
+              feature={feature}
+              example={example}
+              evidence={<RecordedCaseEvidence feature={feature} />}
+            />
+          </RecordedCaseLayout>
         </>
       ) : (
         <div className="empty-search">
@@ -104,7 +106,6 @@ export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
           {example ? 'Why this outcome?' : 'More detail'}{' '}
           {detailOpen ? '−' : '+'}
         </button>
-        <Link to={`${base}/changes`}>See what changed ↗</Link>
       </div>
       {detailOpen && (
         <aside

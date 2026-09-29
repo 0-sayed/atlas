@@ -38,9 +38,9 @@ ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm start
 ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm run seed
 ```
 
-Open `http://127.0.0.1:4318/#/projects/publishing-studio`. The seed creates an initial snapshot and a second revision changing the requirement from one independent approval to two. In **What changed**, the same one-review case demonstrates the difference. These are invented demo rules, not Ghost behavior, and Atlas explains saved cases rather than executing a publishing workflow.
+Open `http://127.0.0.1:4318/#/projects/publishing-studio`. The seed saves the current fictional approval rule and its recorded cases. These are invented demo rules, not Ghost behavior, and Atlas explains saved cases rather than executing a publishing workflow.
 
-The seed uses the authenticated API. Reseeding rejects an existing project and never overwrites edits. Creation and the history update are separate requests; if the second request fails, the error reports the saved initial project rather than claiming completion. Keep normal storage separate. The smaller booking/approval fixtures remain for automated tests, not additional showcase projects.
+The seed uses the authenticated API. Reseeding rejects an existing project and never overwrites edits. Keep normal storage separate. The smaller booking/approval fixtures remain for automated tests, not additional showcase projects.
 
 | Setting               | Default / requirement                                                                                                       |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -63,7 +63,6 @@ All routes below start with `/api/v1`:
 | `GET /ready`                        | Database/schema/foreign-key readiness, no private details                                              |
 | `GET /projects`                     | Up to 100 summaries (`id`, `title`, `revision`) ordered by ID; pass `?after=LAST_ID` for the next page |
 | `GET /projects/:id`                 | Coherent current document                                                                              |
-| `GET /projects/:id/history`         | Immutable Atlas snapshots, oldest first                                                                |
 | `POST /projects`                    | Create at revision 1; [fixtures/booking.ts](fixtures/booking.ts) is the tested full example            |
 | `POST /projects/:id/changes`        | Scoped batch using `expectedRevision`                                                                  |
 | `POST /projects/:id/assets`         | Register immutable ID, `mediaType`, `provenance`, `base64`, `expectedRevision`; increments revision    |
@@ -91,15 +90,15 @@ console.log(response.status, await response.json())
 JS
 ```
 
-`upsertFeatures` replaces each named feature, including cases. Omitted features/relations remain unchanged. `removeFeatureIds` and `removeRelationIds` explicitly remove records; remove references in the same batch. Duplicates, unsupported scenes, cross-project references and stale revisions fail atomically. Asset IDs are immutable and retained for history; new art uses a new ID.
+`upsertFeatures` replaces each named feature, including cases. Omitted features/relations remain unchanged. `removeFeatureIds` and `removeRelationIds` explicitly remove records; remove references in the same batch. Duplicates, unsupported scenes, cross-project references and stale revisions fail atomically. Asset IDs are immutable; new art uses a new ID.
 
 Errors use `{ "error": { "code": "revision_conflict", "message": "..." } }`; shape errors add field paths/codes without submitted values. Statuses: 400 invalid request/references, 401 credential, 403 Host/Origin, 404 missing, 409 duplicate/stale revision, 413 size, 415 media type, 500 unexpected failure, 503 unavailable storage. Conflicts require rereading and deliberately preparing a new batch. Valid format does not prove business truth; source evidence/revision is separate from Atlas revision.
 
 ## Storage, upgrades and recovery
 
-Tracked SQL is in `migrations/`, currently schema 2. Every connection enables foreign keys. Batches, snapshots and revisions commit together. Images are staged completely before registration; generated keys and symlink checks restrict serving.
+Tracked SQL is in `migrations/`, currently schema 3. Every connection enables foreign keys. Current data and revisions commit together. Images are staged completely before registration; generated keys and symlink checks restrict serving.
 
-Before upgrading, stop Atlas and back up using the **existing compatible version**. Backup locks out the app and uses SQLite's backup facility without applying migrations, plus registered assets and a database checksum manifest. Keep the manifest with the backup; restore verifies it before migrations, so changed or missing history cannot silently pass SQLite integrity checks. Startup/migrate applies migrations transactionally; future schema versions are rejected.
+Before upgrading, stop Atlas and back up using the **existing compatible version**. Backup locks out the app and uses SQLite's backup facility without applying migrations, plus registered assets and a database checksum manifest. Keep the manifest with the backup; restore verifies it before migrations. Startup/migrate applies migrations transactionally; future schema versions are rejected.
 
 ```sh
 # Server stopped; destination must not exist.
@@ -110,7 +109,7 @@ ATLAS_DATA_DIR=/private/location/atlas-restored npm run storage -- restore /priv
 ATLAS_DATA_DIR=/private/location/atlas-restored npm start
 ```
 
-Restore verifies database integrity, foreign keys, contracts, history and registered assets before exposing the restored directory. Test restoration before relying on backups. A stopped-process copy of the entire directory is also suitable before an incompatible upgrade; copying only an active database file is not.
+Restore verifies database integrity, foreign keys, current contracts and registered assets before exposing the restored directory. Test restoration before relying on backups. A stopped-process copy of the entire directory is also suitable before an incompatible upgrade; copying only an active database file is not.
 
 Processes hold a storage `.lock`. After a crash, remove a stale lock only after confirming no Atlas process uses that directory. SIGINT/SIGTERM closes listeners/database and releases the lock. Structured startup events omit request bodies, credentials and private paths.
 

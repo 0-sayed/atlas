@@ -3,7 +3,7 @@
 - Before frontend work, read `planning/context/design-reference.md`. The approved visual source is ignored `.local/design/atlas.penpot`; if absent, ask the owner for its local path. Extract only assets needed by the selected task; no gallery or full export is required. Reviewed API/SQLite knowledge, not design examples, supplies product facts.
 
 - Atlas is one React/TypeScript/Vite frontend with a local NestJS API and SQLite knowledge store. Keep `planning/` as development context; do not import its raw briefs or reference images into the app or `public/`.
-- The app displays reviewed, implemented knowledge only. Do not infer current source-product behavior from fixture content, old Atlas content, or a passing build. Keep fixtures and historical snapshots explicitly labelled.
+- The app displays reviewed current knowledge only. Do not infer current source-product behavior from fixture content, old Atlas content, or a passing build. Keep fixtures explicitly labelled; source-product history is not an Atlas browsing feature.
 - The independent `fill-atlas` skill and template are maintained in `.agents/skills/fill-atlas/`. It produces source-context Markdown and stops; it does not modify Atlas source or run in the browser.
 - The separate `.agents/skills/update-atlas/` workflow prepares supported visual choices and incorporates reviewed knowledge through the API. Keep its portable references consistent with the shared contracts. Normal storage starts empty; fixtures and skill tests use separate storage. Unsupported source behavior is a renderer gap, not permission to invent a navigation case.
 - Keep persisted product facts in SQLite via shared strict Zod contracts; `src/content/` contains API loading and pure view helpers, with presentation in scenes/components. Add only boundaries needed by a real activity; avoid a generic content engine.
@@ -12,6 +12,6 @@
 - Keep all changes within the task graph scope. T002 migrates the delivered booking fixture to the local data platform; T003 owns second-project exploration.
 - `server/` owns the NestJS API and SQLite access; `shared/` owns strict versioned Zod contracts and pure scene helpers. `fixtures/` is demo-only and must never be imported by browser runtime code. SQL migrations are tracked in `migrations/`.
 - Keep `.local/` and `.env` private and ignored. Tests must use temporary storage. Bind loopback; require the local write token and validate Host/Origin. Serve registered images only, never storage directories.
-- Before changing migrations, verify nonempty upgrades and backup/restore. Preserve omitted features, scoped references, immutable history, revision conflicts and transactional rollback.
+- Before changing migrations, verify nonempty upgrades and backup/restore. Preserve omitted features, scoped references, revision conflicts and transactional rollback.
 - `npm run validate` runs all required checks plus artifact and production restart/shutdown smoke checks. Run backend integration/API tests against the real production SQLite binding. Security scanning stays in separate CI jobs.
 - Atlas's source repository is public but remains all rights reserved, with no open-source license selected. Keep local knowledge and credentials private; do not select a license or publish release artifacts without the owner's decision.
