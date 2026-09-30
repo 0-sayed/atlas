@@ -146,15 +146,17 @@ export function KnowledgePage({
                 <h2>
                   {info.label === 'Rules' ? 'Product rules' : 'Saved journeys'}
                 </h2>
-                {matches.map((r) => (
-                  <Link
-                    key={r.id}
-                    to={select(r.id)}
-                    aria-current={selected === r.id ? 'true' : undefined}
-                  >
-                    {name(r)}
-                  </Link>
-                ))}
+                {records
+                  .filter((r) => matches.includes(r) || r.id === selected)
+                  .map((r) => (
+                    <Link
+                      key={r.id}
+                      to={select(r.id)}
+                      aria-current={selected === r.id ? 'true' : undefined}
+                    >
+                      {name(r)}
+                    </Link>
+                  ))}
               </aside>
             )}
             <div className="knowledge-records">

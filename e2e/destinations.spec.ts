@@ -263,3 +263,34 @@ test('legacy specialized activities retain supporting destination return state',
   await page.getByRole('link', { name: 'Back to Actors', exact: true }).click()
   await expect(page.getByRole('searchbox')).toHaveValue('Courier')
 })
+
+test('directly selected rules and journeys remain in their index when search does not match', async ({
+  page,
+  request,
+}, info) => {
+  const id = `selected-index-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: { ...authoredSeed, id },
+      })
+    ).status(),
+  ).toBe(201)
+  for (const [destination, label, record] of [
+    ['rules', 'Checklist complete', 'complete'],
+    ['journeys', 'Parcel handoff', 'delivery'],
+  ]) {
+    await page.goto(
+      `/#/projects/${id}/${destination}?q=unmatched&item=${record}`,
+    )
+    await expect(
+      page.getByRole('heading', { name: label, exact: true }),
+    ).toBeVisible()
+    const index = page.locator('.knowledge-index')
+    await expect(
+      index.getByRole('link', { name: label, exact: true }),
+    ).toHaveAttribute('aria-current', 'true')
+    await expect(index.getByRole('link')).toHaveCount(1)
+  }
+})
