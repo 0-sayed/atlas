@@ -4,6 +4,66 @@ import { authoredFeature, authoredSeed } from '../fixtures/authored'
 const headers = {
   authorization: 'Bearer e2e-only-token-not-a-production-secret',
 }
+test('authored outcome, conditions and steps remain separated at desktop and narrow widths', async ({
+  page,
+  request,
+}) => {
+  const id = 'authored-spacing'
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: { ...authoredSeed, id },
+      })
+    ).status(),
+  ).toBe(201)
+  for (const width of [1440, 375]) {
+    await page.setViewportSize({ width, height: 1000 })
+    for (const selected of ['ready', 'incomplete', 'unknown', 'conflict']) {
+      await page.goto(`/#/projects/${id}/explore/handoff?case=${selected}`)
+      await expect(page.getByRole('status')).toBeVisible()
+      await page.evaluate(() => document.fonts.ready)
+      const scene = page.locator('.authored-scene')
+      const outcome = scene.getByRole('status')
+      const conditions = scene.getByRole('heading', {
+        name: 'Conditions in this case',
+        exact: true,
+      })
+      const steps = scene.getByRole('heading', {
+        name: 'Recorded steps',
+        exact: true,
+      })
+      const outcomeBox = (await outcome.boundingBox())!
+      const conditionsBox = (await conditions.boundingBox())!
+      const listBox = (await scene
+        .locator('.authored-conditions')
+        .boundingBox())!
+      const stepsBox = (await steps.boundingBox())!
+      expect(
+        conditionsBox.y - (outcomeBox.y + outcomeBox.height),
+      ).toBeGreaterThanOrEqual(16)
+      expect(
+        listBox.y - (conditionsBox.y + conditionsBox.height),
+      ).toBeGreaterThanOrEqual(8)
+      expect(stepsBox.y - (listBox.y + listBox.height)).toBeGreaterThanOrEqual(
+        16,
+      )
+      const iconBox = (await outcome.locator('.atlas-icon').boundingBox())!
+      const labelBox = (await outcome.locator('.eyebrow').boundingBox())!
+      expect(
+        Math.abs(
+          iconBox.y + iconBox.height / 2 - labelBox.y - labelBox.height / 2,
+        ),
+      ).toBeLessThanOrEqual(1)
+      expect(labelBox.x - (iconBox.x + iconBox.width)).toBeGreaterThanOrEqual(8)
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true)
+    }
+  }
+})
 test('authored relationships retain Explore filters and discard another feature case', async ({
   page,
   request,
