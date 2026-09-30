@@ -232,6 +232,26 @@ test('camera, background dragging, focus, selected relationships and Back share 
   )
   await page.getByRole('button', { name: 'Zoom in', exact: true }).click()
   const remembered = await canvas.getAttribute('data-camera')
+  // Selecting another preview must preserve the live camera once layout settles.
+  await page.evaluate(() => {
+    const next = new URL(window.location.href)
+    next.hash = next.hash.replace(
+      'selected=activity-001',
+      'selected=activity-002',
+    )
+    window.location.hash = next.hash
+  })
+  await expect(page).toHaveURL(/selected=activity-002/)
+  await expect(
+    page.getByRole('heading', { name: 'Parcel activity 002', exact: true }),
+  ).toBeVisible()
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+      }),
+  )
+  await expect(canvas).toHaveAttribute('data-camera', remembered!)
   await page.getByRole('link', { name: 'Open activity', exact: true }).click()
   await page.goBack()
   await expect(

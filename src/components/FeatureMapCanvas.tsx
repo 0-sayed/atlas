@@ -43,6 +43,7 @@ export function FeatureMapCanvas({
     saved.camera ?? { positionX: 0, positionY: 0, scale: 1 },
   )
   const [size, setSize] = useState({ width: 1, height: 600 })
+  const initialized = useRef(false)
   const ref = useRef<ReactZoomPanPinchRef>(null)
   const region = useRef<HTMLDivElement>(null)
   const world = useRef<HTMLDivElement>(null)
@@ -68,7 +69,7 @@ export function FeatureMapCanvas({
     return () => observer.disconnect()
   }, [])
   useEffect(() => {
-    if (size.width <= 1) return
+    if (size.width <= 1 || initialized.current) return
     if (saved.camera) {
       const changed =
         saved.nodes &&
@@ -95,6 +96,7 @@ export function FeatureMapCanvas({
       if (!changed || visible) return
     }
     const frame = requestAnimationFrame(() => {
+      initialized.current = true
       void ref.current?.fitToView({ animationTime: 0 })
     })
     return () => cancelAnimationFrame(frame)
