@@ -42,6 +42,16 @@ test('six destinations omit repeated source blocks and keep shared sources avail
     await expect(sources.locator('.project-source')).toHaveCount(3)
     const url = page.url()
     await sources.locator('summary').click()
+    const rows = await sources
+      .locator('summary, .project-source')
+      .evaluateAll((elements) =>
+        elements.map((element) => {
+          const box = element.getBoundingClientRect()
+          return { top: box.top, bottom: box.bottom }
+        }),
+      )
+    for (let i = 1; i < rows.length; i++)
+      expect(rows[i].top).toBeGreaterThanOrEqual(rows[i - 1].bottom)
     await expect(page).toHaveURL(url)
     await expect(
       sources.locator('[data-source-id="source"]').getByRole('heading', {
