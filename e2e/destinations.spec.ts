@@ -7,7 +7,7 @@ test('six destinations show explicit facts, evidence and ordered repeated journe
   page,
   request,
 }, info) => {
-  const id = 'destinations-saved'
+  const id = `destinations-saved-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   expect(
     (
       await request.post('/api/v1/projects', {
@@ -82,8 +82,8 @@ test('six destinations show explicit facts, evidence and ordered repeated journe
 test('Start here shows saved purpose and evidence even before activities exist', async ({
   page,
   request,
-}) => {
-  const id = 'purpose-only'
+}, info) => {
+  const id = `purpose-only-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   expect(
     (
       await request.post('/api/v1/projects', {
@@ -121,8 +121,8 @@ test('Start here shows saved purpose and evidence even before activities exist',
 test('each supporting destination is honest when records are absent and rejects foreign selections', async ({
   page,
   request,
-}) => {
-  const id = 'destinations-empty'
+}, info) => {
+  const id = `destinations-empty-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   expect(
     (
       await request.post('/api/v1/projects', {
@@ -163,7 +163,7 @@ test('search, direct links, long facts and conflicting support survive Back with
   page,
   request,
 }, info) => {
-  const id = 'destinations-long'
+  const id = `destinations-long-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   expect(
     (
       await request.post('/api/v1/projects', {
@@ -226,7 +226,22 @@ test('search, direct links, long facts and conflicting support survive Back with
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true)
-  await page.goto('/#/projects/destinations-empty/glossary')
+  const emptyId = id + '-empty'
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: {
+          contractVersion: 2,
+          id: emptyId,
+          title: 'Empty destination',
+          features: [],
+          relations: [],
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.goto(`/#/projects/${emptyId}/glossary`)
   await expect(
     page.getByRole('heading', { name: 'Unreferenced term', exact: true }),
   ).toHaveCount(0)
@@ -234,9 +249,9 @@ test('search, direct links, long facts and conflicting support survive Back with
 test('legacy specialized activities retain supporting destination return state', async ({
   page,
   request,
-}) => {
+}, info) => {
   const { navigationFeature } = await import('../fixtures/navigation')
-  const id = 'destinations-specialized'
+  const id = `destinations-specialized-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   expect(
     (
       await request.post('/api/v1/projects', {

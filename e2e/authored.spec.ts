@@ -7,8 +7,8 @@ const headers = {
 test('authored outcome, conditions and steps remain separated at desktop and narrow widths', async ({
   page,
   request,
-}) => {
-  const id = 'authored-spacing'
+}, info) => {
+  const id = `authored-spacing-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   expect(
     (
       await request.post('/api/v1/projects', {
@@ -67,8 +67,8 @@ test('authored outcome, conditions and steps remain separated at desktop and nar
 test('authored relationships retain Explore filters and discard another feature case', async ({
   page,
   request,
-}) => {
-  const id = 'authored-related-browser'
+}, info) => {
+  const id = `authored-related-browser-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   const next = {
     ...authoredFeature,
     id: 'next-handoff',
@@ -117,7 +117,7 @@ test('authored cases round-trip actors, conditions, outcome, evidence, direct li
   page,
   request,
 }, testInfo) => {
-  const id = 'authored-browser'
+  const id = `authored-browser-${testInfo.parallelIndex}-${testInfo.retry}-${testInfo.repeatEachIndex}`
   const created = await request.post('/api/v1/projects', {
     headers,
     data: { ...authoredSeed, id },
@@ -216,8 +216,8 @@ test('authored cases round-trip actors, conditions, outcome, evidence, direct li
 test('sparse and long authored facts stay explicit and project scoped', async ({
   page,
   request,
-}) => {
-  const id = 'authored-sparse'
+}, info) => {
+  const id = `authored-sparse-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   const feature = {
     ...authoredFeature,
     title: 'x'.repeat(160),
@@ -267,7 +267,16 @@ test('sparse and long authored facts stay explicit and project scoped', async ({
   await expect(
     page.getByRole('heading', { name: 'This guide is not here yet' }),
   ).toBeVisible()
-  await page.goto('/#/projects/authored-browser/explore/handoff?case=ready')
+  const otherId = id + '-other'
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: { ...authoredSeed, id: otherId },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.goto(`/#/projects/${otherId}/explore/handoff?case=ready`)
   await expect(
     page.getByRole('heading', { name: 'Parcel handed over', exact: true }),
   ).toBeVisible()
@@ -284,7 +293,7 @@ test('160 activities remain reachable by search within the local browser budget'
   page,
   request,
 }, testInfo) => {
-  const id = 'authored-capacity-browser'
+  const id = `authored-capacity-browser-${testInfo.parallelIndex}-${testInfo.retry}-${testInfo.repeatEachIndex}`
   const features = Array.from({ length: 160 }, (_, i) => ({
     ...authoredFeature,
     id: `activity-${i + 1}`,
@@ -353,7 +362,7 @@ test('registered art failure preserves authored outcomes and long content stays 
   page,
   request,
 }, testInfo) => {
-  const id = 'authored-art-browser'
+  const id = `authored-art-browser-${testInfo.parallelIndex}-${testInfo.retry}-${testInfo.repeatEachIndex}`
   const feature = {
     ...authoredFeature,
     steps: authoredFeature.steps.map((s) => ({
@@ -447,8 +456,8 @@ test('registered art failure preserves authored outcomes and long content stays 
 test('one unchanged authored renderer explains a second domain from saved facts', async ({
   page,
   request,
-}) => {
-  const id = 'support-domain-demo'
+}, info) => {
+  const id = `support-domain-demo-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   const source = {
     ...authoredSeed,
     id,
@@ -525,7 +534,16 @@ test('one unchanged authored renderer explains a second domain from saved facts'
       .first(),
   ).toBeVisible()
   await expect(page.getByText('Dispatcher', { exact: true })).toHaveCount(0)
-  await page.goto('/#/projects/authored-browser/explore/handoff?case=ready')
+  const otherId = id + '-other'
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: { ...authoredSeed, id: otherId },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.goto(`/#/projects/${otherId}/explore/handoff?case=ready`)
   await expect(
     page.getByRole('heading', { name: 'Parcel handed over', exact: true }),
   ).toBeVisible()

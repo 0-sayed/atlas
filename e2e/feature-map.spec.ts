@@ -267,7 +267,9 @@ test('camera, background dragging, focus, selected relationships and Back share 
 test('refresh retains existing slots through additions and removals and isolates identical IDs', async ({
   page,
   request,
-}) => {
+}, info) => {
+  const projectId = `map-stable-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
+  const otherId = projectId + '-other'
   const features = Array.from({ length: 4 }, (_, i) => ({
     ...authoredFeature,
     id: 'stable-' + i,
@@ -284,11 +286,11 @@ test('refresh retains existing slots through additions and removals and isolates
     (
       await request.post('/api/v1/projects', {
         headers,
-        data: { ...seed, id: 'map-stable' },
+        data: { ...seed, id: projectId },
       })
     ).status(),
   ).toBe(201)
-  await page.goto('/#/projects/map-stable/map?group=area%3Adispatch')
+  await page.goto(`/#/projects/${projectId}/map?group=area%3Adispatch`)
   const positions = () =>
     page
       .locator('.map-node')
@@ -308,7 +310,7 @@ test('refresh retains existing slots through additions and removals and isolates
     .getAttribute('data-camera')
   expect(
     (
-      await request.post('/api/v1/projects/map-stable/changes', {
+      await request.post(`/api/v1/projects/${projectId}/changes`, {
         headers,
         data: {
           contractVersion: 2,
@@ -336,7 +338,7 @@ test('refresh retains existing slots through additions and removals and isolates
   for (const id of ['stable-1', 'stable-2', 'stable-3'])
     expect(after[id]).toEqual(before[id])
   await page.goto(
-    '/#/projects/map-stable/map?group=area%3Adispatch&selected=stable-0',
+    `/#/projects/${projectId}/map?group=area%3Adispatch&selected=stable-0`,
   )
   await expect(
     page.getByText('This map location is unavailable.', { exact: true }),
@@ -347,13 +349,13 @@ test('refresh retains existing slots through additions and removals and isolates
         headers,
         data: {
           ...seed,
-          id: 'map-identical',
+          id: otherId,
           title: 'Separate project with identical IDs',
         },
       })
     ).status(),
   ).toBe(201)
-  await page.goto('/#/projects/map-identical/map?group=area%3Adispatch')
+  await page.goto(`/#/projects/${otherId}/map?group=area%3Adispatch`)
   await expect(
     page.getByRole('region', { name: 'Interactive feature map' }),
   ).not.toHaveAttribute('data-camera', camera!)
@@ -366,8 +368,9 @@ test('refresh retains existing slots through additions and removals and isolates
 test('empty, no results, missing group/selection and cross-project camera stay honest', async ({
   page,
   request,
-}) => {
-  const other = 'map-empty'
+}, info) => {
+  const other = `map-empty-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
+  const otherProjectId = other + '-project'
   expect(
     (
       await request.post('/api/v1/projects', {
@@ -407,11 +410,11 @@ test('empty, no results, missing group/selection and cross-project camera stay h
     (
       await request.post('/api/v1/projects', {
         headers,
-        data: { ...authoredSeed, id: 'map-other' },
+        data: { ...authoredSeed, id: otherProjectId },
       })
     ).status(),
   ).toBe(201)
-  await page.goto('/#/projects/map-other/map')
+  await page.goto(`/#/projects/${otherProjectId}/map`)
   await expect(
     page.getByRole('region', { name: 'Interactive feature map' }),
   ).not.toHaveAttribute('data-camera', camera!)
@@ -454,7 +457,7 @@ test('Tab traversal keeps complete long labels visible and minimap aligned witho
   page,
   request,
 }, info) => {
-  const projectId = `map-tab-${info.repeatEachIndex}`
+  const projectId = `map-tab-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   const title = 'W'.repeat(160)
   expect(
     (
@@ -556,6 +559,7 @@ test('long labels fit their surfaces with loaded native art and fonts at desktop
   page,
   request,
 }, info) => {
+  const projectId = `map-long-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
   const long = 'x'.repeat(160)
   expect(
     (
@@ -563,7 +567,7 @@ test('long labels fit their surfaces with loaded native art and fonts at desktop
         headers,
         data: {
           ...authoredSeed,
-          id: 'map-long',
+          id: projectId,
           features: Array.from({ length: 6 }, (_, i) => ({
             ...authoredFeature,
             id: i ? 'long-' + i : authoredFeature.id,
@@ -574,7 +578,7 @@ test('long labels fit their surfaces with loaded native art and fonts at desktop
       })
     ).status(),
   ).toBe(201)
-  await page.goto('/#/projects/map-long/map')
+  await page.goto(`/#/projects/${projectId}/map`)
   await page.getByRole('button', { name: 'Open ' + long, exact: true }).click()
   const node = page.getByRole('button', { name: long, exact: true }).first()
   await node.focus()
@@ -617,7 +621,7 @@ test('long labels fit their surfaces with loaded native art and fonts at desktop
       ),
   ).toBe(true)
   await page.screenshot({
-    path: info.outputPath('map-long.png'),
+    path: info.outputPath(`${projectId}.png`),
     fullPage: true,
   })
   await page.setViewportSize({ width: 375, height: 800 })
