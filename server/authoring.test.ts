@@ -3,6 +3,9 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { capabilities } from '../shared/capabilities.js'
 import { expect, it } from 'vitest'
 import { createApp } from './app.js'
 import { authoredFeature, authoredSeed } from '../fixtures/authored.js'
@@ -69,6 +72,32 @@ it('copied preflight rejects an oversized projected current document before any 
         { cwd: dir },
       ),
     ).rejects.toThrow(/document.*bytes/i)
+    expect(store.read(before.id)).toEqual(before)
+    const whitespaceFeatures = features.slice(280).map((feature) => ({
+      ...feature,
+      steps: feature.steps.map((step) => ({
+        ...step,
+        description: ' '.repeat(3999) + 'x',
+      })),
+    }))
+    const normalized = validateDocument({
+      ...before,
+      revision: before.revision + 1,
+      features: [...before.features, ...whitespaceFeatures],
+    })
+    writeFileSync(
+      changes,
+      JSON.stringify({ ...payload, upsertFeatures: whitespaceFeatures }),
+    )
+    const whitespaceFit = await exec(
+      process.execPath,
+      [script, 'http://127.0.0.1:4386', changes, before.id],
+      { cwd: dir },
+    )
+    expect(JSON.parse(whitespaceFit.stdout)).toMatchObject({
+      fit: 'supported',
+      projectedDocumentBytes: Buffer.byteLength(JSON.stringify(normalized)),
+    })
     expect(store.read(before.id)).toEqual(before)
     const removalIds = before.features.slice(0, 50).map((f) => f.id)
     writeFileSync(
@@ -234,6 +263,48 @@ it('runs the independently copied skill preflight and example against advertised
     expect(authoredSeed.features[0].evidence.status).toBe('demo')
   } finally {
     await app.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+it('portable preflight rejects incomplete capability and limit advertisements', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'atlas-capability-shape-'))
+  cpSync(resolve('.agents/skills/update-atlas'), join(dir, 'skill'), {
+    recursive: true,
+  })
+  let advertised: unknown = capabilities
+  const server = createServer((req, res) => {
+    res.setHeader('content-type', 'application/json')
+    if (req.url === '/api/v1/capabilities') res.end(JSON.stringify(advertised))
+    else {
+      res.statusCode = 404
+      res.end('{}')
+    }
+  })
+  try {
+    await new Promise<void>((done) => server.listen(0, '127.0.0.1', done))
+    const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
+    const script = join(dir, 'skill', 'scripts', 'preflight.mjs')
+    const input = join(dir, 'payload.json')
+    writeFileSync(input, JSON.stringify(authoredSeed))
+    for (const patch of [
+      { limits: {} },
+      { limits: { ...capabilities.limits, requestBytes: 'large' } },
+      { limits: { ...capabilities.limits, documentBytes: null } },
+      { readContractVersion: undefined },
+      { relationshipKinds: undefined },
+      { visual: {} },
+      { scenes: [{ kind: 'authored' }] },
+    ]) {
+      advertised = { ...capabilities, ...patch }
+      await expect(
+        exec(process.execPath, [script, base, input], { cwd: dir }),
+      ).rejects.toThrow(/Unsupported capabilities response/)
+    }
+  } finally {
+    await new Promise<void>((done, fail) =>
+      server.close((error) => (error ? fail(error) : done())),
+    )
     rmSync(dir, { recursive: true, force: true })
   }
 })

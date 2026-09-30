@@ -38,13 +38,45 @@ export async function preflight(baseUrl, payload, projectId) {
       'Unsupported target: read-only capabilities unavailable; stop before writes',
     )
   const caps = await response.json()
+  const strings = (value) =>
+    Array.isArray(value) && value.every((item) => typeof item === 'string')
+  const versions = (value) =>
+    Array.isArray(value) &&
+    value.every((item) => Number.isSafeInteger(item) && item > 0)
+  const positiveLimit = (key) =>
+    Number.isSafeInteger(caps?.limits?.[key]) && caps.limits[key] > 0
   if (
-    caps.capabilitiesVersion !== 1 ||
-    !Array.isArray(caps.writeContractVersions) ||
+    caps?.capabilitiesVersion !== 1 ||
+    caps.readContractVersion !== 2 ||
+    !versions(caps.writeContractVersions) ||
     !Array.isArray(caps.scenes) ||
-    !Array.isArray(caps.records) ||
-    !caps.visual ||
-    !caps.limits
+    !caps.scenes.every(
+      (scene) =>
+        scene &&
+        typeof scene.kind === 'string' &&
+        versions(scene.versions) &&
+        versions(scene.contractVersions),
+    ) ||
+    !strings(caps.records) ||
+    !strings(caps.relationshipKinds) ||
+    typeof caps.visual?.presentation !== 'boolean' ||
+    typeof caps.visual?.registeredRasterAssets !== 'boolean' ||
+    !strings(caps.visual?.illustrations) ||
+    !strings(caps.visual?.accents) ||
+    ![
+      'writeFeatures',
+      'writeRelations',
+      'writeRecords',
+      'projectFeatures',
+      'projectRelations',
+      'projectEvidence',
+      'projectRecords',
+      'projectAssets',
+      'requestBytes',
+      'documentBytes',
+    ].every(positiveLimit) ||
+    (caps.limits.legacyDocumentBytes !== undefined &&
+      !positiveLimit('legacyDocumentBytes'))
   )
     fail('Unsupported capabilities response version or shape')
   if (!caps.writeContractVersions.includes(payload.contractVersion))
@@ -194,6 +226,14 @@ export async function preflight(baseUrl, payload, projectId) {
     if (payload.purpose === null) delete projected.purpose
     else projected.purpose = payload.purpose
   }
+  // Text fields are trimmed by the server before persisted-capacity checks.
+  // Valid IDs and enum values already contain no surrounding whitespace.
+  const normalizedBytes = (value) =>
+    Buffer.byteLength(
+      JSON.stringify(value, (_, field) =>
+        typeof field === 'string' ? field.trim() : field,
+      ),
+    )
   // Match the advertised compatibility bound for exact legacy-only records.
   const legacyOnly =
     !projected.purpose &&
@@ -206,14 +246,14 @@ export async function preflight(baseUrl, payload, projectId) {
         !['actorIds', 'ruleIds', 'areaId', 'evidenceIds'].some(
           (key) => key in feature,
         ) &&
-        Buffer.byteLength(JSON.stringify(feature)) <= caps.limits.requestBytes,
+        normalizedBytes(feature) <= caps.limits.requestBytes,
     ) &&
     projected.relations.every(
       (relation) =>
         ['requires', 'related'].includes(relation.kind) &&
         !relation.evidenceIds,
     )
-  const documentBytes = Buffer.byteLength(JSON.stringify(projected))
+  const documentBytes = normalizedBytes(projected)
   const documentLimit = legacyOnly
     ? (caps.limits.legacyDocumentBytes ?? caps.limits.documentBytes)
     : caps.limits.documentBytes
