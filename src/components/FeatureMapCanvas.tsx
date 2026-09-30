@@ -68,12 +68,37 @@ export function FeatureMapCanvas({
     return () => observer.disconnect()
   }, [])
   useEffect(() => {
-    if (saved.camera) return
+    if (size.width <= 1) return
+    if (saved.camera) {
+      const changed =
+        saved.nodes &&
+        (saved.nodes.length !== layout.nodes.length ||
+          layout.nodes.some(
+            (node) =>
+              !saved.nodes!.some(
+                (old) =>
+                  old.id === node.id && old.x === node.x && old.y === node.y,
+              ),
+          ))
+      const view = visibleWorld(saved.camera, size, layout)
+      const visible =
+        view.width > 0 &&
+        view.height > 0 &&
+        layout.nodes.some(
+          (node) =>
+            node.x < view.x + view.width &&
+            node.x + layout.nodeWidth > view.x &&
+            node.y < view.y + view.height &&
+            node.y + layout.nodeHeight > view.y,
+        )
+      // Preserve intentional panning unless changed islands leave empty water.
+      if (!changed || visible) return
+    }
     const frame = requestAnimationFrame(() => {
       void ref.current?.fitToView({ animationTime: 0 })
     })
     return () => cancelAnimationFrame(frame)
-  }, [nodeHeight, saved.camera])
+  }, [layout, saved, size])
   useEffect(() => {
     const el = region.current!
     const observer = new ResizeObserver(() =>

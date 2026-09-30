@@ -25,7 +25,7 @@ export function FeatureMapPage() {
     selected = params.get('selected')
   const group = groups.find((g) => g.id === groupId)
   const list = params.get('view') === 'list'
-  const page = Number(params.get('page') ?? '1')
+  const requestedPage = Number(params.get('page') ?? '1')
   const filtered = searchFeatures(project, query).filter(
     (f) => !groupId || group?.features.some((x) => x.id === f.id),
   )
@@ -49,6 +49,18 @@ export function FeatureMapPage() {
   )
   const ordered = order.map((id) => items.find((i) => i.id === id)!)
   const pages = Math.max(1, Math.ceil(items.length / 6))
+  const selectedIndex = !overview && selected ? order.indexOf(selected) : -1
+  const page =
+    selectedIndex >= 0 && Number.isInteger(requestedPage) && requestedPage >= 1
+      ? Math.floor(selectedIndex / 6) + 1
+      : requestedPage
+  useEffect(() => {
+    if (page === requestedPage) return
+    const next = new URLSearchParams(params)
+    if (page === 1) next.delete('page')
+    else next.set('page', String(page))
+    setParams(next, { replace: true })
+  }, [page, requestedPage, params, setParams])
   const currentItems = ordered.slice((page - 1) * 6, page * 6)
   const memoryKey = scope + ':' + page
   const selectedFeature = selected

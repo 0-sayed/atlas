@@ -30,7 +30,9 @@ export function readMapMemory(key: string): MapMemory {
         (n) =>
           typeof n.id === 'string' &&
           Number.isFinite(n.x) &&
-          Number.isFinite(n.y),
+          Number.isFinite(n.y) &&
+          (n.slot === undefined ||
+            (Number.isSafeInteger(n.slot) && n.slot >= 0)),
       )
     )
       delete value.nodes

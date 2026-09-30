@@ -628,3 +628,132 @@ test('long labels fit their surfaces with loaded native art and fonts at desktop
     ),
   ).toBe(true)
 })
+
+test('changed maps recover a camera that no longer shows a remaining island', async ({
+  page,
+  request,
+}, info) => {
+  const id = `map-camera-recovery-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
+  const features = Array.from({ length: 6 }, (_, i) => ({
+    ...authoredFeature,
+    id: `recovery-${i}`,
+    title: `Recovery activity ${i}`,
+  }))
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: {
+          ...authoredSeed,
+          id,
+          features,
+          journeys: [],
+          glossary: [],
+          relations: [],
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.setViewportSize({ width: 1000, height: 1000 })
+  await page.goto(`/#/projects/${id}/map?group=area%3Adispatch`)
+  for (let i = 0; i < 5; i++)
+    await page.getByRole('button', { name: 'Zoom in', exact: true }).click()
+  await page
+    .getByRole('button', { name: 'Recovery activity 5', exact: true })
+    .focus()
+  const region = page.getByRole('region', { name: 'Interactive feature map' })
+  const savedCamera = await region.getAttribute('data-camera')
+  await page.reload()
+  await expect(region).toHaveAttribute('data-camera', savedCamera!)
+  expect(
+    (
+      await request.post(`/api/v1/projects/${id}/changes`, {
+        headers,
+        data: {
+          contractVersion: 2,
+          expectedRevision: 1,
+          removeFeatureIds: features.slice(1).map((f) => f.id),
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.reload()
+  await expect(page.locator('.map-node')).toHaveCount(1)
+  await expect
+    .poll(() =>
+      page.locator('.map-node').evaluateAll((nodes) =>
+        nodes.some((node) => {
+          const box = node.getBoundingClientRect(),
+            region = node.closest('.map-camera')!.getBoundingClientRect()
+          return (
+            box.right > region.left &&
+            box.left < region.right &&
+            box.bottom > region.top &&
+            box.top < region.bottom
+          )
+        }),
+      ),
+    )
+    .toBe(true)
+  await expect(region).not.toHaveAttribute('data-camera', savedCamera!)
+})
+test('removing an earlier activity reconciles the selected island with its current page', async ({
+  page,
+  request,
+}, info) => {
+  const id = `map-page-recovery-${info.parallelIndex}-${info.retry}-${info.repeatEachIndex}`
+  const features = Array.from({ length: 8 }, (_, i) => ({
+    ...authoredFeature,
+    id: `paged-${i}`,
+    title: `Paged activity ${i}`,
+  }))
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: {
+          ...authoredSeed,
+          id,
+          features,
+          journeys: [],
+          glossary: [],
+          relations: [
+            {
+              id: 'selection-link',
+              from: 'paged-6',
+              to: 'paged-5',
+              kind: 'related',
+            },
+          ],
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.goto(
+    `/#/projects/${id}/map?group=area%3Adispatch&page=2&selected=paged-6`,
+  )
+  await expect(
+    page.getByRole('button', { name: 'Paged activity 6', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  expect(
+    (
+      await request.post(`/api/v1/projects/${id}/changes`, {
+        headers,
+        data: {
+          contractVersion: 2,
+          expectedRevision: 1,
+          removeFeatureIds: ['paged-0'],
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.reload()
+  await expect(
+    page.getByRole('button', { name: 'Paged activity 6', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.map-relationship-layer line')).toHaveCount(1)
+  await expect(page).not.toHaveURL(/page=2/)
+  await expect(page.locator('.map-feature-preview')).toContainText(
+    'Paged activity 6',
+  )
+})
