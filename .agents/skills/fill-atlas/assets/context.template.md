@@ -21,6 +21,8 @@
 - Conditions: <preconditions, states, exact thresholds/operators/units, and restrictions; include configuration or time-zone scope where relevant> [E2]
 - Exceptions: <supported differences or explicitly unknown behavior> [E2; identify the evidence gap for unknowns]
 - Connections: <specific requires / blocks / triggers meaning, when established> [E2]
+- Ordered behavior, when established: <observable steps, participating actors at each step, and the evidence for their order; do not infer permissions or journey order from dependencies> [E1]
+- Optional shared context: <evidenced product purpose, meaningful areas, journey goals and ordered activities, and domain terms with definitions; omit unsupported context rather than filling a layout> [E1]
 
 ## Examples
 

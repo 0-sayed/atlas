@@ -30,7 +30,7 @@ export function AtlasSidebar({
                 end={item.path === '/'}
               >
                 <span className="sidebar-icon" aria-hidden="true">
-                  <AtlasIcon name={item.id === 'start' ? 'map' : 'compass'} />
+                  <AtlasIcon name={item.icon} />
                 </span>
                 {item.label}
               </NavLink>

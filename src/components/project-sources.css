@@ -1,0 +1,22 @@
+.project-sources {
+  margin-top: 32px;
+  padding: 16px 20px;
+  min-width: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.project-sources summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.project-source {
+  padding-block: 16px;
+  border-top: 1px solid var(--atlas-line);
+}
+.project-source h3,
+.project-source h4 {
+  margin: 0 0 8px;
+}
+.project-sources .source-status {
+  font-weight: 700;
+}

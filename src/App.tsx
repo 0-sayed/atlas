@@ -8,7 +8,10 @@ import { KnowledgeProvider } from './content/KnowledgeProvider'
 import { RefreshContext, useProject } from './content/knowledge'
 import { StartPage, ExplorePage, MissingPage } from './pages/GuidePages'
 import { FeaturePage } from './pages/FeaturePage'
+import { FeatureMapPage } from './pages/FeatureMapPage'
+import { KnowledgePage } from './pages/KnowledgePages'
 import { ProjectPicker } from './pages/ProjectPicker'
+import { ProjectSources } from './components/ProjectSources'
 
 function ProjectWorkspace() {
   const project = useProject()
@@ -30,9 +33,24 @@ function ProjectWorkspace() {
         <Routes>
           <Route index element={<StartPage />} />
           <Route path="explore" element={<ExplorePage />} />
+          <Route path="map" element={<FeatureMapPage />} />
+          <Route
+            path="actors"
+            element={<KnowledgePage destination="actors" />}
+          />
+          <Route path="rules" element={<KnowledgePage destination="rules" />} />
+          <Route
+            path="journeys"
+            element={<KnowledgePage destination="journeys" />}
+          />
+          <Route
+            path="glossary"
+            element={<KnowledgePage destination="glossary" />}
+          />
           <Route path="explore/:featureId" element={<FeaturePage />} />
           <Route path="*" element={<MissingPage />} />
         </Routes>
+        <ProjectSources />
       </div>
     </div>
   )

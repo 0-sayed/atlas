@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import type { Feature, ProjectDocument } from '../../shared/contracts'
 import { projectPath } from '../content/knowledge'
+import { ClaimEvidence } from '../components/ClaimEvidence'
 import { AtlasBadge } from '../components/AtlasPrimitives'
 import { AtlasActivityIcon, AtlasIcon } from '../components/AtlasIcon'
 import './island-overview.css'
@@ -37,8 +38,12 @@ export function IslandOverview({
           <div>
             <h1 id="page-title">Start here</h1>
             <p className="island-overview-deck">
-              Explore the saved activities that shape this guide.
+              {project.purpose?.text ??
+                'Explore the saved activities that shape this guide.'}
             </p>
+            {project.purpose && (
+              <ClaimEvidence ids={project.purpose.evidenceIds} />
+            )}
           </div>
           <p className="island-overview-count">
             <strong>{project.features.length}</strong> saved{' '}

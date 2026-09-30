@@ -1,0 +1,209 @@
+{
+  "contractVersion": 2,
+  "id": "logistics-demo",
+  "title": "Logistics Lab · synthetic",
+  "purpose": {
+    "text": "Explain illustrative parcel dispatch.",
+    "evidenceIds": ["source"]
+  },
+  "evidenceRecords": [
+    {
+      "id": "source",
+      "status": "demo",
+      "source": "Synthetic logistics specification",
+      "sourceRevision": "demo-1",
+      "scope": "Illustrative handoff only; no real-source claim",
+      "description": "Authored for isolated tests, not observed product behavior."
+    },
+    {
+      "id": "unverified",
+      "status": "uncertain",
+      "source": "Synthetic logistics specification",
+      "sourceRevision": "demo-1",
+      "scope": "Illustrative handoff only; no real-source claim",
+      "description": "Checklist state has not been established."
+    },
+    {
+      "id": "disagreement",
+      "status": "conflicting",
+      "source": "Synthetic logistics specification",
+      "sourceRevision": "demo-1",
+      "scope": "Illustrative handoff only; no real-source claim",
+      "description": "The inspected examples record incompatible outcomes."
+    }
+  ],
+  "actors": [
+    {
+      "id": "dispatcher",
+      "name": "Dispatcher",
+      "evidenceIds": ["source"]
+    },
+    {
+      "id": "courier",
+      "name": "Courier",
+      "description": "Receives the parcel in this example.",
+      "evidenceIds": ["source"]
+    }
+  ],
+  "rules": [
+    {
+      "id": "complete",
+      "title": "Checklist complete",
+      "statement": "All required checklist entries must be complete before handoff.",
+      "evidenceIds": ["source"]
+    }
+  ],
+  "areas": [
+    {
+      "id": "dispatch",
+      "title": "Dispatch",
+      "evidenceIds": ["source"]
+    }
+  ],
+  "journeys": [
+    {
+      "id": "delivery",
+      "title": "Parcel handoff",
+      "goal": "Transfer a prepared parcel to a courier.",
+      "steps": [
+        {
+          "featureId": "handoff",
+          "stepId": "prepare"
+        },
+        {
+          "featureId": "handoff",
+          "stepId": "receive"
+        }
+      ],
+      "evidenceIds": ["source"]
+    }
+  ],
+  "glossary": [
+    {
+      "id": "checklist",
+      "term": "Checklist",
+      "definition": "The recorded list of handoff prerequisites.",
+      "featureIds": ["handoff"],
+      "ruleIds": ["complete"],
+      "evidenceIds": ["source"]
+    }
+  ],
+  "features": [
+    {
+      "id": "handoff",
+      "title": "Hand off a parcel",
+      "actor": "Dispatcher and courier",
+      "purpose": "Explain the recorded parcel handoff and its checklist restriction.",
+      "group": "Dispatch",
+      "revisionLabel": "Synthetic example",
+      "evidence": {
+        "status": "demo",
+        "source": "Synthetic logistics specification",
+        "sourceRevision": "demo-1",
+        "scope": "Illustrative handoff only; no real-source claim",
+        "description": "Authored for isolated tests, not observed product behavior."
+      },
+      "evidenceIds": ["source"],
+      "assetIds": [],
+      "presentation": {
+        "illustration": "parcel",
+        "accent": "sage"
+      },
+      "scene": {
+        "kind": "authored",
+        "version": 1
+      },
+      "actorIds": ["dispatcher", "courier"],
+      "ruleIds": ["complete"],
+      "areaId": "dispatch",
+      "steps": [
+        {
+          "id": "prepare",
+          "title": "Prepare the parcel",
+          "description": "The dispatcher checks the recorded checklist.",
+          "actorIds": ["dispatcher"],
+          "ruleIds": ["complete"],
+          "evidenceIds": ["source"]
+        },
+        {
+          "id": "receive",
+          "title": "Receive the parcel",
+          "description": "The courier receives the prepared parcel.",
+          "actorIds": ["courier"],
+          "ruleIds": [],
+          "evidenceIds": ["source"]
+        }
+      ],
+      "cases": [
+        {
+          "id": "ready",
+          "label": "Complete handoff",
+          "stepIds": ["prepare", "receive"],
+          "conditions": [
+            {
+              "ruleId": "complete",
+              "state": "met"
+            }
+          ],
+          "outcome": {
+            "status": "allowed",
+            "result": "Parcel handed over",
+            "reason": "The required checklist is complete."
+          },
+          "evidenceIds": ["source"]
+        },
+        {
+          "id": "incomplete",
+          "label": "Incomplete handoff",
+          "stepIds": ["prepare"],
+          "conditions": [
+            {
+              "ruleId": "complete",
+              "state": "not-met"
+            }
+          ],
+          "outcome": {
+            "status": "blocked",
+            "result": "Handoff stopped",
+            "reason": "The required checklist is incomplete."
+          },
+          "evidenceIds": ["source"]
+        },
+        {
+          "id": "unknown",
+          "label": "Unverified handoff",
+          "stepIds": [],
+          "conditions": [
+            {
+              "ruleId": "complete",
+              "state": "unknown"
+            }
+          ],
+          "outcome": {
+            "status": "unknown",
+            "result": "Handoff outcome not established"
+          },
+          "evidenceIds": ["unverified"]
+        },
+        {
+          "id": "conflict",
+          "label": "Conflicting handoff",
+          "stepIds": ["prepare"],
+          "conditions": [
+            {
+              "ruleId": "complete",
+              "state": "conflicting"
+            }
+          ],
+          "outcome": {
+            "status": "conflicting",
+            "result": "Conflicting recorded outcomes",
+            "reason": "The inspected examples disagree; no single outcome is established."
+          },
+          "evidenceIds": ["disagreement"]
+        }
+      ]
+    }
+  ],
+  "relations": []
+}

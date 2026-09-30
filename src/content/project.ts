@@ -1,25 +1,54 @@
+import type { AtlasIconName } from '../components/AtlasIcon'
+export type DestinationId =
+  'start' | 'map' | 'journeys' | 'actors' | 'rules' | 'glossary'
 export type Destination = {
-  id: 'start' | 'explore'
-  path: '/' | '/explore'
+  id: DestinationId
+  path: string
   label: string
   description: string
-  state: 'fixture'
+  icon: AtlasIconName
 }
-
 export const destinations: readonly Destination[] = [
   {
     id: 'start',
     path: '/',
     label: 'Start here',
-    description: 'A place to begin exploring a product through visual stories.',
-    state: 'fixture',
+    description: 'What this project lets people accomplish.',
+    icon: 'map',
   },
   {
-    id: 'explore',
-    path: '/explore',
-    label: 'Explore',
-    description:
-      'Explore the illustrative booking activity and its saved cases.',
-    state: 'fixture',
+    id: 'map',
+    path: '/map',
+    label: 'Feature Map',
+    description: 'Recorded activities and their relationships.',
+    icon: 'compass',
+  },
+  {
+    id: 'journeys',
+    path: '/journeys',
+    label: 'User Journeys',
+    description: 'Authored paths towards a recorded goal.',
+    icon: 'link',
+  },
+  {
+    id: 'actors',
+    path: '/actors',
+    label: 'Actors',
+    description: 'Recorded roles and explicit participation.',
+    icon: 'people',
+  },
+  {
+    id: 'rules',
+    path: '/rules',
+    label: 'Rules',
+    description: 'Conditions that explain recorded behavior.',
+    icon: 'rule',
+  },
+  {
+    id: 'glossary',
+    path: '/glossary',
+    label: 'Glossary',
+    description: 'Saved product terms and their meanings.',
+    icon: 'book',
   },
 ]

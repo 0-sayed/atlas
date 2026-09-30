@@ -136,11 +136,14 @@ it('upgrades a nonempty v1 database and rejects a future schema', () => {
   store.create(seed)
   store.close()
   const old = new Database(join(dir, 'atlas.sqlite'))
+  old.exec(
+    'DROP TABLE knowledge_records; ALTER TABLE projects DROP COLUMN purpose; ALTER TABLE relations DROP COLUMN evidence_ids;',
+  )
   old.pragma('user_version = 1')
   old.close()
   store = new Store(dir)
   expect(store.read(seed.id).features).toEqual(seed.features)
-  expect(store.db.pragma('user_version', { simple: true })).toBe(3)
+  expect(store.db.pragma('user_version', { simple: true })).toBe(4)
   expect(
     store.db
       .prepare("SELECT name FROM sqlite_master WHERE name='history'")
@@ -157,6 +160,9 @@ it('upgrades every project beyond a public page and paginates without loss', () 
     store.create({ ...seed, id: `p-${String(n).padStart(3, '0')}` })
   store.close()
   const old = new Database(join(dir, 'atlas.sqlite'))
+  old.exec(
+    'DROP TABLE knowledge_records; ALTER TABLE projects DROP COLUMN purpose; ALTER TABLE relations DROP COLUMN evidence_ids;',
+  )
   old.pragma('user_version = 1')
   old.close()
   store = new Store(dir)

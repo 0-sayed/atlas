@@ -5,7 +5,9 @@ test('current guide destinations are reachable and Back restores the prior view'
 }) => {
   await page.goto('/#/projects/booking-demo/')
   await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await expect(
     page.getByRole('heading', { name: 'Browse recorded activities' }),
   ).toBeVisible()
@@ -80,10 +82,12 @@ test('navigation stays usable by keyboard and at narrow widths', async ({
   await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
   await page.setViewportSize({ width: 375, height: 800 })
   await expect(
-    page.getByRole('link', { name: 'Explore', exact: true }),
+    page.getByRole('link', { name: 'Search activities', exact: true }),
   ).toBeVisible()
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await expect(
     page.getByRole('heading', { name: 'Browse recorded activities' }),
   ).toBeVisible()

@@ -1,6 +1,7 @@
+import { featureReturn } from '../content/destinations'
 import { useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
-import { useBooking, useProject, projectPath } from '../content/knowledge'
+import { useBooking, useProject } from '../content/knowledge'
 import { FeatureEvidence } from '../components/FeatureDetail'
 import { RegisteredArt } from '../components/RegisteredArt'
 import {
@@ -20,7 +21,6 @@ export function BookingPage() {
     defaultCaseId,
   } = useBooking()
   const project = useProject()
-  const base = projectPath(project.id)
   const feature = project.features.find((f) => f.id === booking.id)!
   const [params, setParams] = useSearchParams()
   const location = useLocation()
@@ -31,13 +31,7 @@ export function BookingPage() {
   const detailTrigger = useRef<HTMLButtonElement>(null)
   if (!example && (requestedCaseId !== null || bookingCases.length > 0))
     return <MissingPage />
-  const origin = params.get('from')
-  const returnPath =
-    origin === 'start'
-      ? base
-      : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
-  const returnLabel =
-    origin === 'start' ? 'Back to Start here' : 'Back to Explore'
+  const back = featureReturn(project.id, params)
   return (
     <section
       className="booking-page recorded-case-page"
@@ -45,10 +39,10 @@ export function BookingPage() {
     >
       <Link
         className="back-link"
-        to={returnPath}
+        to={back.to}
         state={{ restorePosition: true }}
       >
-        {returnLabel}
+        Back to {back.label}
       </Link>
       <FixtureLabel feature={feature} />
       <div className="feature-heading">

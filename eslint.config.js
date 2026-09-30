@@ -10,6 +10,7 @@ export default tseslint.config(
       'dist',
       'dist-server',
       '.local',
+      '.superpowers',
       'coverage',
       'playwright-report',
       'test-results',
