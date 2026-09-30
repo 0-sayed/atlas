@@ -1,6 +1,8 @@
 import { expect, it } from 'vitest'
 import { authoredSeed } from '../fixtures/authored'
 import { validateDocument } from './contracts'
+import { navigationFeature } from '../fixtures/navigation'
+import { approvalFeature } from '../fixtures/approval'
 import { searchFeatures, featureGroup } from './exploration'
 it('finds explicit participants, conditions and steps without inventing domain labels', () => {
   const project = validateDocument({ ...authoredSeed, revision: 1, assets: [] })
@@ -22,4 +24,23 @@ it('finds explicit participants, conditions and steps without inventing domain l
       group: undefined,
     }),
   ).toBe('Activities')
+})
+
+it('finds legacy activities by their saved case actions, reasons and states', () => {
+  const project = validateDocument({
+    ...authoredSeed,
+    features: [navigationFeature, approvalFeature],
+    journeys: [],
+    glossary: [],
+    revision: 1,
+    assets: [],
+  })
+  expect(
+    searchFeatures(project, navigationFeature.cases[0].action).map(
+      (feature) => feature.id,
+    ),
+  ).toContain(navigationFeature.id)
+  expect(
+    searchFeatures(project, 'pending').map((feature) => feature.id),
+  ).toContain(approvalFeature.id)
 })

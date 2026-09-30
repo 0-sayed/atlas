@@ -32,7 +32,9 @@ export function searchFeatures(project: ProjectDocument, query: string) {
       feature.purpose,
       feature.actor,
       featureGroup(project, feature),
-      ...feature.cases.map((c) => c.label),
+      ...feature.cases.map((c) =>
+        isAuthoredFeature(feature) ? c.label : Object.values(c).join(' '),
+      ),
       ...(feature.actorIds ?? []).map((id) => actors.get(id)),
       ...(feature.ruleIds ?? []).map((id) => rules.get(id)),
       ...(isAuthoredFeature(feature)
