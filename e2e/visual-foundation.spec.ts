@@ -65,7 +65,9 @@ test('two saved projects share navigation but retain distinct live illustration 
     })
   expect(artBounds.subjectTop).toBeGreaterThanOrEqual(artBounds.frameTop)
   expect(artBounds.subjectBottom).toBeLessThanOrEqual(artBounds.frameBottom + 1)
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await expect(page).toHaveURL(new RegExp(`${skyId}/explore$`))
   await page.goBack()
   await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
@@ -167,7 +169,7 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
   await page.getByRole('button', { name: /Show more activities/ }).click()
   await expect(page.locator('.island-link')).toHaveCount(12)
   await expect(
-    page.getByRole('link', { name: 'Explore', exact: true }),
+    page.getByRole('link', { name: 'Search activities', exact: true }),
   ).toBeVisible()
   expect(
     await page
@@ -188,7 +190,9 @@ test('empty picker and 100 long activities remain usable at 375px', async ({
     path: testInfo.outputPath('visual-foundation-mobile.png'),
     fullPage: true,
   })
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await expect(page.locator('.activity-card')).toHaveCount(100)
   expect(
     await page.evaluate(
@@ -229,7 +233,9 @@ test('an explicitly selected essential activity alone appears on Start', async (
   await expect(
     page.getByText('Unmarked activity', { exact: true }),
   ).toHaveCount(0)
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await expect(
     page.getByRole('link', { name: 'Unmarked activity' }),
   ).toBeVisible()

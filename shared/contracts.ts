@@ -1,21 +1,28 @@
 import { z } from 'zod'
-export const idSchema = z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/)
+import {
+  idSchema,
+  text,
+  short,
+  revision,
+  evidenceSchema,
+  presentationSchema,
+  featureFields,
+} from './contract-fields.js'
+import {
+  authoredFeatureSchema,
+  bindings,
+  evidenceIds,
+  knowledgeFields,
+  knowledgeCreateFields,
+  knowledgeUpdateFields,
+} from './knowledge-contracts.js'
+import { documentByteLimit, limits } from './limits.js'
+import { validateKnowledge } from './knowledge-validation.js'
+export { idSchema, evidenceSchema, presentationSchema }
+export type { AuthoredFeature, EvidenceRecord } from './knowledge-contracts.js'
+export type Presentation = z.infer<typeof presentationSchema>
 export const projectListQuerySchema = z.strictObject({
   after: idSchema.optional(),
-})
-const text = z.string().trim().min(1).max(4000)
-const short = z.string().trim().min(1).max(160)
-const revision = z
-  .number()
-  .int()
-  .min(0)
-  .max(Number.MAX_SAFE_INTEGER - 1)
-export const evidenceSchema = z.strictObject({
-  status: z.enum(['demo', 'supported', 'uncertain']),
-  source: text,
-  sourceRevision: short,
-  scope: text,
-  description: text,
 })
 export const caseSchema = z.strictObject({
   id: idSchema,
@@ -25,23 +32,6 @@ export const caseSchema = z.strictObject({
   confirmed: z.boolean(),
   slot: z.enum(['free', 'occupied', 'unknown']),
 })
-export const presentationSchema = z.strictObject({
-  illustration: z.enum(['calendar', 'document', 'compass', 'parcel', 'people']),
-  accent: z.enum(['sky', 'sage', 'peach']),
-})
-export type Presentation = z.infer<typeof presentationSchema>
-const featureFields = {
-  id: idSchema,
-  title: short,
-  actor: short,
-  purpose: text,
-  group: short.optional(),
-  essentialOrder: z.number().int().min(0).max(100).optional(),
-  revisionLabel: short,
-  evidence: evidenceSchema,
-  assetIds: z.array(idSchema).max(20),
-  presentation: presentationSchema.optional(),
-}
 export const bookingFeatureSchema = z.strictObject({
   ...featureFields,
   scene: z.strictObject({ kind: z.literal('booking'), version: z.literal(1) }),
@@ -79,10 +69,16 @@ export const navigationFeatureSchema = z.strictObject({
   rules: z.array(text).max(20),
   cases: z.array(navigationCaseSchema).max(100),
 })
-export const featureSchema = z.union([
+const legacyFeatureSchema = z.union([
   bookingFeatureSchema,
   approvalFeatureSchema,
   navigationFeatureSchema,
+])
+export const featureSchema = z.union([
+  bookingFeatureSchema.extend(bindings),
+  approvalFeatureSchema.extend(bindings),
+  navigationFeatureSchema.extend(bindings),
+  authoredFeatureSchema,
 ])
 export const relationSchema = z.strictObject({
   id: idSchema,
@@ -95,24 +91,54 @@ export const assetSchema = z.strictObject({
   mediaType: z.enum(['image/png', 'image/jpeg', 'image/webp']),
   provenance: text,
 })
-export const createSchema = z.strictObject({
+const legacyCreateSchema = z.strictObject({
   contractVersion: z.literal(1),
   id: idSchema,
   title: short,
-  features: z.array(featureSchema).max(100),
+  features: z.array(legacyFeatureSchema).max(limits.writeFeatures),
   relations: z.array(relationSchema).max(200),
 })
-export const updateSchema = z.strictObject({
+const legacyUpdateSchema = z.strictObject({
   contractVersion: z.literal(1),
   expectedRevision: revision,
   title: short.optional(),
-  upsertFeatures: z.array(featureSchema).max(100).optional(),
+  upsertFeatures: z
+    .array(legacyFeatureSchema)
+    .max(limits.writeFeatures)
+    .optional(),
   removeFeatureIds: z.array(idSchema).max(100).optional(),
   upsertRelations: z.array(relationSchema).max(200).optional(),
   removeRelationIds: z.array(idSchema).max(200).optional(),
 })
+export const currentRelationSchema = relationSchema.extend({
+  kind: z.enum(['requires', 'related', 'blocks', 'triggers']),
+  evidenceIds: evidenceIds.optional(),
+})
+const currentCreateSchema = legacyCreateSchema.extend({
+  contractVersion: z.literal(2),
+  features: z.array(featureSchema).max(limits.writeFeatures),
+  relations: z.array(currentRelationSchema).max(limits.writeRelations),
+  ...knowledgeCreateFields,
+})
+const currentUpdateSchema = legacyUpdateSchema.extend({
+  contractVersion: z.literal(2),
+  upsertFeatures: z.array(featureSchema).max(limits.writeFeatures).optional(),
+  upsertRelations: z
+    .array(currentRelationSchema)
+    .max(limits.writeRelations)
+    .optional(),
+  ...knowledgeUpdateFields,
+})
+export const createSchema = z.discriminatedUnion('contractVersion', [
+  legacyCreateSchema,
+  currentCreateSchema,
+])
+export const updateSchema = z.discriminatedUnion('contractVersion', [
+  legacyUpdateSchema,
+  currentUpdateSchema,
+])
 export const uploadSchema = z.strictObject({
-  contractVersion: z.literal(1),
+  contractVersion: z.union([z.literal(1), z.literal(2)]),
   expectedRevision: revision,
   ...assetSchema.shape,
   base64: z
@@ -121,10 +147,24 @@ export const uploadSchema = z.strictObject({
     .max(1400000)
     .regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/),
 })
-export const documentSchema = createSchema.extend({
+const currentDocumentSchema = currentCreateSchema.extend({
+  ...knowledgeFields,
+  features: z.array(featureSchema).max(limits.projectFeatures),
+  relations: z.array(currentRelationSchema).max(limits.projectRelations),
   revision,
-  assets: z.array(assetSchema).max(200),
+  assets: z.array(assetSchema).max(limits.projectAssets),
 })
+export const documentSchema = z.union([
+  legacyCreateSchema
+    .extend({
+      revision,
+      assets: z.array(assetSchema).max(limits.projectAssets),
+    })
+    .transform((d) =>
+      currentDocumentSchema.parse({ ...d, contractVersion: 2 }),
+    ),
+  currentDocumentSchema,
+])
 export type Feature = z.infer<typeof featureSchema>
 export type BookingFeature = z.infer<typeof bookingFeatureSchema>
 export type ApprovalFeature = z.infer<typeof approvalFeatureSchema>
@@ -170,5 +210,17 @@ export function validateDocument(input: unknown): ProjectDocument {
   }
   if (doc.relations.some((r) => !features.has(r.from) || !features.has(r.to)))
     throw new Error('Invalid scoped feature reference')
+  validateKnowledge(doc)
+  const byteLimit = documentByteLimit(doc)
+  if (new TextEncoder().encode(JSON.stringify(doc)).byteLength > byteLimit)
+    throw new Error(
+      `Invalid project capacity: current document exceeds ${byteLimit / 1024 / 1024} MiB`,
+    )
   return doc
+}
+
+export function isAuthoredFeature(
+  feature: Feature,
+): feature is import('./knowledge-contracts.js').AuthoredFeature {
+  return feature.scene.kind === 'authored'
 }

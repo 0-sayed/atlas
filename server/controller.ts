@@ -12,13 +12,17 @@ import type { Response } from 'express'
 import { Store, DataError } from './store.js'
 import { idSchema, projectListQuerySchema } from '../shared/contracts.js'
 import { registerAsset, readAssetFile } from './assets.js'
+import { capabilities } from '../shared/capabilities.js'
 @Controller('api/v1')
 export class ApiController {
   constructor(@Inject(Store) private readonly store: Store) {}
   @Get('ready') ready() {
     if (!this.store.ready())
       throw new DataError(503, 'unavailable', 'Storage unavailable')
-    return { status: 'ready', contractVersion: 1 }
+    return { status: 'ready', contractVersion: 2 }
+  }
+  @Get('capabilities') capabilities() {
+    return capabilities
   }
   @Get('projects') list(@Query() query: unknown) {
     return this.store.list(projectListQuerySchema.parse(query).after)

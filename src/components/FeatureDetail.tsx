@@ -1,9 +1,16 @@
-import { Link } from 'react-router'
+import { originParams } from '../content/destinations'
+import { Link, useSearchParams } from 'react-router'
 import type { Feature } from '../../shared/contracts'
+import { relationshipLabel } from '../../shared/relationships'
+import { ClaimEvidence } from './ClaimEvidence'
 import { projectPath, useProject } from '../content/knowledge'
 
 export function FeatureEvidence({ feature }: { feature: Feature }) {
   const project = useProject()
+  const [params] = useSearchParams()
+  const origin = originParams(params)
+  const relatedParams = origin.params
+  if (params.has('from')) relatedParams.set('from', origin.origin)
   const relations = project.relations.filter(
     (r) => r.from === feature.id || r.to === feature.id,
   )
@@ -32,18 +39,16 @@ export function FeatureEvidence({ feature }: { feature: Feature }) {
               const other = project.features.find(
                 (f) => f.id === (outgoing ? r.to : r.from),
               )!
-              const label =
-                r.kind === 'requires'
-                  ? outgoing
-                    ? 'Requires'
-                    : 'Required by'
-                  : 'Related to'
+              const label = relationshipLabel(r.kind, outgoing)
               return (
                 <li key={r.id}>
                   {label}:{' '}
-                  <Link to={`${projectPath(project.id)}/explore/${other.id}`}>
+                  <Link
+                    to={`${projectPath(project.id)}/explore/${other.id}${relatedParams.size ? `?${relatedParams}` : ''}`}
+                  >
                     {other.title}
                   </Link>
+                  {r.evidenceIds && <ClaimEvidence ids={r.evidenceIds} />}
                 </li>
               )
             })}

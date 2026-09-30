@@ -25,7 +25,15 @@ export class DataError extends Error {
     super(message)
   }
 }
-export const SCHEMA_VERSION = 3
+export const SCHEMA_VERSION = 4
+const recordKeys = [
+  'evidenceRecords',
+  'actors',
+  'rules',
+  'areas',
+  'journeys',
+  'glossary',
+] as const
 export class Store {
   readonly db!: Database.Database
   private lock: number | undefined
@@ -59,7 +67,9 @@ export class Store {
                 ? '001-initial.sql'
                 : n === 2
                   ? '002-history.sql'
-                  : '003-current.sql'
+                  : n === 3
+                    ? '003-current.sql'
+                    : '004-knowledge.sql'
             this.db.exec(readFileSync(resolve('migrations', file), 'utf8'))
             this.db.pragma(`user_version = ${n}`)
           }
@@ -111,7 +121,8 @@ export class Store {
   }
   read(id: string): ProjectDocument {
     const p = this.db.prepare('SELECT * FROM projects WHERE id=?').get(id) as
-      { id: string; title: string; revision: number } | undefined
+      | { id: string; title: string; revision: number; purpose: string | null }
+      | undefined
     if (!p) throw new DataError(404, 'not_found', 'Project unavailable')
     const features = (
       this.db
@@ -120,45 +131,90 @@ export class Store {
     ).map((r) => JSON.parse(r.data) as Feature)
     const relations = this.db
       .prepare(
-        'SELECT id,source_id AS "from",target_id AS "to",kind FROM relations WHERE project_id=? ORDER BY id',
+        'SELECT id,source_id AS "from",target_id AS "to",kind,evidence_ids FROM relations WHERE project_id=? ORDER BY id',
       )
-      .all(id)
+      .all(id) as {
+      id: string
+      from: string
+      to: string
+      kind: string
+      evidence_ids: string | null
+    }[]
     const assets = this.db
       .prepare(
         'SELECT id,media_type AS mediaType,provenance FROM assets WHERE project_id=? ORDER BY id',
       )
       .all(id)
     return validateDocument({
-      contractVersion: 1,
-      ...p,
+      contractVersion: 2,
+      id: p.id,
+      title: p.title,
+      revision: p.revision,
+      ...(p.purpose !== null ? { purpose: JSON.parse(p.purpose) } : {}),
       features,
-      relations,
+      relations: relations.map(({ evidence_ids, ...r }) => ({
+        ...r,
+        ...(evidence_ids !== null
+          ? { evidenceIds: JSON.parse(evidence_ids) }
+          : {}),
+      })),
       assets,
+      ...Object.fromEntries(
+        recordKeys.map((kind) => [
+          kind,
+          (
+            this.db
+              .prepare(
+                'SELECT data FROM knowledge_records WHERE project_id=? AND kind=? ORDER BY id',
+              )
+              .all(id, kind) as { data: string }[]
+          ).map((row) => JSON.parse(row.data)),
+        ]),
+      ),
     })
   }
   private save(doc: ProjectDocument) {
     this.db.prepare('DELETE FROM relations WHERE project_id=?').run(doc.id)
     this.db.prepare('DELETE FROM features WHERE project_id=?').run(doc.id)
+    const insertFeature = this.db.prepare('INSERT INTO features VALUES (?,?,?)')
+    const insertCase = this.db.prepare('INSERT INTO cases VALUES (?,?,?,?)')
+    const insertAsset = this.db.prepare(
+      'INSERT INTO feature_assets VALUES (?,?,?)',
+    )
     for (const f of doc.features) {
-      this.db
-        .prepare('INSERT INTO features VALUES (?,?,?)')
-        .run(doc.id, f.id, JSON.stringify(f))
+      insertFeature.run(doc.id, f.id, JSON.stringify(f))
       for (const c of f.cases)
-        this.db
-          .prepare('INSERT INTO cases VALUES (?,?,?,?)')
-          .run(doc.id, f.id, c.id, JSON.stringify(c))
-      for (const a of f.assetIds)
-        this.db
-          .prepare('INSERT INTO feature_assets VALUES (?,?,?)')
-          .run(doc.id, f.id, a)
+        insertCase.run(doc.id, f.id, c.id, JSON.stringify(c))
+      for (const a of f.assetIds) insertAsset.run(doc.id, f.id, a)
     }
     for (const r of doc.relations)
       this.db
-        .prepare('INSERT INTO relations VALUES (?,?,?,?,?)')
-        .run(doc.id, r.id, r.from, r.to, r.kind)
+        .prepare('INSERT INTO relations VALUES (?,?,?,?,?,?)')
+        .run(
+          doc.id,
+          r.id,
+          r.from,
+          r.to,
+          r.kind,
+          r.evidenceIds ? JSON.stringify(r.evidenceIds) : null,
+        )
     this.db
-      .prepare('UPDATE projects SET title=?,revision=? WHERE id=?')
-      .run(doc.title, doc.revision, doc.id)
+      .prepare('DELETE FROM knowledge_records WHERE project_id=?')
+      .run(doc.id)
+    const insertRecord = this.db.prepare(
+      'INSERT INTO knowledge_records VALUES (?,?,?,?)',
+    )
+    for (const key of recordKeys)
+      for (const record of doc[key])
+        insertRecord.run(doc.id, key, record.id, JSON.stringify(record))
+    this.db
+      .prepare('UPDATE projects SET title=?,revision=?,purpose=? WHERE id=?')
+      .run(
+        doc.title,
+        doc.revision,
+        doc.purpose ? JSON.stringify(doc.purpose) : null,
+        doc.id,
+      )
   }
   create(input: unknown) {
     const data = createSchema.parse(input)
@@ -168,7 +224,7 @@ export class Store {
           throw new DataError(409, 'conflict', 'Project already exists')
         const doc = validateDocument({ ...data, revision: 1, assets: [] })
         this.db
-          .prepare('INSERT INTO projects VALUES (?,?,?)')
+          .prepare('INSERT INTO projects(id,title,revision) VALUES (?,?,?)')
           .run(doc.id, doc.title, 1)
         this.save(doc)
         return this.read(doc.id)
@@ -215,6 +271,36 @@ export class Store {
             data.upsertRelations,
             data.removeRelationIds,
           ),
+          ...(data.contractVersion === 2
+            ? {
+                purpose:
+                  data.purpose === null
+                    ? undefined
+                    : (data.purpose ?? doc.purpose),
+                evidenceRecords: merge(
+                  doc.evidenceRecords,
+                  data.upsertEvidenceRecords,
+                  data.removeEvidenceRecordIds,
+                ),
+                actors: merge(
+                  doc.actors,
+                  data.upsertActors,
+                  data.removeActorIds,
+                ),
+                rules: merge(doc.rules, data.upsertRules, data.removeRuleIds),
+                areas: merge(doc.areas, data.upsertAreas, data.removeAreaIds),
+                journeys: merge(
+                  doc.journeys,
+                  data.upsertJourneys,
+                  data.removeJourneyIds,
+                ),
+                glossary: merge(
+                  doc.glossary,
+                  data.upsertGlossary,
+                  data.removeGlossaryIds,
+                ),
+              }
+            : {}),
         })
         this.save(next)
         return this.read(id)

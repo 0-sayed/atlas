@@ -1,8 +1,9 @@
+import { featureReturn } from '../content/destinations'
 import { useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import { approvalOutcome } from '../../shared/approval'
 import type { ApprovalFeature } from '../../shared/contracts'
-import { useProject, projectPath } from '../content/knowledge'
+import { useProject } from '../content/knowledge'
 import { ApprovalScene } from '../scenes/ApprovalScene'
 import { FeatureEvidence } from '../components/FeatureDetail'
 import { RegisteredArt } from '../components/RegisteredArt'
@@ -15,7 +16,6 @@ import './recorded-case.css'
 
 export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
   const project = useProject()
-  const base = projectPath(project.id)
   const [params, setParams] = useSearchParams()
   const location = useLocation()
   const [detailOpen, setDetailOpen] = useState(false)
@@ -24,11 +24,7 @@ export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
   const example = feature.cases.find((c) => c.id === selected)
   if (!example && (selected !== undefined || feature.cases.length > 0))
     return <MissingPage />
-  const from = params.get('from')
-  const returnPath =
-    from === 'start'
-      ? base
-      : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
+  const back = featureReturn(project.id, params)
   return (
     <section
       className="booking-page recorded-case-page"
@@ -36,10 +32,10 @@ export function ApprovalPage({ feature }: { feature: ApprovalFeature }) {
     >
       <Link
         className="back-link"
-        to={returnPath}
+        to={back.to}
         state={{ restorePosition: true }}
       >
-        Back to {from === 'start' ? 'Start here' : 'Explore'}
+        Back to {back.label}
       </Link>
       <FixtureLabel feature={feature} />
       <div className="feature-heading">

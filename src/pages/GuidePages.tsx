@@ -1,14 +1,13 @@
+import { featureReturn } from '../content/destinations'
 import { Link, useSearchParams } from 'react-router'
-import {
-  isBookingFeature,
-  isApprovalFeature,
-  type Feature,
-} from '../../shared/contracts'
+import type { Feature } from '../../shared/contracts'
 import { useProject, projectPath } from '../content/knowledge'
 import { AtlasActivityIcon, AtlasIcon } from '../components/AtlasIcon'
 import { IslandOverview } from './IslandOverview'
 import { DecorativeIsland } from './DecorativeIsland'
+import { ClaimEvidence } from '../components/ClaimEvidence'
 import './collection-states.css'
+import { searchFeatures, featureGroup } from '../../shared/exploration'
 
 export function FixtureLabel({ feature }: { feature?: Feature }) {
   const project = useProject()
@@ -71,6 +70,12 @@ export function StartPage() {
       <section className="scaffold-guide" aria-labelledby="page-title">
         <FixtureLabel />
         <h1 id="page-title">No implemented activities found</h1>
+        {project.purpose && (
+          <>
+            <p className="intro">{project.purpose.text}</p>
+            <ClaimEvidence ids={project.purpose.evidenceIds} />
+          </>
+        )}
         <p className="intro">
           This project has no reviewed, implemented activities yet.
         </p>
@@ -92,23 +97,10 @@ export function ExplorePage() {
   const project = useProject()
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
-  const words = query.trim().toLocaleLowerCase().split(/\s+/)
-  const matches = project.features.filter((f) =>
-    words.every((word) =>
-      `${f.title} ${f.purpose} ${f.actor} ${f.group ?? ''} ${f.cases.map((c) => c.label).join(' ')}`
-        .toLocaleLowerCase()
-        .includes(word),
-    ),
-  )
+  const matches = searchFeatures(project, query)
   const groups = new Map<string, Feature[]>()
   for (const feature of matches) {
-    const group =
-      feature.group ??
-      (isBookingFeature(feature)
-        ? 'Bookings'
-        : isApprovalFeature(feature)
-          ? 'Reviews'
-          : 'Navigation')
+    const group = featureGroup(project, feature)
     groups.set(group, [...(groups.get(group) ?? []), feature])
   }
   return (
@@ -228,8 +220,7 @@ export function ExplorePage() {
 export function MissingPage() {
   const project = useProject()
   const [params] = useSearchParams()
-  const query = params.get('q')
-  const returnPath = `${projectPath(project.id)}/explore${query ? `?${new URLSearchParams({ q: query })}` : ''}`
+  const back = featureReturn(project.id, params)
   return (
     <section className="missing-page" aria-labelledby="page-title">
       <p className="eyebrow">Atlas / Unavailable</p>
@@ -243,10 +234,10 @@ export function MissingPage() {
         </p>
         <Link
           className="primary-link"
-          to={returnPath}
+          to={back.to}
           state={{ restorePosition: true }}
         >
-          Return to Explore
+          Return to {back.label}
         </Link>
       </div>
     </section>

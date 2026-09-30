@@ -39,7 +39,9 @@ test('creates a non-booking guide through the API and explores both projects in 
   await expect(
     page.getByRole('heading', { name: 'Ready for approval', exact: true }),
   ).toBeVisible()
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await page.getByRole('searchbox').fill('publishing')
   await page
     .getByRole('link', { name: approvalFeature.title, exact: true })
@@ -50,7 +52,9 @@ test('creates a non-booking guide through the API and explores both projects in 
   await page
     .getByRole('link', { name: 'Illustrative booking guide', exact: true })
     .click()
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await expect(page.getByRole('searchbox')).toHaveValue('')
   await expect(page.getByText(approvalFeature.title)).toHaveCount(0)
   await page.getByRole('searchbox').fill('publishing')

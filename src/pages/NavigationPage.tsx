@@ -1,6 +1,8 @@
+import { featureReturn, originParams } from '../content/destinations'
 import { useRef } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import type { NavigationFeature } from '../../shared/contracts'
+import { relationshipLabel } from '../../shared/relationships'
 import { projectPath, useProject } from '../content/knowledge'
 import { NavigationScene } from '../scenes/NavigationScene'
 import { AtlasActivityIcon, AtlasIcon } from '../components/AtlasIcon'
@@ -26,15 +28,10 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
   const example = feature.cases.find((item) => item.id === selected)
   if (!example && selected !== undefined) return <MissingPage />
 
-  const from = params.get('from')
-  const returnPath =
-    from === 'start'
-      ? base
-      : `${base}/explore${params.get('q') ? `?${new URLSearchParams({ q: params.get('q')! })}` : ''}`
-  const relatedParams = new URLSearchParams()
-  if (from === 'start' || from === 'explore') relatedParams.set('from', from)
-  const query = params.get('q')
-  if (query) relatedParams.set('q', query)
+  const back = featureReturn(project.id, params)
+  const origin = originParams(params)
+  const relatedParams = origin.params
+  if (params.has('from')) relatedParams.set('from', origin.origin)
   const related = project.relations.flatMap((relation) => {
     if (relation.from !== feature.id && relation.to !== feature.id) return []
     const outgoing = relation.from === feature.id
@@ -46,12 +43,7 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
       {
         id: relation.id,
         feature: other,
-        label:
-          relation.kind === 'related'
-            ? 'Related to'
-            : outgoing
-              ? 'Requires'
-              : 'Required by',
+        label: relationshipLabel(relation.kind, outgoing),
       },
     ]
   })
@@ -63,10 +55,10 @@ export function NavigationPage({ feature }: { feature: NavigationFeature }) {
     >
       <Link
         className="back-link"
-        to={returnPath}
+        to={back.to}
         state={{ restorePosition: true }}
       >
-        Back to {from === 'start' ? 'Start here' : 'Explore'}
+        Back to {back.label}
       </Link>
       <FixtureLabel feature={feature} />
 

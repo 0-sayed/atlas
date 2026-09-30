@@ -1,0 +1,171 @@
+.knowledge-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.knowledge-hero > div {
+  min-width: 0;
+}
+.knowledge-hero > img {
+  width: 30%;
+  max-width: 350px;
+  height: auto;
+}
+.knowledge-layout {
+  display: grid;
+  gap: 24px;
+  margin-top: 20px;
+}
+.knowledge-layout-rules,
+.knowledge-layout-journeys {
+  grid-template-columns: minmax(220px, 0.35fr) minmax(0, 1fr);
+  align-items: start;
+}
+.knowledge-index {
+  padding: 20px;
+  background: var(--atlas-paper);
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-card);
+}
+.knowledge-index a {
+  display: block;
+  padding: 16px;
+  margin-top: 12px;
+  background: var(--atlas-secondary);
+  border-radius: var(--atlas-radius-control);
+  overflow-wrap: anywhere;
+  font-family: var(--atlas-font-label);
+  font-size: 23px;
+}
+.knowledge-index a[aria-current] {
+  outline: 2px solid var(--atlas-primary);
+}
+.knowledge-records {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.knowledge-layout-actors .knowledge-records,
+.knowledge-layout-glossary .knowledge-records {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  align-items: start;
+}
+.knowledge-record {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.knowledge-record p {
+  white-space: pre-line;
+}
+.knowledge-record h3 {
+  font-family: var(--atlas-font-label);
+  font-size: 22px;
+  margin: 20px 0 10px;
+}
+.knowledge-record ul {
+  padding-left: 22px;
+}
+.knowledge-record li {
+  margin: 12px 0;
+}
+.knowledge-record a {
+  font-weight: 700;
+}
+.knowledge-statement {
+  font-family: var(--atlas-font-label);
+  font-size: 25px;
+  line-height: 1.4;
+}
+.knowledge-context {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-control);
+  background: var(--atlas-paper);
+}
+.knowledge-empty {
+  padding: 28px;
+  margin-top: 24px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-card);
+  background: var(--atlas-paper);
+}
+.journey-path {
+  list-style: none;
+  padding: 0;
+}
+.journey-step {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--atlas-line);
+  border-radius: var(--atlas-radius-card);
+  background: var(--atlas-info);
+  background-image: var(--atlas-water-detail);
+}
+.journey-step:not(:last-child)::after {
+  content: '↓';
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  z-index: 1;
+  color: var(--atlas-secondary-text);
+  font-size: 28px;
+}
+.journey-path .journey-step {
+  margin: 28px 0;
+}
+.journey-scenery {
+  position: relative;
+  display: block;
+  flex: 0 0 140px;
+  width: 140px;
+  height: 100px;
+}
+.journey-scenery > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.journey-scenery .atlas-activity-icon {
+  position: absolute;
+  left: 52px;
+  top: 24px;
+  width: 36px;
+  height: 36px;
+  aspect-ratio: auto;
+  background: transparent;
+}
+.journey-scenery .atlas-activity-icon > .atlas-icon {
+  width: 100%;
+  height: 100%;
+}
+.journey-step > div {
+  min-width: 0;
+}
+.journey-number {
+  display: grid;
+  place-items: center;
+  align-self: flex-start;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--atlas-info);
+  font-weight: 800;
+}
+@media (max-width: 900px) {
+  .journey-step {
+    flex-wrap: wrap;
+  }
+  .knowledge-layout-rules,
+  .knowledge-layout-journeys {
+    grid-template-columns: 1fr;
+  }
+  .knowledge-hero > img {
+    display: none;
+  }
+}

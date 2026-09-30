@@ -32,7 +32,9 @@ test('Publishing Studio explains a connected journey and its current approval ru
     path: testInfo.outputPath('publishing-studio-desktop.png'),
     fullPage: true,
   })
-  await page.getByRole('link', { name: 'Explore', exact: true }).click()
+  await page
+    .getByRole('link', { name: 'Search activities', exact: true })
+    .click()
   await expect(page.locator('.activity-card')).toHaveCount(5)
   await page.getByRole('searchbox').fill('review')
   await expect(page.locator('.activity-card').first()).toBeVisible()
