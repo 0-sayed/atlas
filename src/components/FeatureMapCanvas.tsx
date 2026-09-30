@@ -98,19 +98,29 @@ export function FeatureMapCanvas({
     saveMapMemory(memoryKey, { ...current, nodes: layout.nodes, camera: next })
   }
   const ensureVisible = (el: HTMLButtonElement) => {
-    const box = el.getBoundingClientRect(),
-      wrapper = region.current!.getBoundingClientRect()
+    const controls = ref.current!
+    const { scale, positionX, positionY } = controls.instance.state
+    // DOM transforms can lag behind the live camera during React updates.
+    const left = positionX + el.offsetLeft * scale
+    const top = positionY + el.offsetTop * scale
     if (
-      box.left < wrapper.left ||
-      box.right > wrapper.right ||
-      box.top < wrapper.top ||
-      box.bottom > wrapper.bottom
-    )
-      void ref.current?.zoomToElement(
-        el,
-        Math.min(1, size.width / el.offsetWidth, size.height / el.offsetHeight),
+      left < 0 ||
+      left + el.offsetWidth * scale > size.width ||
+      top < 0 ||
+      top + el.offsetHeight * scale > size.height
+    ) {
+      const nextScale = Math.min(
+        1,
+        size.width / el.offsetWidth,
+        size.height / el.offsetHeight,
+      )
+      void controls.setTransform(
+        size.width / 2 - (el.offsetLeft + el.offsetWidth / 2) * nextScale,
+        size.height / 2 - (el.offsetTop + el.offsetHeight / 2) * nextScale,
+        nextScale,
         0,
       )
+    }
   }
   return (
     <div className="map-canvas-section">

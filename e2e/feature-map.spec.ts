@@ -453,7 +453,8 @@ test('node-origin dragging does not activate an island, while clicks and keyboar
 test('Tab traversal keeps complete long labels visible and minimap aligned without native scrolling', async ({
   page,
   request,
-}) => {
+}, info) => {
+  const projectId = `map-tab-${info.repeatEachIndex}`
   const title = 'W'.repeat(160)
   expect(
     (
@@ -461,7 +462,7 @@ test('Tab traversal keeps complete long labels visible and minimap aligned witho
         headers,
         data: {
           ...authoredSeed,
-          id: 'map-tab',
+          id: projectId,
           features: Array.from({ length: 6 }, (_, i) => ({
             ...authoredFeature,
             id: 'tab-' + i,
@@ -476,7 +477,7 @@ test('Tab traversal keeps complete long labels visible and minimap aligned witho
   ).toBe(201)
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/#/projects/map-tab/map?group=area%3Adispatch')
+  await page.goto(`/#/projects/${projectId}/map?group=area%3Adispatch`)
   const fit = page.getByRole('button', { name: 'Fit all islands', exact: true })
   await expect(fit).toBeVisible()
   await page.evaluate(() => document.fonts.ready)
