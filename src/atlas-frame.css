@@ -75,26 +75,127 @@
   height: 42px;
   background: transparent;
 }
+.atlas-project-switcher {
+  min-width: 0;
+  max-width: min(100%, 350px);
+}
 .atlas-project-control {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--atlas-space-3);
+  width: 250px;
   min-height: var(--atlas-control-height);
   max-width: min(100%, 350px);
   padding: var(--atlas-space-2) var(--atlas-space-3);
   border: 1px solid var(--atlas-line);
   border-radius: var(--atlas-radius-control);
   background: var(--atlas-canvas);
-  text-decoration: none;
-  overflow-wrap: anywhere;
-  font-size: 14px;
-}
-.atlas-project-control > span:first-child {
-  min-width: 0;
-  overflow: hidden;
+  color: var(--atlas-ink);
+  font: 700 14px/1.4 var(--atlas-font-body);
   text-overflow: ellipsis;
-  white-space: nowrap;
+  cursor: pointer;
+}
+.atlas-project-control:disabled {
+  color: var(--atlas-muted);
+  cursor: not-allowed;
+}
+.atlas-project-selection {
+  display: none;
+}
+@supports (appearance: base-select) {
+  .atlas-project-control,
+  .atlas-project-control::picker(select) {
+    appearance: base-select;
+  }
+  .atlas-project-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--atlas-space-3);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .atlas-project-selection {
+    display: contents;
+  }
+  .atlas-project-value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .atlas-project-control:not(:disabled):hover,
+  .atlas-project-control:open {
+    border-color: var(--atlas-primary);
+    background: var(--atlas-secondary);
+  }
+  .atlas-project-control::picker-icon {
+    content: '';
+    flex: 0 0 7px;
+    width: 7px;
+    height: 7px;
+    margin: 0 3px 3px 0;
+    border-right: 2px solid var(--atlas-muted);
+    border-bottom: 2px solid var(--atlas-muted);
+    rotate: 45deg;
+  }
+  .atlas-project-control:open::picker-icon {
+    rotate: 225deg;
+    margin-bottom: -3px;
+  }
+  .atlas-project-control::picker(select) {
+    width: min(350px, calc(100vw - 32px));
+    max-height: min(360px, 50dvh);
+    margin-block: var(--atlas-space-2);
+    padding: var(--atlas-space-2);
+    border: 1px solid var(--atlas-line);
+    border-radius: var(--atlas-radius-card);
+    background: var(--atlas-paper);
+    color: var(--atlas-ink);
+    box-shadow: 0 12px 32px
+      color-mix(in srgb, var(--atlas-ink) 12%, transparent);
+    overflow: auto;
+    overscroll-behavior: contain;
+    font: 400 14px/1.5 var(--atlas-font-body);
+  }
+  .atlas-project-control option {
+    display: flex;
+    align-items: center;
+    gap: var(--atlas-space-3);
+    min-height: var(--atlas-control-height);
+    padding: var(--atlas-space-3);
+    border-radius: var(--atlas-radius-control);
+    background: var(--atlas-paper);
+    color: var(--atlas-ink);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+  .atlas-project-control option:hover,
+  .atlas-project-control option:focus-visible {
+    background: var(--atlas-secondary);
+  }
+  .atlas-project-control option:focus-visible {
+    outline: 2px solid var(--atlas-primary);
+    outline-offset: -2px;
+  }
+  .atlas-project-control option:checked {
+    background: var(--atlas-selected);
+    font-weight: 700;
+  }
+  .atlas-project-control option::checkmark {
+    order: 1;
+    margin-left: auto;
+    color: var(--atlas-primary);
+  }
+  .atlas-project-control option:disabled {
+    color: var(--atlas-muted);
+    cursor: not-allowed;
+  }
+  .atlas-project-control option[value=''] {
+    display: none;
+  }
+}
+.atlas-project-error {
+  color: var(--atlas-muted);
+  font-size: 14px;
 }
 .atlas-header-caption {
   color: var(--atlas-muted);
@@ -183,7 +284,7 @@
 .site-shell .site-footer {
   padding-inline: var(--atlas-space-6);
 }
-.site-shell :is(a, button, input, summary):focus-visible {
+.site-shell :is(a, button, input, select, summary):focus-visible {
   outline: 3px solid var(--atlas-primary);
   outline-offset: 4px;
 }

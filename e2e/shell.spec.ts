@@ -120,9 +120,12 @@ test('keyboard navigation reaches the home link after the skip link', async ({
   ).toBeVisible()
   await page.keyboard.press('Tab')
   await expect(page.getByRole('link', { name: 'Atlas home' })).toBeFocused()
+  await expect(
+    page.getByRole('combobox', { name: /^Choose project:/ }),
+  ).toBeEnabled()
   await page.keyboard.press('Tab')
   await expect(
-    page.getByRole('link', { name: /^Choose project:/ }),
+    page.getByRole('combobox', { name: /^Choose project:/ }),
   ).toBeFocused()
   await page.keyboard.press('Tab')
   await expect(

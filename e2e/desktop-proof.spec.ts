@@ -65,7 +65,7 @@ test('desktop proof has a shared header and separate content-fitting overview su
     scene!.y + scene!.height - (field!.y + field!.height),
   ).toBeLessThanOrEqual(32)
   await expect(
-    page.getByRole('banner').getByRole('link', { name: /Choose project/ }),
+    page.getByRole('banner').getByRole('combobox', { name: /Choose project/ }),
   ).toBeVisible()
   const summary = await page.locator('.island-summary').boundingBox()
   expect(summary!.x - (scene!.x + scene!.width)).toBeGreaterThanOrEqual(16)
@@ -254,7 +254,7 @@ test('long and absent facts stay inside proof cards at desktop and narrow widths
     await expect(
       page.getByRole('heading', { name: 'Start here' }),
     ).toBeVisible()
-    const projectControl = page.getByRole('banner').getByRole('link', {
+    const projectControl = page.getByRole('banner').getByRole('combobox', {
       name: `Choose project: ${longProjectTitle}`,
     })
     await expect(projectControl).toHaveAttribute('title', longProjectTitle)
