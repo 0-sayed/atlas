@@ -48,6 +48,7 @@ test('six destinations show explicit facts, evidence and ordered repeated journe
   await expect(
     page.getByText(authoredSeed.rules[0].statement, { exact: true }),
   ).toBeVisible()
+  await page.getByText('4 saved cases', { exact: true }).click()
   await page
     .getByRole('link', {
       name: 'Conflicting handoff · Conflicting',

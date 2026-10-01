@@ -97,7 +97,7 @@ export function FeatureMapCanvas({
     }
     const frame = requestAnimationFrame(() => {
       initialized.current = true
-      void ref.current?.fitToView({ animationTime: 0 })
+      void ref.current?.fitToView({ animationTime: 0, maxScale: 1 })
     })
     return () => cancelAnimationFrame(frame)
   }, [layout, saved, size])
@@ -209,7 +209,7 @@ export function FeatureMapCanvas({
                 void ref.current?.zoomOut(0.2, 0)
               },
               Home: () => {
-                void ref.current?.fitToView({ animationTime: 0 })
+                void ref.current?.fitToView({ animationTime: 0, maxScale: 1 })
               },
             }
             if (actions[e.key]) {
@@ -322,7 +322,7 @@ export function FeatureMapCanvas({
                     <span className="map-node-title">{item.title}</span>
                     <span className="map-node-meta">
                       {item.count !== undefined
-                        ? item.count + ' recorded activities'
+                        ? `${item.count} recorded ${item.count === 1 ? 'activity' : 'activities'}`
                         : item.feature?.evidence.status === 'demo'
                           ? 'Illustrative fixture'
                           : item.feature?.evidence.status === 'uncertain'
@@ -361,7 +361,7 @@ export function FeatureMapCanvas({
             <button
               className="atlas-button"
               onClick={() => {
-                void ref.current?.fitToView({ animationTime: 0 })
+                void ref.current?.fitToView({ animationTime: 0, maxScale: 1 })
               }}
             >
               Fit all islands
@@ -399,7 +399,7 @@ export function FeatureMapCanvas({
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                void ref.current?.fitToView({ animationTime: 0 })
+                void ref.current?.fitToView({ animationTime: 0, maxScale: 1 })
               }
             }}
           >

@@ -1,11 +1,18 @@
 import { featureReturn } from '../content/destinations'
-import { Link, useSearchParams } from 'react-router'
+import { useEffect } from 'react'
+import {
+  Link,
+  useLocation,
+  useNavigationType,
+  useSearchParams,
+} from 'react-router'
 import type { Feature } from '../../shared/contracts'
 import { useProject, projectPath } from '../content/knowledge'
 import { AtlasActivityIcon, AtlasIcon } from '../components/AtlasIcon'
 import { IslandOverview } from './IslandOverview'
 import { DecorativeIsland } from './DecorativeIsland'
 import { ClaimEvidence } from '../components/ClaimEvidence'
+import { useSearchInput } from '../components/useSearchInput'
 import './collection-states.css'
 import { searchFeatures, featureGroup } from '../../shared/exploration'
 
@@ -96,7 +103,15 @@ export function StartPage() {
 export function ExplorePage() {
   const project = useProject()
   const [params, setParams] = useSearchParams()
+  const location = useLocation()
+  const navigationType = useNavigationType()
   const query = params.get('q') ?? ''
+  const search = useSearchInput(query)
+  useEffect(() => {
+    if (location.state?.focusSearch && navigationType !== 'POP') {
+      search.current?.focus()
+    }
+  }, [location.key, location.state, navigationType, search])
   const matches = searchFeatures(project, query)
   const groups = new Map<string, Feature[]>()
   for (const feature of matches) {
@@ -137,10 +152,11 @@ export function ExplorePage() {
         <div className="search-row">
           <AtlasIcon name="search" />
           <input
+            ref={search}
             id="activity-search"
             type="search"
             placeholder="Search activities, cases, or areas"
-            value={query}
+            defaultValue={query}
             onChange={(e) =>
               setParams(e.target.value ? { q: e.target.value } : {}, {
                 replace: true,

@@ -97,6 +97,7 @@ test('Publishing Studio explains a connected journey and its current approval ru
     })
   }
   await page.goto(`${base}/rules?item=reviewer-independent`)
+  await page.locator('.knowledge-case-details summary').click()
   await page
     .getByRole('link', {
       name: 'Reviewer records disagree · Conflicting',

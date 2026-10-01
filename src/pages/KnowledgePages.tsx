@@ -11,6 +11,7 @@ import { useProject, projectPath } from '../content/knowledge'
 import { AtlasIcon, AtlasActivityIcon } from '../components/AtlasIcon'
 import { AtlasPanel } from '../components/AtlasPrimitives'
 import { ClaimEvidence } from '../components/ClaimEvidence'
+import { useSearchInput } from '../components/useSearchInput'
 import { FixtureLabel } from './GuidePages'
 import { DecorativeIsland } from './DecorativeIsland'
 import './knowledge-pages.css'
@@ -25,6 +26,7 @@ export function KnowledgePage({
   const [params, setParams] = useSearchParams()
   const info = destinations.find((d) => d.id === destination)!
   const query = params.get('q') ?? ''
+  const search = useSearchInput(query)
   const selected = params.get('item')
   const records = project[destination]
   const name = (record: (typeof records)[number]) =>
@@ -89,9 +91,10 @@ export function KnowledgePage({
         <div className="search-row">
           <AtlasIcon name="search" />
           <input
+            ref={search}
             id="record-search"
             type="search"
-            value={query}
+            defaultValue={query}
             placeholder="Find a saved record"
             onChange={(e) => {
               const p = new URLSearchParams(params)
@@ -105,7 +108,7 @@ export function KnowledgePage({
       </form>
       {(query || selected) && (
         <button className="atlas-button" type="button" onClick={clear}>
-          Clear search
+          {selected && !query ? `Show all ${info.label}` : 'Clear search'}
         </button>
       )}
       {selected && scoped.length === 0 ? (
@@ -135,6 +138,7 @@ export function KnowledgePage({
       ) : (
         <>
           <p className="revision-note">
+            {(query.trim() || selected) && `${scoped.length} of `}
             {records.length} saved {records.length === 1 ? 'record' : 'records'}
           </p>
           <div className={'knowledge-layout knowledge-layout-' + destination}>
@@ -219,34 +223,38 @@ export function KnowledgePage({
                                   {steps.map((s) => s.title).join(' · ')}
                                 </p>
                               )}
-                              {cases.length ? (
-                                <ul>
-                                  {cases.map((c) => (
-                                    <li key={c.id}>
-                                      <Link
-                                        to={href(feature.id, c.id, record.id)}
-                                      >
-                                        {c.label} ·{' '}
-                                        {
-                                          authoredOutcomeLabels[
-                                            c.outcome.status
-                                          ]
-                                        }
-                                      </Link>
-                                      <p>
-                                        Condition:{' '}
-                                        {c.conditions
-                                          .find((x) => x.ruleId === record.id)!
-                                          .state.replace('-', ' ')}
-                                      </p>
-                                      <ClaimEvidence ids={c.evidenceIds} />
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p>
-                                  No saved case conditions reference this rule.
-                                </p>
+                              {cases.length > 0 && (
+                                <details className="knowledge-case-details">
+                                  <summary>
+                                    {cases.length} saved{' '}
+                                    {cases.length === 1 ? 'case' : 'cases'}
+                                  </summary>
+                                  <ul>
+                                    {cases.map((c) => (
+                                      <li key={c.id}>
+                                        <Link
+                                          to={href(feature.id, c.id, record.id)}
+                                        >
+                                          {c.label} ·{' '}
+                                          {
+                                            authoredOutcomeLabels[
+                                              c.outcome.status
+                                            ]
+                                          }
+                                        </Link>
+                                        <p>
+                                          Condition:{' '}
+                                          {c.conditions
+                                            .find(
+                                              (x) => x.ruleId === record.id,
+                                            )!
+                                            .state.replace('-', ' ')}
+                                        </p>
+                                        <ClaimEvidence ids={c.evidenceIds} />
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </details>
                               )}
                             </div>
                           ),
