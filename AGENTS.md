@@ -3,6 +3,7 @@
 - Before frontend work, read `planning/context/design-reference.md`. The approved visual source is ignored `.local/design/atlas.penpot`; if absent, ask the owner for its local path. Extract only assets needed by the selected task; no gallery or full export is required. Reviewed API/SQLite knowledge, not design examples, supplies product facts.
 
 - Atlas is one React/TypeScript/Vite frontend with a local NestJS API and SQLite knowledge store. Keep `planning/` as development context; do not import its raw briefs or reference images into the app or `public/`.
+- Keep project context, specifications and delivery evidence under `planning/context/`. `planning/roadmap/` contains only `tasks.md` and `dependencies.mmd`; update those together and link to context instead of adding task plans or reports there.
 - The app displays reviewed current knowledge only. Do not infer current source-product behavior from fixture content, old Atlas content, or a passing build. Keep fixtures explicitly labelled; source-product history is not an Atlas browsing feature.
 - Owner previews use `npm run showcase` at `http://127.0.0.1:4176`, with exactly one Publishing Studio demo in disposable storage. Never hand off the Playwright/`ATLAS_E2E_PORT` server or add QA projects to the showcase; booking, logistics, and capacity fixtures stay in isolated tests.
 - The independent `fill-atlas` skill and template are maintained in `.agents/skills/fill-atlas/`. It produces source-context Markdown and stops; it does not modify Atlas source or run in the browser.

@@ -1,6 +1,6 @@
 # Atlas Project Bootstrap Checklist
 
-This checklist records the delivered T000 static frontend foundation and subsequent T002 platform transition. T001 delivered the labelled booking experience (merged PR #2); T002 implemented the local API/SQLite platform. The checkboxes and verification statements below are historical evidence, not current setup instructions. Read [the planning entry point](README.md) and [current task graph](roadmap/tasks.md) for the 2026-09-28 baseline and T007–T011 desktop work.
+This checklist records the delivered T000 static frontend foundation and subsequent T002 platform transition. T001 delivered the labelled booking experience (merged PR #2); T002 implemented the local API/SQLite platform. The checkboxes and verification statements below are historical evidence, not current setup instructions. Read [the planning entry point](../README.md) and [current task graph](../roadmap/tasks.md) for the merged baseline and remaining acceptance work.
 
 ## Phase 0 — Planning and repository foundation
 
@@ -10,8 +10,9 @@ Use one `planning/` folder at the repository root:
 
 ```text
 planning/
-  bootstrap.md
+  README.md
   context/
+    bootstrap.md           # Historical foundation evidence
     business/              # Product, design, and visual references
     technical/             # Technical baseline
   roadmap/
@@ -113,7 +114,7 @@ T001 delivered one illustrated, clearly labelled booking fixture from the design
 
 ## T002 — verified platform transition
 
-Root guidance and ignore rules now describe the implemented NestJS/SQLite architecture. `.local/` was ignored before runtime data creation. See [the T002 outcome](roadmap/tasks.md#outcome-boundaries) and [technical acceptance checks](context/technical/TECHNICAL.md#9-first-build-tests-and-acceptance).
+Root guidance and ignore rules now describe the implemented NestJS/SQLite architecture. `.local/` was ignored before runtime data creation. See [the T002 outcome](../roadmap/tasks.md#outcome-boundaries) and [technical acceptance checks](technical/TECHNICAL.md#9-first-build-tests-and-acceptance).
 
 Verified on 2026-09-25: `npm run validate` passed 31 unit/integration tests, 16 browser tests, frontend/backend builds, artifact checks, and production restart/shutdown. A separate fresh copy passed `npm ci`, builds and production smoke. Independent review findings for dynamic case/art/actor reads, failed-start cleanup and maintenance beyond 100 projects were reproduced and fixed with regression tests. Dependency audit reported zero vulnerabilities; remote CI jobs are configured but have not been run on a pushed branch.
 

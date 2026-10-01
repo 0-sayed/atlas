@@ -1,10 +1,10 @@
-# Atlas — Technical Baseline and Proposed Guide Model
+# Atlas — Technical Baseline and Guide Model
 
-**Version:** 0.8\
-**Updated:** 2026-09-29\
-**Status:** Current implementation reconciled with the proposed full-guide direction. The proposed model and sequence below are for owner review; they are not an executable implementation plan or a claim of delivered behavior.
+**Version:** 0.9\
+**Updated:** 2026-10-01\
+**Status:** T009 and T010 implementation merged in PR #13 (`f7bc975`). Contract v2, schema 4, authored activities, capabilities, six desktop destinations and the interactive map are delivered. T011 real-source/cross-domain desktop acceptance and T005 human evaluation remain open.
 
-[PROJECT.md](../business/PROJECT.md) owns product scope and the six destinations. [DESIGN.md](../business/DESIGN.md) owns their visual behavior. This document states the implemented technical boundary, then the smallest data and renderer extensions that appear necessary to support that direction.
+[PROJECT.md](../business/PROJECT.md) owns product scope and the six destinations. [DESIGN.md](../business/DESIGN.md) owns their visual behavior. This document records the implemented technical boundary and remaining acceptance work.
 
 For concrete Penpot boards, components and token lookup, use the [design reference](../design-reference.md). Design changes do not automatically update application code.
 
@@ -19,20 +19,20 @@ React guide → local API → SQLite and registered assets
 
 `fill-atlas` records source facts only. `update-atlas` prepares a scoped write after scene-fit and evidence review. The NestJS API validates and persists it; the browsing app does not analyze source, execute a model, or run either skill. JSON is the API encoding, while SQLite is the authoritative project store. A validated data update can change saved knowledge without rebuilding Atlas. A new interaction or contract capability still needs an application release.
 
-**Implemented today:** One React/TypeScript/Vite client with hash-based React Router navigation; a loopback NestJS API on its Express adapter; one SQLite database through `better-sqlite3`; tracked SQL migrations; shared strict version-1 Zod contracts; project-scoped current features, cases, relations, and registered raster assets. Booking, approval, and navigation are the only accepted scene kinds, all at scene version 1. The frontend has their explicit code-owned scene helpers and components. Normal storage starts empty; fixtures are labelled demo data and stay outside browser runtime imports.
+**Implemented today:** One React/TypeScript/Vite client with hash-based React Router navigation; a loopback NestJS API on Express; one SQLite database through `better-sqlite3`; tracked migrations through schema 4; strict Zod read contract v2 and version-1/version-2 writes. Booking, approval, navigation and authored scenes are accepted at scene version 1. Authored scenes require contract v2. Explicit purpose, actors, rules, areas, journeys, glossary, evidence and typed relationships support six desktop destinations. Normal storage starts empty; fixtures remain outside browser runtime imports.
 
-**Proposed:** A domain-neutral, versioned authored-activity scene and first-class supporting records for the complete guide. Neither exists in the current write contract or renderer. The current visual foundation and two-screen proof do not establish that all six destinations work or that arbitrary web-product behavior fits the three existing scenes.
+**Remaining acceptance:** T011 must establish the required three-domain reuse, two authorized real-source contexts and broader desktop/source review. The delivered finite scene set does not guarantee arbitrary web-product coverage. T005 human understanding and voluntary return remain separate.
 
 ## 2. Stack and dependency decisions
 
-| Concern | Implemented baseline and proposed limit |
+| Concern | Implemented baseline and boundary |
 |---|---|
 | Client | React, TypeScript, Vite, React Router `HashRouter`, Tailwind CSS and ordinary CSS. Keep the existing illustrated Atlas style and scene components. [T1][T2][T9] |
 | Server | One NestJS process on Express, with local API checks and optional built-client serving. No new service tier is needed for authored knowledge. [T5] |
 | Persistence | `better-sqlite3`, prepared SQL and tracked migrations in `migrations/`; no ORM, Redis, queue or graph database justified by this change. [T6][T7][T16] |
 | Contracts | Strict shared Zod schemas and TypeScript types in `shared/`, with backend validation and version checks. [T8] |
 | Interaction | Native controls, visible focus, and reduced-motion-safe behavior. Radix is a candidate only for a complex widget that needs it; Radix and shadcn are not installed baselines. [T3][T4] |
-| Art/navigation | Existing code-owned SVG/React illustrations and registered PNG/JPEG/WebP. `react-zoom-pan-pinch` is a candidate for a bounded map interaction check, not a selected or installed dependency. |
+| Art/navigation | Approved Penpot-derived PNG artwork and SVG icons, bundled font roles and registered raster art. Pinned `react-zoom-pan-pinch` 4.2.0 handles map camera transforms; application code owns grouping, nodes, routes and minimap coordinates. |
 | Verification | Vitest for contracts, pure helpers and real SQLite/API behavior; Playwright for navigation and interaction. Run repository-required gates before claiming a branch ready. [T10][T11] |
 
 The current package versions and lockfile, rather than this document, are the source for installed versions. Keep the established `src/components/`, `src/pages/`, `src/scenes/`, `src/content/`, `shared/`, and `server/` boundaries. Add a boundary only when real behavior needs one. No generic content engine, new framework, separate writer service, schema-generated UI, or per-project frontend build is implied.
@@ -54,14 +54,14 @@ One database contains all projects. Assets have project-scoped registrations; ra
 
 ## 4. Minimal data model and constraints
 
-**Current contract:** A project has a stable ID, title, revision, up to 100 features and 200 relations. Each feature contains its scene-specific payload, actor/purpose, one evidence object, case list, optional group/essential order/presentation, and asset IDs. Relations have project-scoped stable endpoints and only `requires` or `related` meaning. The SQLite schema stores projects, features, cases, relations, assets, and feature-asset links. Its SQL migrations are tracked. Those are current facts, not a sufficient model for every activity in a large web app.
+**Current contract:** A project has a stable ID, title and revision. `shared/limits.ts` bounds the normalized document at 500 features, 2,000 relationships, 2,000 evidence records, 1,000 records per supporting collection and 200 assets. Writes allow 100 features, 200 relationships and 100 records per supporting collection per request. Requests are limited to 2 MiB; ordinary current documents to 8 MiB. A narrowly checked legacy-only document can retain the former 256 MiB readability allowance. Each feature has a strict scene-specific payload, cases, evidence, optional bindings/presentation and registered asset IDs. Relationship kinds are `requires`, `related`, `blocks` and `triggers`. Schema 4 stores supporting knowledge with the project while keeping existing feature/asset tables; shared validation enforces scoped references.
 
-**Proposed record set for the six destinations:**
+**Implemented record set for the six destinations:**
 
 | Record or binding | Purpose |
 |---|---|
 | Project | Stable identity, title and optional evidenced purpose; absent purpose stays absent. |
-| Activity and authored scene | Stable project-scoped feature identity, purpose, versioned scene selection, ordered observable steps, actors involved, explicit conditions, recorded cases and their outcome **and reason**. A case is a cited observation/example, not an executable simulation or universal rule program. |
+| Activity and authored scene | Stable project-scoped feature identity, purpose, versioned scene selection, ordered observable steps, actors involved, explicit conditions, recorded cases and their outcome with an optional reason. A case is a cited observation/example, not an executable simulation or universal rule program. |
 | Actor and participation | Identifiable person/system entries and scoped links to activities/steps. Do not infer permissions from participation. |
 | Rule/condition | A stable, searchable condition with precise authored meaning, applicability and affected activities/cases; preserve exact operators, thresholds and units where applicable. Preserve unknown or configuration-dependent values; do not duplicate a changed rule as conflicting prose across views. |
 | Journey | Authored goal and ordered references to existing activities/steps, with supported cautions. Do not derive journeys from dependency links. |
@@ -70,23 +70,23 @@ One database contains all projects. Assets have project-scoped registrations; ra
 | Domain/group and essentials | Optional grouping and curated Start Here ordering. No universal taxonomy, island count, or fabricated usage score. |
 | Evidence | Source identity, inspected revision/scope, status and precise source reference for each meaningful claim or shared record. |
 
-Evidence at one feature level is too coarse when steps, conditions, actors, journeys, terms, and cases can have different support. Give each meaningful claim or shared record evidence identifiers and scoped references to inspected paths, symbols, documents or verified sources. Preserve `supported`, `uncertain` and `demo` distinctions; record source revision separately from Atlas revision. A valid schema cannot establish source truth or production deployment.
+Contract v2 binds steps, actors, conditions, journeys, terms and cases to scoped evidence records. Preserve `supported`, `uncertain`, `demo` and `conflicting` statuses, and record source revision separately from Atlas revision. A valid schema cannot establish source truth or deployment.
 
-Use stable project-scoped IDs and check cross-record references within the same project. Store primary identities and relationship endpoints in checkable columns; use strictly validated serialized detail only where it keeps the schema small. Do not turn every noun into a table or accept arbitrary JSON as a user interface specification. The exact next SQL shape belongs to the reviewed contract/migration work. Foreign keys remain enabled per connection. [T14]
+Keep stable scoped IDs and same-project reference checks. Schema 4 persists supporting records as strictly validated project knowledge; feature identities and relationship endpoints retain their existing relational tables. Do not accept arbitrary JSON as an interface specification. Foreign keys remain enabled per connection. [T14]
 
 ## 5. What “the backend validates” means
 
-The existing API parses strict version-1 requests, rejects unknown scene kinds and malformed or cross-project references, checks the expected Atlas revision, and writes the scoped current update in one transaction. Omitted features remain unchanged; explicit removals are required. An upsert replaces the full named feature, so callers must read and preserve unmodified fields. Failed batches roll back. [T8][T15]
+The API parses strict version-1/version-2 requests, rejects unknown scene kinds and malformed or cross-project references, checks the expected Atlas revision, and writes the scoped current update in one transaction. Omitted records remain unchanged; explicit removals are required. An upsert replaces the full named record, so callers must preserve unmodified fields. Failed batches roll back. [T8][T15]
 
-The proposed contract must keep those guarantees for new activities and records: bound text and collection sizes; unique project-scoped IDs; typed references; no orphaned steps, rules, case evidence or relationships; supported scene/version combinations; exact source/status fields; and transactionally consistent current data and revision. A source change or a new inspected commit alone must not alter the current guide. Existing version-1 current documents must remain readable after migration, including their optional presentation. A conversion may add optional structure, but it must not silently reinterpret a booking threshold, an approval decision, a navigation outcome, or prior evidence.
+Contract v2 enforces bounded text/collections, unique scoped IDs, valid references, supported scene/version combinations and transactionally consistent current data. Nonempty upgrade and backup/restore tests cover legacy current knowledge, registered assets and revision preservation. A source commit alone never changes the guide; a conversion must not reinterpret recorded rules or evidence.
 
-The API should advertise the **actual accepted scene kinds, scene versions, contract extensions and presentation options** through a read-only supported-capabilities response. `GET /ready` returning `contractVersion: 1` only proves readiness for that contract; it does not prove a particular scene or optional presentation extension is accepted. `update-atlas` must inspect advertised support before preparing a write, and its portable API/art references and contract tests must change in the same task as the server contract. Never use a normal project write as a capability probe. Keep unsupported source behavior as an explicit renderer gap, not a forced navigation case.
+`GET /api/v1/capabilities` advertises accepted scenes/versions, contracts, records, relationships, visuals and limits. `GET /api/v1/ready` reports read contract version 2; readiness alone does not establish scene support. The portable `update-atlas` preflight checks advertised capabilities, validates payload support and projected document capacity before writes. Its independently copied workflow is tested against an isolated API. Keep unsupported behavior as a renderer gap, never a fabricated navigation case.
 
 Requests contain data, never SQL, JSX, arbitrary expressions or executable scene programs. Backend validation protects the normal API boundary; it does not make unreviewed source claims true. [T7]
 
 ## 6. Dynamic visuals without a generic game engine
 
-The proposed authored-activity scene is a **reviewed, versioned composition** for a finite activity with recorded actors, steps, conditions, cases, outcome and reason. Its renderer can change a selected recorded case, highlight applicable steps/conditions and show the recorded consequence. It must not evaluate an arbitrary rule tree, invent an unrecorded outcome, fetch live product state, or generate UI from arbitrary JSON. Booking/approval/navigation can stay as existing specialized version-1 scenes; shared facts may become reusable records when migration and exact source meaning support that change.
+The authored-activity scene is a finite, versioned composition of saved actors, steps, conditions, cases and outcomes. Selecting a recorded case shows its recorded conditions, outcome, optional reason and evidence, including unknown/conflicting states. It does not evaluate arbitrary rule programs or fetch live source state. Booking, approval and navigation retain specialized version-1 scenes.
 
 Start Here uses curated essentials or honestly labelled unprioritized content. Feature Map groups and searches all recorded activities, with selective local relationships and stable routes. User Journeys follow authored order. Actors, Rules and Glossary read their own saved records and links. One record can appear in several destinations without conflicting copies of its facts. A new visual treatment is code-owned, reviewed, versioned and explicitly advertised before the portable updater may target it.
 
@@ -94,11 +94,11 @@ Project data can select supported art and accent choices and refer to registered
 
 ## 7. Loading, updates, and project selection
 
-The current client selects a saved project, reads it through the API, and uses project-scoped hash routes, direct feature/case links and browser Back. Current views cover Start Here and Explore/feature detail. The proposed full guide keeps one stable six-destination frame within a chosen project: Start Here, Feature Map, User Journeys, Actors, Rules and Glossary. Feature-local tabs and filters do not become extra project destinations. Empty destinations need truthful states, not placeholder claims of completion.
+The client reads the selected project through the API and supports Start Here, Feature Map, User Journeys, Actors, Rules and Glossary, plus project-scoped feature/case details and browser Back. Filters and local section controls do not add project destinations. Missing records have honest empty states; project switching isolates selection/search/camera state.
 
 A browser view must use one coherent loaded Atlas revision for its facts, cases, evidence and links. A successful API write needs a refetch/Refresh before an open browser reflects it; there is no live source sync. Preserve project/feature/case identity in navigation and cache state so switching projects cannot show stale content from another project. Handle empty storage, empty or partial projects, unknown outcomes, missing assets, retired features and API failure distinctly. Routes should remain directly loadable and Back should restore orientation.
 
-The current document cap of 100 features and full-project reads are acceptable as a present constraint, not as a large-project answer. The desktop delivery roadmap targets a future test dataset of at least 160 features, above that cap; this fixture is not implemented yet. Before raising limits, create and measure that fixture through contract validation, storage read/write, search and browser rendering. Then choose bounded page/section reads, grouping and selective relationship expansion based on the measured bottleneck. Preserve complete reachability and revision consistency while avoiding a giant rendered graph. Do not add Redis, an ORM, vector search or separate databases ahead of that evidence. [T16]
+The reader uses bounded full-project documents, stable grouping and selective map detail. Isolated capacity and browser tests exercise 160 activities through API persistence, rendering, search, keyboard and camera interactions. The normalized project cap is 500 features; legacy compatibility has its own checked byte boundary. This is bounded capacity evidence, not a benchmark for arbitrary large repositories. Keep QA datasets outside the single owner showcase; add infrastructure only for a measured bottleneck. [T16]
 
 ## 8. Privacy, assets, and backups
 
@@ -112,16 +112,16 @@ The repository is public but all rights reserved; private local knowledge and cr
 
 The existing platform and scenes have unit, API, storage and Playwright coverage. A future branch is ready only after the repository-required `format:check`, `lint`, `typecheck`, `test:unit`, `test:e2e` and `build` gates pass; the `validate` script also runs artifact and production restart/shutdown checks. Use temporary storage and the real production SQLite binding for backend integration tests. Do not infer source-product accuracy or owner approval from passing tests.
 
-For the proposed expansion, test strict scene/version and capabilities discovery, legacy version-1 current reads and nonempty migration/restore, cross-project reference rejection, stale revision and rollback. Test the authored case against its recorded outcome/reason and source reference without building a parallel rules engine. Browser checks should cover each implemented destination, direct links and Back, project isolation, selectable cases, keyboard focus and reduced motion. A large labelled fixture should exercise the 160+ feature boundary and measured read behavior. Check three genuinely distinct domains, including at least two authorized real-source contexts; use a clearly labelled synthetic domain only if needed to expose a renderer boundary. These are future acceptance targets, not results already observed.
+PR #13's recorded full validation passed 86 unit/API tests and 71 Chromium tests, covering contracts/capabilities, copied preflight, nonempty upgrades/restore, scoped references, revision conflicts/rollback, six destinations, direct links/Back, recorded cases, keyboard/reduced motion and 160-feature map behavior. Preserve these regressions. T011 still needs three genuinely distinct domains, at least two authorized reviewed real-source contexts, broader desktop/source review and end-to-end authoring effort. Synthetic fixtures cannot establish those outcomes.
 
 ## 10. Build order and remaining choices
 
-The proposed sequence for owner review is:
+Delivered milestones and remaining acceptance are:
 
 1. **T007 — local Penpot design handoff:** preserve the approved native file at ignored `.local/design/atlas.penpot`. Record its identity, relevant boards and missing-file retrieval in the [design reference](../design-reference.md). Extract assets only as required by implementation tasks; no generated gallery or full export prerequisite.
-2. **T008 — two-screen visual proof:** review the illustrated Start Here and one activity explanation in the current shared frame before expanding the guide.
-3. **T009 — models, capabilities and authoring:** design and test the versioned authored-activity scene, supporting records, evidence granularity, migration and capabilities response; update `update-atlas` references/tests with the same contract change.
-4. **T010 — desktop views and map:** implement the remaining six-destination views, grouped map and relevant relationship exploration against saved data.
+2. **T008 — two-screen visual proof (complete):** illustrated Start Here and one activity explanation are merged at `0681fef` and accepted by the owner on 2026-09-30. See [validation](../delivery-evidence.md#t008--desktop-visual-proof).
+3. **T009 — models, capabilities and authoring (merged):** contract v2, schema 4, authored scenes, supporting records and capability-aware portable authoring delivered in PR #13.
+4. **T010 — desktop views and map (merged):** six destinations, current source details and the interactive grouped map delivered in PR #13.
 5. **T011 — cross-domain verification:** test three distinct domains, at least two based on authorized real-source evidence, and size/accessibility behavior; keep synthetic examples labelled.
 
 This is a dependency outline, not authorization to implement all five tasks or a substitute for reviewed task specs. Exact schemas, evidence references, migration steps and measured capacity budgets belong in the scoped implementation plans within these boundaries; owner review evaluates visual results and consequential scope changes. Desktop is the design priority; preserve today's responsive baseline while full tablet/mobile design is deferred. No real source should be inferred from fixtures or old Atlas content.
@@ -157,3 +157,8 @@ These primary references explain relevant technology constraints; they do not pr
 | 0.6 | 2026-09-24 | Proposed local SQLite/API platform and project-scoped data. |
 | 0.7 | 2026-09-28 | Reconciled implemented platform and three current scenes; scoped proposed authored activities, seven-view records, evidence, capability discovery, migration, size checks and T007–T011 sequence for review. |
 | 0.8 | 2026-09-29 | Set the six-destination current-state contract: no product-history API or saved comparisons; revision conflicts, transactional updates, current data, and backup/restore remain required. |
+| 0.9 | 2026-10-01 | Recorded PR #13's delivered contract v2, schema 4, four scenes, capability preflight, six destinations, map and bounded capacity; T011 and T005 remain open. |
+
+### T010 map camera integration decision — 2026-09-30
+
+Adopt pinned `react-zoom-pan-pinch` 4.2.0 for transient camera transforms only. Before installation, an isolated Chromium probe using the packed distribution checked 160 nodes, background dragging versus node clicks, keyboard pan and off-screen focus, Fit/viewport-minimap agreement, reduced-motion zero-duration transforms and 160-character labels. All checks passed after removing unconditional focus re-centering (it could swallow a pointer click) and fitting long-label row height. The app owns derived grouping/layout, URL selection, accessible text and minimap coordinates; the dependency owns gesture/transform mechanics. Neither camera nor layout writes knowledge revisions. The final map adds the same checks against saved API data. Official API reference: [maintainer repository](https://github.com/BetterTyped/react-zoom-pan-pinch).

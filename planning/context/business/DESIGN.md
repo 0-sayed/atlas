@@ -1,8 +1,8 @@
 # Atlas — Experience & Visual Design
 
-**Version:** 0.13\
-**Updated:** 2026-09-29\
-**Status:** Six-destination current-state direction approved; live Penpot cleanup for that direction is complete; local revision 235 snapshot is verified. The original desktop reference was reviewed. T006 is a committed, limited application foundation; full destination support, browser visual acceptance and human usefulness remain pending. \
+**Version:** 0.15\
+**Updated:** 2026-10-01\
+**Status:** Native Penpot revision 235 is the approved source. T008's two-screen composition is owner-approved. T009/T010's authored knowledge, six desktop destinations and map merged via PR #13 (`f7bc975`). Broader desktop/source acceptance remains T011; human usefulness remains T005. \
 **Scope:** A reusable visual guide for saved web projects, rendered from SQLite through a small local backend; source context is prepared independently.
 
 **Penpot lookup:** [Design reference](../design-reference.md) contains verified page/board links, shared component IDs, task mappings and export status. Start there to inspect the actual design; this document owns experience rules.
@@ -19,7 +19,7 @@
 
 **Clarified boundary:** `fill-atlas` inspects source evidence and creates a standalone context file only. No downstream tool, planner, or implementation instruction belongs in that skill or its output. Separately, the user's agent can turn that context into validated Atlas data updates. The file is not automatically interpreted or imported by the app; the skill never calls the database/API.
 
-**The fixed six-destination frame is the approved direction.** Case switching remains a useful feature interaction. The booking fixture is optional historical test content. See [V1 defaults and prototype checks](PROJECT.md#16-v1-defaults-and-prototype-checks). The API, SQLite platform, project-scoped exploration and source skill exist. T006 adds a limited shared visual foundation, while running application acceptance remains open; the local Penpot snapshot is refreshed. [TECHNICAL.md](../technical/TECHNICAL.md) owns the backend baseline.
+**The fixed six-destination frame is implemented.** Case switching explains recorded outcomes. Booking/logistics/capacity fixtures stay in isolated tests; owner previews show one Publishing Studio demo. T008's two-screen composition is accepted; broader desktop/source acceptance remains T011. See [V1 defaults](PROJECT.md#16-v1-defaults-and-prototype-checks) and [TECHNICAL](../technical/TECHNICAL.md).
 
 ### Shared frame, project-specific explanation
 
@@ -29,7 +29,7 @@ The overview curates saved essentials in an illustrated landscape, with all acti
 
 Optional feature `presentation` selects `calendar`, `document`, `compass`, `parcel` or `people` and `sky`, `sage` or `peach`. Absent settings use scene defaults, so older knowledge stays readable. These settings change artwork, not facts or behavior. `assetIds` still attach supporting registered artwork; they do not replace scene controls or act as a full-screen page. Arbitrary layouts, JSX, SVG markup and executable configuration are not stored in the database.
 
-The companion `update-atlas` skill owns preparation and incorporation under the user's instruction. Its present API/art references explain source-fit checks, supported artwork, image provenance, registration, scoped revision-checked updates and browser verification. T009 proposes extending its capability checks alongside new contracts; until then it must report unsupported source behavior explicitly. It does not expand `fill-atlas` or promise arbitrary scenes without application work.
+The separate `update-atlas` workflow handles reviewed incorporation, capability/limit preflight, supported artwork and provenance, revision-checked writes and verification. T009 delivered its contract-v2 support and independently copied preflight tests. Unsupported behavior remains an explicit gap. It does not expand `fill-atlas` or promise arbitrary scenes.
 
 ### The design in one glance
 
@@ -236,7 +236,7 @@ The desktop Penpot file supplies the reviewed visual reference: fixed navigation
 
 ### Prove the art in code before scaling
 
-For the separately authorized T008 proof, refine the existing Publishing Studio overview and one supported navigation-feature explanation with a **small reusable asset set**. Use the approved local Penpot snapshot identified by the [design reference](../design-reference.md) and only facts supported by the existing dataset and contract. The booking art proof was historical; it is not the next screen to build.
+T008 delivered the Publishing Studio overview and one supported navigation-feature explanation with a **small reusable asset set**; the owner accepted the running proof on 2026-09-30. Use the approved local Penpot snapshot identified by the [design reference](../design-reference.md) and only facts supported by the existing dataset and contract. The booking art proof was historical; it is not the next screen to build.
 
 Implement the approved Penpot scenery, icon masters, typography roles, tokens and component compositions, then compare the running screens with their specific reference boards. Do not substitute the earlier prototype's art or styling under the label of reuse. Different project facts can change text, supported sections and content-fitting geometry; document these adaptations without inventing facts or silently changing the visual system. Critical text and controls stay in the UI. Verify extracted images are visibly correct and fonts actually load; retain provenance and required font notices. Historical generated concepts below are inspiration only and cannot override the approved Penpot design.
 
@@ -260,9 +260,9 @@ The retained reference guide is in [PROJECT.md](PROJECT.md#15-visual-reference-g
 
 ## 8. Next design checkpoint
 
-**Review verdict:** the original desktop Penpot reference was reviewed; its live current-state cleanup is complete; local revision 235 snapshot is verified. Its static compositions do not prove that arbitrary short, long or missing project content reflows in the application. T006 remains a limited foundation (commit `ac10c83`); the running two-screen visual proof and six working destinations remain to be accepted.
+**Review verdict:** the original desktop Penpot reference was reviewed; its live current-state cleanup is complete; local revision 235 snapshot is verified. Its static compositions do not prove that arbitrary short, long or missing project content reflows in the application. T008’s running two-screen visual proof is merged (`0681fef`) and accepted by the owner. Six working destinations and the broader knowledge model remain T009–T011.
 
-GOV.UK's design guidance recommends prototypes before committing to a full build and identifies coded prototypes as useful for realistic interaction testing [R1]. For Atlas, T008's next proof is **a running illustrated Start Here overview and one feature explanation using the existing API and SQLite path**, checked against the reviewed desktop design. The six destinations are the full-product direction; this proof does not mean all six views or their contracts are complete.
+GOV.UK's design guidance recommends prototypes before committing to a full build and identifies coded prototypes as useful for realistic interaction testing [R1]. For Atlas, the accepted T008 proof is **a running illustrated Start Here overview and one feature explanation using the existing API and SQLite path**, checked against the reviewed desktop design. The six destinations are the full-product direction; this proof does not mean all six views or their contracts are complete.
 
 ### Historical booking learning loop and current visual proof
 
@@ -270,7 +270,7 @@ The illustrative **Reschedule a booking** fixture above was the earlier end-to-e
 
 `Start Here → select a documented feature → inspect a case → open/close a reason → return`
 
-The booking loop remains a historical fixture test. T006 uses labelled Publishing Studio demo data for the overview and navigation-feature explanation. T008 must evaluate these running screens against the reviewed desktop design. Additional destinations may have honest empty states until their authored data and views are implemented. No real booking or publishing action occurs in Atlas.
+The booking loop remains a historical fixture test. T006 uses labelled Publishing Studio demo data for the overview and navigation-feature explanation. T008 evaluated these running screens against the reviewed desktop design and received owner acceptance. Additional destinations may have honest empty states until their authored data and views are implemented. No real booking or publishing action occurs in Atlas.
 
 The historical booking fixture demonstrated allowed, time-blocked, occupied-slot and ownership cases from section 1, plus one uncertain outcome. The explanation displays recorded examples, not computed booking outcomes. Empty, partial, no-result and unknown states must never imply a live source connection.
 
@@ -315,7 +315,7 @@ Check one change that affects a rule, one that adds/removes behavior, and one re
 
 ### Proposed desktop sequence
 
-T007 reconciles the handoff and acceptance boundaries. T008 verifies the two-screen visual proof in the browser. T009 extends strict project knowledge, presentation capabilities and `update-atlas` together. T010 completes the remaining desktop destinations and map. T011 runs the three-domain same-build acceptance above. This sequence is for owner review; it does not authorize implementation. Tablet and mobile design completion remains deferred, while existing responsive checks must continue passing. Enjoyment, comprehension and source accuracy remain unproven until exercised. Large-repository discovery and broad integrations remain deferred.
+T007/T008 established the native handoff and owner-approved two-screen proof. T009/T010 implementation merged together in PR #13 (`f7bc975`). T011 is next: the three-domain same-build acceptance above with authorized real-source and desktop review. The sequence does not authorize future work. Tablet/mobile design expansion stays deferred; preserve existing responsive checks. Enjoyment, comprehension and source accuracy remain unproven until evaluated.
 
 ## 9. Research informing this review
 
@@ -344,3 +344,5 @@ Accessed 2026-09-24. These sources support design/testing principles, not a clai
 | 0.11 | 2026-09-25 | Superseded the earlier three-place recommendation with seven fixed project destinations; defined the first two-screen visual proof and deferred full-view contracts and visual acceptance. |
 | 0.12 | 2026-09-28 | Distinguished T006, reviewed desktop Penpot and target behavior; specified bounded authored activities, design-system choices and T007–T011 acceptance. Documentation proposal only. |
 | 0.13 | 2026-09-29 | Set the six-destination current-state direction; removed Recent Changes and before/after product-history screens. The original Penpot reference was reviewed; owner browser acceptance remains open; the local snapshot is refreshed. |
+| 0.14 | 2026-09-30 | Recorded merged T008 visual proof and owner acceptance of Start Here and the feature explanation; broader desktop destinations and human usefulness remain open. |
+| 0.15 | 2026-10-01 | Reconciled merged authored knowledge, six destinations and map from PR #13; kept T011 source/desktop acceptance and T005 human evaluation open. |
