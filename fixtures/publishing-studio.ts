@@ -1,8 +1,15 @@
 import type {
   ApprovalFeature,
+  AuthoredFeature,
   CreateRequest,
+  Feature,
   NavigationFeature,
 } from '../shared/contracts.js'
+
+type KnowledgeBindings = Pick<
+  Feature,
+  'actorIds' | 'ruleIds' | 'areaId' | 'evidenceIds'
+>
 
 // Entirely fictional editorial scenarios for an Atlas showcase.
 const evidence = {
@@ -14,7 +21,7 @@ const evidence = {
     'Invented examples for a fictional publication. These saved scenarios do not execute editing, review, publishing, or search in a source product.',
 }
 
-const prepareArticle: NavigationFeature = {
+const prepareArticle: NavigationFeature & KnowledgeBindings = {
   id: 'prepare-article',
   title: 'Prepare the Field Notes article',
   actor: 'Writer',
@@ -25,6 +32,10 @@ const prepareArticle: NavigationFeature = {
   scene: { kind: 'navigation', version: 1 },
   revisionLabel: 'Publishing Studio fixture v1',
   evidence,
+  actorIds: ['writer'],
+  ruleIds: ['draft-prepared', 'image-permission'],
+  areaId: 'editorial',
+  evidenceIds: ['editorial-example'],
   assetIds: [],
   presentation: { illustration: 'document', accent: 'sky' },
   rules: [
@@ -64,55 +75,107 @@ const prepareArticle: NavigationFeature = {
   ],
 }
 
-const requestReview: NavigationFeature = {
+const requestReview: AuthoredFeature = {
   id: 'request-review',
   title: 'Request editorial review',
-  actor: 'Writer',
+  actor: 'Writer and Reviewer',
   purpose: 'Hand the prepared article to an independent reviewer.',
   group: 'Field Notes · Editorial',
-  scene: { kind: 'navigation', version: 1 },
+  scene: { kind: 'authored', version: 1 },
   revisionLabel: 'Publishing Studio fixture v1',
   evidence,
+  evidenceIds: ['editorial-example'],
+  actorIds: ['writer', 'reviewer'],
+  ruleIds: ['draft-prepared', 'reviewer-independent'],
+  areaId: 'editorial',
   assetIds: [],
   presentation: { illustration: 'people', accent: 'peach' },
-  rules: [
-    'The draft must be prepared before review can be requested.',
-    'An independent reviewer must be assigned to receive the request.',
+  steps: [
+    {
+      id: 'check-draft',
+      title: 'Check the prepared draft',
+      description:
+        'The writer confirms the story, summary, image credit, and image permission.',
+      actorIds: ['writer'],
+      ruleIds: ['draft-prepared'],
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'assign-reviewer',
+      title: 'Assign an independent reviewer',
+      description:
+        'A reviewer other than the writer receives the review request.',
+      actorIds: ['reviewer'],
+      ruleIds: ['reviewer-independent'],
+      evidenceIds: ['editorial-example'],
+    },
   ],
   cases: [
     {
       id: 'review-requested',
       label: 'Prepared draft handed off',
-      start:
-        '“Harbor Walks” is prepared and an independent reviewer is assigned.',
-      action: 'Request review',
-      result: 'Review request ready',
-      reason: 'The prepared draft has an independent reviewer.',
-      outcome: 'available',
+      stepIds: ['check-draft', 'assign-reviewer'],
+      evidenceIds: ['editorial-example'],
+      conditions: [
+        { ruleId: 'draft-prepared', state: 'met' },
+        { ruleId: 'reviewer-independent', state: 'met' },
+      ],
+      outcome: {
+        status: 'allowed',
+        result: 'Review request ready',
+        reason: 'The prepared draft has an independent reviewer.',
+      },
     },
     {
       id: 'draft-incomplete',
       label: 'Draft still incomplete',
-      start: '“Harbor Walks” still lacks its image credit.',
-      action: 'Request review',
-      result: 'Review request blocked',
-      reason: 'The image credit must be added before handoff.',
-      outcome: 'unavailable',
+      stepIds: ['check-draft'],
+      evidenceIds: ['editorial-example'],
+      conditions: [
+        { ruleId: 'draft-prepared', state: 'not-met' },
+        { ruleId: 'reviewer-independent', state: 'met' },
+      ],
+      outcome: {
+        status: 'blocked',
+        result: 'Review request blocked',
+        reason: 'The image credit must be added before handoff.',
+      },
     },
     {
       id: 'reviewer-unassigned',
       label: 'Reviewer assignment unclear',
-      start:
-        'The draft is prepared, but the reviewer assignment was not recorded.',
-      action: 'Request review',
-      result: 'Reviewer handoff unclear',
-      reason: 'No independent reviewer is confirmed for this request.',
-      outcome: 'unknown',
+      stepIds: ['check-draft'],
+      evidenceIds: ['reviewer-unverified'],
+      conditions: [
+        { ruleId: 'draft-prepared', state: 'met' },
+        { ruleId: 'reviewer-independent', state: 'unknown' },
+      ],
+      outcome: {
+        status: 'unknown',
+        result: 'Reviewer handoff unclear',
+        reason: 'No independent reviewer is confirmed for this request.',
+      },
+    },
+    {
+      id: 'reviewer-conflict',
+      label: 'Reviewer records disagree',
+      stepIds: ['check-draft'],
+      evidenceIds: ['reviewer-disagreement'],
+      conditions: [
+        { ruleId: 'draft-prepared', state: 'met' },
+        { ruleId: 'reviewer-independent', state: 'conflicting' },
+      ],
+      outcome: {
+        status: 'conflicting',
+        result: 'Reviewer independence disputed',
+        reason:
+          'One invented record assigns an independent reviewer; another assigns the writer. The handoff outcome is unresolved.',
+      },
     },
   ],
 }
 
-const approveArticle: ApprovalFeature = {
+const approveArticle: ApprovalFeature & KnowledgeBindings = {
   id: 'approve-article',
   title: 'Approve the article request',
   actor: 'Reviewer',
@@ -129,6 +192,10 @@ const approveArticle: ApprovalFeature = {
     description:
       'Invented example: the fictional review request requires two independent approvals. No source product behavior was inspected.',
   },
+  actorIds: ['reviewer'],
+  ruleIds: ['reviewer-independent', 'two-approvals', 'request-pending'],
+  areaId: 'editorial',
+  evidenceIds: ['approval-example'],
   assetIds: [],
   presentation: { illustration: 'people', accent: 'sage' },
   cases: [
@@ -170,7 +237,7 @@ const approveArticle: ApprovalFeature = {
   ],
 }
 
-const publishArticle: NavigationFeature = {
+const publishArticle: NavigationFeature & KnowledgeBindings = {
   id: 'publish-article',
   title: 'Publish the Field Notes issue',
   actor: 'Editor',
@@ -180,6 +247,10 @@ const publishArticle: NavigationFeature = {
   scene: { kind: 'navigation', version: 1 },
   revisionLabel: 'Publishing Studio fixture v1',
   evidence,
+  actorIds: ['editor'],
+  ruleIds: ['review-approved', 'issue-assigned'],
+  areaId: 'editorial',
+  evidenceIds: ['editorial-example'],
   assetIds: [],
   presentation: { illustration: 'calendar', accent: 'peach' },
   rules: [
@@ -222,7 +293,7 @@ const publishArticle: NavigationFeature = {
   ],
 }
 
-const findPublishedArticle: NavigationFeature = {
+const findPublishedArticle: NavigationFeature & KnowledgeBindings = {
   id: 'find-published-article',
   title: 'Find the published article',
   actor: 'Reader',
@@ -231,6 +302,10 @@ const findPublishedArticle: NavigationFeature = {
   scene: { kind: 'navigation', version: 1 },
   revisionLabel: 'Publishing Studio fixture v1',
   evidence,
+  actorIds: ['reader'],
+  ruleIds: ['published-listing'],
+  areaId: 'reader',
+  evidenceIds: ['editorial-example'],
   assetIds: [],
   presentation: { illustration: 'compass', accent: 'sky' },
   rules: [
@@ -270,9 +345,171 @@ const findPublishedArticle: NavigationFeature = {
 }
 
 export const publishingStudioSeed: CreateRequest = {
-  contractVersion: 1,
+  contractVersion: 2,
   id: 'publishing-studio',
   title: 'Publishing Studio · Demo',
+  purpose: {
+    text: 'Help a team prepare, review, and publish a Field Notes article, then help readers find it.',
+    evidenceIds: ['editorial-example'],
+  },
+  evidenceRecords: [
+    { id: 'editorial-example', ...evidence },
+    { id: 'approval-example', ...approveArticle.evidence },
+    {
+      id: 'reviewer-unverified',
+      ...evidence,
+      status: 'uncertain',
+      description:
+        'Invented example: the prepared draft has no confirmed reviewer assignment. No source product was inspected.',
+    },
+    {
+      id: 'reviewer-disagreement',
+      ...evidence,
+      status: 'conflicting',
+      description:
+        'Invented example: two fictional assignment records disagree about reviewer independence. No source product was inspected.',
+    },
+  ],
+  actors: [
+    {
+      id: 'writer',
+      name: 'Writer',
+      description: 'Prepares the article and requests review.',
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'reviewer',
+      name: 'Reviewer',
+      description:
+        'Receives a review request and assesses its approval conditions.',
+      evidenceIds: ['editorial-example', 'approval-example'],
+    },
+    {
+      id: 'editor',
+      name: 'Editor',
+      description: 'Places an approved article in a selected issue.',
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'reader',
+      name: 'Reader',
+      description: 'Finds published articles in the issue listing.',
+      evidenceIds: ['editorial-example'],
+    },
+  ],
+  rules: [
+    {
+      id: 'draft-prepared',
+      title: 'Draft prepared',
+      statement:
+        'A complete draft includes the story, summary, and image credit before review is requested.',
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'image-permission',
+      title: 'Image permission confirmed',
+      statement:
+        'Image permission must be confirmed before the draft is ready for review.',
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'reviewer-independent',
+      title: 'Independent reviewer assigned',
+      statement:
+        'A reviewer other than the writer must receive the review request; writers cannot approve their own request.',
+      evidenceIds: ['editorial-example', 'approval-example'],
+    },
+    {
+      id: 'two-approvals',
+      title: 'Two independent approvals',
+      statement:
+        'The pending request needs at least two independent approvals.',
+      evidenceIds: ['approval-example'],
+    },
+    {
+      id: 'request-pending',
+      title: 'Request still pending',
+      statement: 'Only a pending request can be approved.',
+      evidenceIds: ['approval-example'],
+    },
+    {
+      id: 'review-approved',
+      title: 'Review approved',
+      statement: 'The review request must be approved before publication.',
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'issue-assigned',
+      title: 'Issue selected',
+      statement:
+        'The editor must assign an issue for the article before publication.',
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'published-listing',
+      title: 'Published article listed',
+      statement:
+        'A published article appears in its assigned issue listing; an unpublished draft has no public listing.',
+      evidenceIds: ['editorial-example'],
+    },
+  ],
+  areas: [
+    {
+      id: 'editorial',
+      title: 'Field Notes · Editorial',
+      description: 'Prepare, review, approve, and publish the article.',
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'reader',
+      title: 'Field Notes · Reader',
+      description: 'Discover the published article in its issue.',
+      evidenceIds: ['editorial-example'],
+    },
+  ],
+  journeys: [
+    {
+      id: 'article-to-reader',
+      title: 'From draft to reader',
+      goal: 'Prepare Harbor Walks, request independent review, approve and publish it, then find the article in its issue.',
+      evidenceIds: ['editorial-example', 'approval-example'],
+      steps: [
+        { featureId: 'prepare-article' },
+        { featureId: 'request-review', stepId: 'assign-reviewer' },
+        { featureId: 'approve-article' },
+        { featureId: 'publish-article' },
+        { featureId: 'find-published-article' },
+      ],
+    },
+  ],
+  glossary: [
+    {
+      id: 'independent-review',
+      term: 'Independent review',
+      definition: 'A review by someone other than the writer requesting it.',
+      featureIds: ['request-review', 'approve-article'],
+      ruleIds: ['reviewer-independent', 'two-approvals'],
+      evidenceIds: ['editorial-example', 'approval-example'],
+    },
+    {
+      id: 'issue',
+      term: 'Issue',
+      definition:
+        'A named collection of published Field Notes articles, such as the September issue.',
+      featureIds: ['publish-article', 'find-published-article'],
+      ruleIds: ['issue-assigned', 'published-listing'],
+      evidenceIds: ['editorial-example'],
+    },
+    {
+      id: 'image-credit',
+      term: 'Image credit',
+      definition:
+        'The recorded attribution for the image accompanying an article.',
+      featureIds: ['prepare-article', 'request-review'],
+      ruleIds: ['draft-prepared'],
+      evidenceIds: ['editorial-example'],
+    },
+  ],
   features: [
     prepareArticle,
     requestReview,

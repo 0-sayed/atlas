@@ -39,7 +39,7 @@ For example, the same area-to-activity composition can show Orders → Cancel or
 
 Do not hard-code commerce categories, a fixed island count, shop-specific routes or business rules into shared components. Render supported project knowledge from the API in the same unchanged build. Keep optional content absent when unknown, and let layouts adapt to short, long and missing content. The fixed sidebar destinations organize knowledge; their contents vary by project.
 
-**Current capability limit:** booking, approval and navigation are the implemented scene kinds. Broader authored activities and supporting records are planned in T009. An activity outside supported patterns is a renderer gap, not permission to invent a navigation case. The direction covers varied web applications; it does not claim that every possible project is supported today. See [product scope](business/PROJECT.md) and [technical boundaries](technical/TECHNICAL.md).
+**Current capability limit:** booking, approval, navigation and authored scenes are implemented. T009's supporting records and T010's six destinations/map merged in PR #13 (`f7bc975`). An activity outside the advertised capabilities remains a renderer gap, not permission to invent a navigation case. T011 must still establish the required real-source and cross-domain coverage. See [product scope](business/PROJECT.md) and [technical boundaries](technical/TECHNICAL.md).
 
 ## Version and scope
 
@@ -193,4 +193,4 @@ All entries below were found on the verified desktop page. Board names describe 
 - `.local/audits/`, `.local/penpot-design/` and the archived T007 export package are historical supporting material, not prerequisites or competing sources of truth. Original concept images under `planning/context/business/references/` are inspiration, not current screen specifications.
 - When the owner approves a new design snapshot, update the native file identity/hash and affected board references together. Penpot component/token edits do not automatically update React or CSS. Verify the rendered implementation against the approved design.
 
-See the [T007 validation record](../roadmap/t007-validation.md) for this handoff's checks. See the [T008 validation record](../roadmap/t008-validation.md) for the current implementation evidence and pending owner visual acceptance; T009/T010 remain separate work.
+See [T007 evidence](delivery-evidence.md#t007--native-design-handoff) for the handoff checks and [T008 evidence](delivery-evidence.md#t008--desktop-visual-proof) for owner visual acceptance on 2026-09-30. T009/T010's merged implementation is recorded separately; broad cross-domain desktop acceptance remains T011.

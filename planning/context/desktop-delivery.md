@@ -1,11 +1,11 @@
 # Dynamic desktop delivery specification
 
-**Date:** 2026-09-29\
-**Stage:** Written specification for owner review. The direction is agreed; this document defines delivery outcomes and acceptance, not permission to start application changes. This refresh updates project context and roadmap only. Future feature implementation requires a separate task instruction; roadmap entries do not authorize execution.
+**Date:** 2026-10-01\
+**Stage:** T007 and T008 are complete; T009 and T010 implementation merged via PR #13 (`f7bc975`). T008's owner visual acceptance remains the two-screen proof. T011 cross-domain and broader desktop acceptance is next. This document records scope and remaining gates; it does not authorize future implementation.
 
-Read [PROJECT](../context/business/PROJECT.md), [DESIGN](../context/business/DESIGN.md), and [TECHNICAL](../context/technical/TECHNICAL.md) together. This brief owns task boundaries; those documents own product, visual, and architecture decisions respectively.
+Read [PROJECT](business/PROJECT.md), [DESIGN](business/DESIGN.md), and [TECHNICAL](technical/TECHNICAL.md) together. This brief owns task boundaries; those documents own product, visual, and architecture decisions respectively.
 
-Use the [Penpot design reference and task mapping](../context/design-reference.md#task-to-design-mapping) to locate the exact system and desktop boards. The approved native file is available under ignored `.local/design/atlas.penpot`; the reference records its identity and retrieval instructions.
+Use the [Penpot design reference and task mapping](design-reference.md#task-to-design-mapping) to locate the exact system and desktop boards. The approved native file is available under ignored `.local/design/atlas.penpot`; the reference records its identity and retrieval instructions.
 
 ## Acceptance contract
 
@@ -21,13 +21,13 @@ Use the [Penpot design reference and task mapping](../context/design-reference.m
 
 **Depends on:** T006. **Outcome:** an approved local native design file and a small tracked agent reference.
 
-Keep the approved `.penpot` file at `.local/design/atlas.penpot`. The [design reference](../context/design-reference.md) records its identity, task-to-board mapping, dynamic-content boundaries and access instructions. On a fresh clone, ask the owner for the file path when absent. Extract only the assets/reference views needed during each implementation task; no offline gallery, mass screen export or duplicated generated library is required.
+Keep the approved `.penpot` file at `.local/design/atlas.penpot`. The [design reference](design-reference.md) records its identity, task-to-board mapping, dynamic-content boundaries and access instructions. On a fresh clone, ask the owner for the file path when absent. Extract only the assets/reference views needed during each implementation task; no offline gallery, mass screen export or duplicated generated library is required.
 
-**Exit gate:** the native archive opens and its recorded identity matches; a new agent can locate the relevant design without old chat context, knows how to request a missing file, and distinguishes visual examples from reviewed product facts. Carry forward the [compact component rules](../context/business/DESIGN.md#compact-content-driven-component-rules), including complete card containment when Penpot bodies/actions are scene siblings. Mobile/tablet remains excluded.
+**Exit gate:** the native archive opens and its recorded identity matches; a new agent can locate the relevant design without old chat context, knows how to request a missing file, and distinguishes visual examples from reviewed product facts. Carry forward the [compact component rules](business/DESIGN.md#compact-content-driven-component-rules), including complete card containment when Penpot bodies/actions are scene siblings. Mobile/tablet remains excluded.
 
 ## T008 — shared components and two-screen visual proof
 
-**Depends on:** T007. **Outcome:** approved Start Here and one feature explanation in the running shared frame.
+**Depends on:** T007. **Status:** complete; merged in PR #11 (`0681fef`) and accepted by the owner on 2026-09-30. See [validation](delivery-evidence.md#t008--desktop-visual-proof). **Outcome:** approved Start Here and one feature explanation in the running shared frame.
 
 Implement semantic tokens and the small set of shared controls/layouts needed by these screens. Keep appearance aligned with the approved local Penpot snapshot. Use native controls and selective Radix primitives where composite behavior needs them; install only dependencies required by the proof. Preserve current project and feature navigation.
 
@@ -37,7 +37,7 @@ Use an isolated, labelled existing Publishing Studio dataset and a supported nav
 
 ## T009 — cross-domain knowledge, capabilities, and authoring
 
-**Depends on:** T008. **Outcome:** validated, persisted knowledge and a working authored-activity renderer that explains supported activities across domains.
+**Depends on:** T008. **Status:** delivered in PR #13 (`f7bc975`); see [implementation evidence](delivery-evidence.md#t009-and-t010--merged-implementation). **Outcome:** validated, persisted knowledge and a working authored-activity renderer that explains supported activities across domains.
 
 Introduce a bounded versioned authored-activity contract for ordered steps, participating actors, explicit conditions, recorded cases, outcomes/reasons, and scoped evidence. Preserve specialized booking/approval/navigation support. Add explicit records/references for project purpose, meaningful areas, actors/participation, identifiable rules, journeys, glossary, and typed relationships only as required by the six destinations. Authored journey order cannot be inferred from arbitrary relationship edges.
 
@@ -51,13 +51,13 @@ Replace the current total 100-feature constraint with a deliberate tested capaci
 
 ## T010 — complete desktop destinations and Feature Map
 
-**Depends on:** T009. **Outcome:** the six desktop destinations and feature details work against persisted current project data.
+**Depends on:** T009. **Status:** delivered in PR #13 (`f7bc975`); broader cross-domain desktop acceptance remains T011. See [implementation evidence](delivery-evidence.md#t009-and-t010--merged-implementation). **Outcome:** the six desktop destinations and feature details work against persisted current project data.
 
 Build the remaining views from the shared components and selectors. Actors show explicit participation, Rules show referenced conditions, Glossary shows saved definitions, and Journeys show authored ordered paths. Complete supported current evidence presentations. Keep truthful no-data, partial, unknown, conflict, no-results, and unavailable states. Treat design examples as reference compositions, never source data.
 
 Implement the illustrated map as reusable scenery plus accessible text/nodes/relationship layers. Provide meaningful grouping, list/search access, progressive detail, pan/zoom/Fit, a useful minimap, keyboard operation, and location restoration after detail/Back. Persisted project facts do not contain arbitrary coordinates, HTML, JSX, CSS, or executable scene programs. Camera/UI state must not create knowledge revisions. A stable derived layout keeps ordinary data updates from unnecessarily moving everything.
 
-Run a bounded integration check of the `react-zoom-pan-pinch` candidate before adopting it: selected-node clicks must coexist with dragging, keyboard focus must stay usable, Fit and minimap must agree with bounds, reduced motion must work, and dense/long-label datasets must remain readable. Record the choice in TECHNICAL; the candidate is not yet an installed dependency or a proven solution.
+The bounded integration check selected pinned `react-zoom-pan-pinch` 4.2.0 for camera transforms. The decision is recorded in TECHNICAL. Retain regression coverage for selected-node clicks versus dragging, keyboard focus, Fit/minimap bounds, reduced motion and dense/long-label datasets.
 
 **Exit gate:** every implemented destination has a valid saved-data case and an honest empty case. Direct URLs, browser Back, search/group/case state, and project switching do not leak state across projects. Desktop screenshots match the captured design intent with actual long content. Large-map validation uses at least 160 features and the T009 supported data boundary. An isolated map implementation is not completion of the other destinations.
 
@@ -71,7 +71,7 @@ Demonstrate additions, changes, explicit removals, evidence corrections, support
 
 Exercise sparse content, no facts, absent optional art, multiple actors, long names/text, changed/deleted links, conflicting evidence, and the dense map. Run `npm run validate` in isolated test storage, plus a desktop visual/accessibility review against the approved local Penpot design. Retain existing automated responsive checks while further mobile/tablet design remains deferred. Verify normal startup still has no demo knowledge and build artifacts contain no private material.
 
-**Exit gate:** a concise tracked validation report identifies build revision, source coverage, dataset labels, checks and outcomes, remaining gaps, and actual end-to-end authoring effort. Private payloads and source data stay private. This technical gate does not close T005's human comprehension/voluntary-return evaluation; collect that evidence separately.
+**Exit gate:** update the existing [delivery evidence](delivery-evidence.md) with build revision, source coverage, dataset labels, checks and outcomes, remaining gaps, and actual end-to-end authoring effort. Keep project context in this folder rather than creating task reports under the roadmap. Private payloads and source data stay private. This technical gate does not close T005's human comprehension/voluntary-return evaluation; collect that evidence separately.
 
 ## Sequencing and handoff
 

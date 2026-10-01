@@ -1,16 +1,16 @@
 # Atlas — Living Project Context
 
-**Version:** 0.13\
-**Last updated:** 2026-09-29\
+**Version:** 0.15\
+**Last updated:** 2026-10-01\
 **Owner:** Sayed  
-**Stage:** The local API/database, project-scoped exploration, independent source skill, and limited shared visual foundation exist. T006 is committed at `ac10c83`. The original desktop Penpot reference was reviewed; its live six-destination current-state cleanup is complete; local revision 235 snapshot is verified. Most destination views and general authored-activity support are not implemented. Browser visual acceptance and human usefulness evaluation remain pending.\
+**Stage:** T009/T010 implementation merged via PR #13 (`f7bc975`): authored activities, supporting knowledge records, capability-aware authoring, all six destinations and the interactive Feature Map. The approved native Penpot snapshot remains revision 235. T008's two-screen proof has separate owner acceptance. T011 real-source/cross-domain desktop acceptance is next; T005 human usefulness remains pending.\
 **Project name:** Atlas — confirmed by Sayed on 2026-09-24. Use Atlas in product titles, documentation, and future UI copy.
 
 > **North star:** Make it enjoyable to understand and remember what I built, without making me read documentation.
 
 This is a working record of the decisions, constraints, reasoning, V1 defaults, and prototype checks from the project conversation. It is not a transcript, a frozen specification, or an instruction to implement every idea below. The complete document is for preserving context; its length is not a template for the application's UI.
 
-**Design companion:** [DESIGN.md](DESIGN.md) v0.13 records the approved six-destination direction, the reviewed original desktop reference, and proposed implementation architecture. The local Penpot snapshot is refreshed; owner browser visual acceptance remains open. This document continues to own product requirements and scope.
+**Design companion:** [DESIGN.md](DESIGN.md) v0.15 records the approved six-destination direction and implemented desktop baseline. T008's two-screen owner approval is recorded; broader cross-domain visual acceptance remains T011. This document owns product requirements and scope.
 
 **Technical companion:** [TECHNICAL.md](../technical/TECHNICAL.md) records the React interface, small local backend, one SQLite database, validated data updates, and implementation checks. [README.md](../README.md) provides the shortest entry into this pack and states what has actually been reviewed.
 
@@ -60,7 +60,7 @@ The second step is not embedded in the skill. Sayed chooses his development tool
 
 ### Current implementation and next work
 
-The earlier booking fixture and second-project checks proved the initial data path; the three-place shell was a historical starting point. T006 adds a limited shared visual foundation and Publishing Studio demo, committed at `ac10c83`. The approved product has six fixed destinations, but their desktop Penpot designs are reference work, not six working application views. T007–T011 are the proposed path from that foundation to a tested, reusable guide; writing this architecture does not authorize implementation.
+The earlier booking fixture and second-project checks proved the initial data path. T006 established the shared visual foundation; T008 supplied the approved two-screen Penpot composition. PR #13 delivers T009's authored knowledge and T010's six desktop destinations/map. T011 must still verify three-domain reuse with two authorized real-source contexts and broader desktop acceptance. Future work requires a separate instruction.
 
 ---
 
@@ -167,11 +167,11 @@ This is the consolidated feature list for Atlas itself, not the features of the 
 | **Find and go deeper** | Search and grouped navigation to incorporated activities, with optional rules, clearly labelled relationships, and source evidence. Everything recorded remains reachable without drawing a giant graph. |
 | **Honest knowledge states** | An empty guide when no behavior has been incorporated, clear gaps for unknown/partial evidence, and honest no-result or unavailable-feature states. No fictional features or live-analysis indicators. |
 
-The complete guide needs authored behavior steps, multiple actors and their participation, identifiable rules, typed evidenced relationships, optional domains, explicit journeys, and glossary definitions. These are project data with optional sections and variable lengths, not fixed counts or a mandatory glossary entry for every concept. The current booking, approval and navigation scene types cover selected examples, not every web app. Unsupported behavior requires a reviewed contract and renderer addition; do not force it into a navigation case or invent a universal taxonomy.
+The delivered guide supports authored steps, multiple actors and participation, identifiable rules, typed relationships, optional areas, explicit journeys and glossary definitions. These are saved data with optional sections and variable lengths. Booking, approval, navigation and authored scenes cover bounded patterns; unsupported behavior still requires a reviewed contract/renderer addition. Do not invent navigation cases or a universal taxonomy.
 
 **Separate source-preparation deliverable:** `fill-atlas` inspects an authorized source PR/range or small existing project, writes standalone context Markdown, and stops. It can recognize scaffold-only sources and describe existing behavior. It is not a feature of the running Atlas app and has no downstream planning or implementation dependency.
 
-**Current visual foundation:** T006 introduces an illustrated Start Here overview and a navigation-feature explanation in the shared frame using labelled Publishing Studio demo data. This proves a limited composition and data path, not full destination coverage or visual acceptance. T008 will check the running two-screen result against the reviewed desktop reference. See [DESIGN.md](DESIGN.md#8-next-design-checkpoint).
+**Current visual foundation:** T008 replaced prototype visuals with the approved Penpot composition and received two-screen owner approval. T009/T010 now supply the authored model, six destinations and map. Broader real-source and desktop acceptance remains T011. Owner previews show one labelled Publishing Studio project in disposable storage. See [DESIGN.md](DESIGN.md#8-next-design-checkpoint).
 
 ### Do not automatically add
 
@@ -480,7 +480,7 @@ This planning context retains **13 visual references** in `business/references/i
 
 ## 16. V1 defaults and prototype checks
 
-The current direction supersedes the earlier three-place default. T006 is a limited foundation; T008 checks two running screens against the reviewed desktop reference, then T009–T011 complete supported knowledge, destination views and cross-project proof. None of these decisions proves usability or source accuracy.
+The six-destination direction supersedes the earlier three-place default. T008's two-screen proof is owner-approved; T009/T010's knowledge and desktop implementation are merged. T011 cross-project/source/desktop acceptance and T005 human evaluation remain open. Implementation alone does not establish usability or source accuracy.
 
 ### Settled for the first build
 
@@ -525,7 +525,7 @@ A large brownfield engine, full 3D, cross-project enterprise search, multi-user 
 
 Synthetic feature records can test navigation and rendering. Reviewed real sources are needed to test whether the system understands actual behavior. Neither test alone proves the other. A renderer gap or unknown fact remains explicit in the guide and in authoring feedback.
 
-### Proposed implementation sequence
+### Delivery sequence
 
 | Task | Reviewable result |
 |---|---|
@@ -535,7 +535,7 @@ Synthetic feature records can test navigation and rendering. Reviewed real sourc
 | T010 | Working Feature Map, User Journeys, Actors, Rules and Glossary desktop destinations using the shared design system and honest empty/unknown states. |
 | T011 | Same-build acceptance with three distinct domain datasets, at least two from reviewed authorized real sources; no per-project application edits. |
 
-This is a proposed roadmap for review, not implementation authorization. Desktop is the current design scope. Existing responsive behavior must not regress; tablet and mobile design completion is deferred.
+T007–T010 are delivered; T011 is the next acceptance task. The [task graph](../../roadmap/tasks.md) records current status and [delivery evidence](../delivery-evidence.md) records its basis. Desktop remains the design scope; additional tablet/mobile design is deferred. This sequence does not authorize future implementation.
 
 ---
 
@@ -547,7 +547,7 @@ Start with this context README.md, this section 1, the [V1 defaults](#16-v1-defa
 
 Preserve the user's constraints. Do not silently promote a proposal, mockup widget, or plausible product convention into a requirement. Ask about consequential unresolved choices when necessary rather than filling them with enterprise defaults.
 
-Preserve the existing T006 foundation. The recorded roadmap sequence is T007 for the local Penpot handoff, T008 for the running two-screen visual proof, T009 for supported knowledge and authoring, and T010 for the five destinations beyond Start Here and the full desktop experience. Start one of these only when separately instructed to implement that task. This documentation refresh does not initiate feature planning or execution.
+Preserve the merged T009/T010 implementation at `f7bc975`; do not restart it from stale reports or branch names. T011 is next when separately instructed: verify the required real-source/cross-domain and desktop acceptance. T005 human evaluation remains independent. This status refresh does not initiate feature implementation.
 
 ### Updating this document
 
@@ -584,6 +584,8 @@ For another conversation or a coding session, supply the latest document and the
 | 0.11 | 2026-09-25 | Superseded the historical three-place recommendation with seven fixed destinations, specified full-product knowledge needs, and limited the active visual milestone to the overview plus one feature explanation. Visual acceptance remains pending. |
 | 0.12 | 2026-09-28 | Distinguished committed T006 and reviewed desktop references from target behavior; bounded authored activities and specified T007–T011 same-build acceptance. Documentation proposal only. |
 | 0.13 | 2026-09-29 | Approved a current-state-only guide with six destinations. Removed product-history, Recent Changes, and historical-comparison requirements while retaining revision-safe updates, browser Back, and historical development evidence. Live current-state Penpot cleanup is complete; local revision 235 snapshot is verified. |
+| 0.14 | 2026-09-30 | Recorded merged T008 implementation (`0681fef`) and owner acceptance of the running desktop proof. T009 is next; remaining destinations and human usefulness evaluation remain open. |
+| 0.15 | 2026-10-01 | Reconciled merged T009/T010 (`f7bc975`), six destinations and authored knowledge; identified T011 as next and preserved T005 human-evaluation limits. |
 
 ---
 

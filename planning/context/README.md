@@ -1,7 +1,7 @@
 # Atlas planning context
 
-**Updated:** 2026-09-29\
-**Current state:** React/TypeScript/Vite, the local NestJS API, SQLite persistence, project-scoped exploration, and the source-context skill are implemented. The current working foundation is not the final Penpot desktop experience. Broader knowledge contracts and the remaining desktop views are planned work.
+**Updated:** 2026-10-01\
+**Current state:** T009 and T010 merged in PR #13 (`f7bc975`): authored contract v2, SQLite schema 4, capability-aware authoring, six desktop destinations and the interactive map. T008's two-screen visual approval is recorded separately. T011 cross-domain/source/desktop acceptance is next; T005 human evaluation remains open.
 
 ## Start here
 
@@ -13,7 +13,9 @@ Start with [the planning entry point](../README.md), then read these documents i
 | [Design reference](design-reference.md) | Approved local Penpot file, shared component IDs, task mapping and missing-file retrieval instructions. |
 | [DESIGN.md](business/DESIGN.md) | Illustrated desktop composition, shared components, content sizing, interactions, and honest knowledge states. |
 | [TECHNICAL.md](technical/TECHNICAL.md) | Implemented architecture, proposed contract/rendering extensions, library choices, and technical acceptance. |
-| [Desktop delivery brief](../roadmap/desktop-delivery.md) | T007–T011 deliverables, prerequisites, acceptance gates, and handoff requirements. |
+| [Desktop delivery brief](desktop-delivery.md) | T007–T011 deliverables, prerequisites, acceptance gates, and handoff requirements. |
+| [Delivery evidence](delivery-evidence.md) | Concise delivery findings, merged implementation evidence, and remaining evaluation limits. |
+| [Bootstrap evidence](bootstrap.md) | Historical T000/T002 foundation checklist; use the root README for current setup. |
 | [Task graph](../roadmap/tasks.md) | Task completion, dependencies, and historical verification boundaries. |
 
 ## Runtime and authoring boundaries
@@ -22,9 +24,11 @@ Start with [the planning entry point](../README.md), then read these documents i
 
 One local SQLite database stores all projects; private registered image files live alongside it. The frontend reads validated saved knowledge. Normal storage starts empty; fixtures and Penpot examples are explicitly illustrative. Ordinary supported project additions and fact/art updates must work without changing or rebuilding the app. Unsupported semantics require a reviewed reusable contract/renderer addition.
 
-The running model currently accepts booking, approval, and navigation scenes. The domain-neutral authored activity, full six-view knowledge model, and capability-aware authoring described in the refreshed specification are **targets**, not installed capabilities.
+The running model accepts booking, approval, navigation and authored scenes. It reads contract v2 and accepts version-1 and version-2 writes. Explicit purpose, actors, rules, areas, journeys, glossary and evidence records support the six views. Capabilities and limits are advertised by the API. Automated checks establish these bounded features, not arbitrary-project coverage or source truth.
 
 ## Source material and freshness
+
+Keep project specifications, design guidance, and delivery evidence in `planning/context/`. The roadmap contains only the task list and dependency graph, which link to this context rather than duplicating it. Maintain delivery findings in the existing evidence document instead of creating separate task reports or a validation folder.
 
 The v0.10 pack was incorporated into this folder; maintain these files instead of a second context pack. Keep the [13 original references](business/PROJECT.md#15-visual-reference-guide) as planning assets only. They are not runtime screenshots, source-product facts, or licensed production artwork.
 

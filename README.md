@@ -11,7 +11,7 @@ The repository includes two separate skills:
 
 Copy the whole skill folder, including references/assets, when installing it outside this repository. Claude Code supports personal skills under `~/.claude/skills/` and repository skills under `.claude/skills/` ([official installation guidance](https://code.claude.com/docs/en/skills#choose-where-skills-load)). Other agents should use their documented skill directory or be explicitly instructed to read the skill file. Installation grants no source access, credentials, or permission to publish. The folders use the portable [Agent Skills format](https://agentskills.io/specification); provider-specific discovery and tools still differ.
 
-Normal incorporation changes data and assets, not the frontend. Supported scenes are booking, approval and navigation; artwork choices are calendar, document, compass, parcel and people, with sky, sage or peach accents. A new interaction requires a separately scoped reusable renderer. Valid JSON is not proof of source accuracy. Neither skill runs in the browser or watches PRs automatically.
+Normal incorporation changes data and assets, not the frontend. Supported scenes are booking, approval, navigation and authored; artwork choices are calendar, document, compass, parcel and people, with sky, sage or peach accents. A new interaction requires a separately scoped reusable renderer. Valid JSON is not proof of source accuracy. Neither skill runs in the browser or watches PRs automatically.
 
 ## Run locally
 
@@ -29,18 +29,26 @@ npm start
 
 Open `http://127.0.0.1:4317`. Fresh storage shows an empty project shelf; startup never seeds. For development run `npm run dev:api` and `npm run dev` in separate terminals. Vite proxies `/api` to Nest. `npm run preview` serves frontend files only; `npm start` serves the complete production app.
 
-To explore **Publishing Studio**, run a separate demo server with its own storage and port. This single fictional project follows one article through preparation, review, approval, publication and discovery, with saved allowed/blocked/unknown cases, connected activities and varied artwork:
+For the owner's visual preview, use the **single Publishing Studio showcase**:
 
 ```sh
-ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm run storage -- migrate
-ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm start
-# In another terminal:
-ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm run seed
+npm run showcase
 ```
 
-Open `http://127.0.0.1:4318/#/projects/publishing-studio`. The seed saves the current fictional approval rule and its recorded cases. These are invented demo rules, not Ghost behavior, and Atlas explains saved cases rather than executing a publishing workflow.
+Open `http://127.0.0.1:4176`. The launcher creates disposable storage with exactly one fictional project. It demonstrates all six guide destinations, a connected five-activity journey, participants, rules, glossary, and allowed/blocked/unknown/conflicting recorded cases. Stopping it removes its temporary storage; restarting begins a fresh demo. Normal storage remains empty unless knowledge is incorporated deliberately.
 
-The seed uses the authenticated API. Reseeding rejects an existing project and never overwrites edits. Keep normal storage separate. The smaller booking/approval fixtures remain for automated tests, not additional showcase projects.
+**Do not hand off the Playwright server as the owner's preview.** The e2e-server script and ATLAS_E2E_PORT are for isolated automated QA. Booking, logistics, and large synthetic projects are test datasets, never additional showcase projects.
+
+For a persistent private copy instead, migrate and start a separate storage directory and port, then run the seed command against that server:
+
+```sh
+ATLAS_DATA_DIR=.local/publishing-demo ATLAS_PORT=4318 npm run storage -- migrate
+ATLAS_DATA_DIR=.local/publishing-demo ATLAS_PORT=4318 npm start
+# In a second terminal, using the same .env credential:
+ATLAS_PORT=4318 npm run seed -- publishing-studio
+```
+
+The seed uses the authenticated API and rejects an existing project without overwriting edits. These invented demo rules do not establish source-product behavior; Atlas explains saved cases rather than executing a publishing workflow. The disposable showcase uses a separate generated credential, so the agent write example below targets this private copy instead.
 
 | Setting               | Default / requirement                                                                                                       |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -54,13 +62,14 @@ Keep `.env`, SQLite, journals, images and backups private. `.local/` is ignored 
 
 ## API for local agents
 
-[shared/contracts.ts](shared/contracts.ts) owns strict versioned schemas. Write bodies require `contractVersion: 1`; unknown fields fail. Current project responses carry the version. Limits: JSON 2 MiB; images 1 MiB; 100 features, 100 cases per feature, 200 relations and 200 assets per project. IDs use lowercase ASCII letters/digits/hyphens, at most 64 characters. Supported scenes are `booking`, `approval`, and `navigation`, all version 1.
+[shared/contracts.ts](shared/contracts.ts) owns strict versioned schemas. Current write bodies use `contractVersion: 2`; legacy v1 create/update bodies remain accepted. Unknown fields fail. Current project responses carry version 2. Request limits: JSON 2 MiB, images 1 MiB, 100 features, 100 cases per feature, 200 relations and 100 records per supporting collection per batch. Project limits: 500 features, 2,000 relations/evidence records, 1,000 records per other supporting collection and 200 assets; normalized documents fit 8 MiB, with a separate bounded legacy compatibility allowance. `GET /api/v1/capabilities` advertises the exact limits and supported shapes. IDs use lowercase ASCII letters/digits/hyphens, at most 64 characters. Supported scenes are `booking`, `approval`, `navigation`, and `authored`, all scene version 1.
 
 All routes below start with `/api/v1`:
 
 | Method / path                       | Behavior                                                                                               |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `GET /ready`                        | Database/schema/foreign-key readiness, no private details                                              |
+| `GET /capabilities`                 | Accepted contracts, scenes, records, visuals and limits                                                |
 | `GET /projects`                     | Up to 100 summaries (`id`, `title`, `revision`) ordered by ID; pass `?after=LAST_ID` for the next page |
 | `GET /projects/:id`                 | Coherent current document                                                                              |
 | `POST /projects`                    | Create at revision 1; [fixtures/booking.ts](fixtures/booking.ts) is the tested full example            |
@@ -70,7 +79,7 @@ All routes below start with `/api/v1`:
 
 Writes require `Authorization: Bearer <local credential>`. CLI callers may omit Origin; browser Origin/Host are restricted to configured loopback ports. Cross-site requests fail. No permissive CORS or frontend credential.
 
-After starting and seeding the separate Publishing Studio demo above, this changes its illustrative approval requirement to three independent approvals:
+After starting and seeding the persistent private Publishing Studio copy on port `4318` above, this changes its illustrative approval requirement to three independent approvals using the same `.env` credential:
 
 ```sh
 ATLAS_PORT=4318 node --env-file=.env --input-type=module <<'JS'
@@ -80,8 +89,11 @@ const read = await fetch(`${base}/projects/publishing-studio`)
 if (!read.ok) throw new Error(`Read failed: ${read.status}`)
 const project = await read.json()
 const feature = project.features.find(item => item.id === 'approve-article')
-const body = updateSchema.parse({ contractVersion: 1, expectedRevision: project.revision,
-  upsertFeatures: [{ ...feature, requiredApprovals: 3 }] })
+const rule = project.rules.find(item => item.id === 'two-approvals')
+const body = updateSchema.parse({ contractVersion: 2, expectedRevision: project.revision,
+  upsertFeatures: [{ ...feature, requiredApprovals: 3 }],
+  upsertRules: [{ ...rule, title: 'Three independent approvals',
+    statement: 'The pending request needs at least three independent approvals.' }] })
 const response = await fetch(`${base}/projects/${project.id}/changes`, {
   method: 'POST', headers: { 'content-type': 'application/json',
     authorization: `Bearer ${process.env.ATLAS_WRITE_TOKEN}` }, body: JSON.stringify(body),
@@ -96,7 +108,7 @@ Errors use `{ "error": { "code": "revision_conflict", "message": "..." } }`; sha
 
 ## Storage, upgrades and recovery
 
-Tracked SQL is in `migrations/`, currently schema 3. Every connection enables foreign keys. Current data and revisions commit together. Images are staged completely before registration; generated keys and symlink checks restrict serving.
+Tracked SQL is in `migrations/`, currently schema 4. Every connection enables foreign keys. Current data and revisions commit together. Images are staged completely before registration; generated keys and symlink checks restrict serving.
 
 Before upgrading, stop Atlas and back up using the **existing compatible version**. Backup locks out the app and uses SQLite's backup facility without applying migrations, plus registered assets and a database checksum manifest. Keep the manifest with the backup; restore verifies it before migrations. Startup/migrate applies migrations transactionally; future schema versions are rejected.
 
@@ -117,7 +129,7 @@ Processes hold a storage `.lock`. After a crash, remove a stale lock only after 
 
 Install Chromium with `npx playwright install chromium`, then run `npm run validate`. It covers format, lint, TypeScript, Vitest/database/Supertest, Playwright through production Nest/frontend/SQLite, both builds, artifact boundaries, and production restart/shutdown. Tests use temporary storage, never `.local/`. Browser checks retain navigation, Back, cases, evidence, keyboard/focus, narrow layouts and reduced motion. Audit and secret scanning are separate CI jobs; dependency updates are monthly, grouped into one npm PR and one GitHub Actions PR. Security updates are grouped separately per ecosystem and are not delayed until the monthly run.
 
-PR checks enforce Conventional Commit titles and reject newly introduced high/critical dependency vulnerabilities across runtime and development dependencies. A separate metadata-only workflow assigns human-authored PRs to their authors. The pending GitHub activation steps are in [bootstrap repository settings](planning/bootstrap.md#step-3--repository-settings).
+PR checks enforce Conventional Commit titles and reject newly introduced high/critical dependency vulnerabilities across runtime and development dependencies. A separate metadata-only workflow assigns human-authored PRs to their authors. The recorded GitHub activation checklist is in [bootstrap repository settings](planning/context/bootstrap.md#step-3--repository-settings).
 
 Production needs `dist-server/`, `dist/`, tracked `migrations/` and runtime npm dependencies, started from the repository root. Static hosting alone cannot serve the database. Docker and publishing remain deferred.
 
@@ -125,4 +137,4 @@ Production needs `dist-server/`, `dist/`, tracked `migrations/` and runtime npm 
 
 Atlas's source repository is **public, all rights reserved**; no open-source license has been selected. Repository visibility does not make local knowledge or credentials public. The owner must decide licensing before an open-source release or artifact distribution. In-app SVG/CSS is original artwork; system fonts need no bundled files. Design-only `planning/` references are excluded from application builds. Dependency packages retain their own license files. Before distributing built frontend/backend artifacts, include the applicable dependency licenses and notices with those artifacts; no duplicated root notice snapshot is maintained.
 
-See [scope](planning/context/business/PROJECT.md), [design](planning/context/business/DESIGN.md), [technical baseline](planning/context/technical/TECHNICAL.md), [task graph](planning/roadmap/tasks.md), and [bootstrap](planning/bootstrap.md). T003 proves two distinct compositions in one unchanged build; T004 validates the independent skill; T005 evaluates real-source knowledge. Demo tests establish none of those later outcomes.
+See [scope](planning/context/business/PROJECT.md), [design](planning/context/business/DESIGN.md), [technical baseline](planning/context/technical/TECHNICAL.md), [task graph](planning/roadmap/tasks.md), and [bootstrap](planning/context/bootstrap.md). T009/T010 implementation is merged; T011 real-source/cross-domain acceptance and T005 human evaluation remain open. Demo tests do not establish those outcomes.
