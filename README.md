@@ -11,7 +11,7 @@ The repository includes two separate skills:
 
 Copy the whole skill folder, including references/assets, when installing it outside this repository. Claude Code supports personal skills under `~/.claude/skills/` and repository skills under `.claude/skills/` ([official installation guidance](https://code.claude.com/docs/en/skills#choose-where-skills-load)). Other agents should use their documented skill directory or be explicitly instructed to read the skill file. Installation grants no source access, credentials, or permission to publish. The folders use the portable [Agent Skills format](https://agentskills.io/specification); provider-specific discovery and tools still differ.
 
-Normal incorporation changes data and assets, not the frontend. Supported scenes are booking, approval and navigation; artwork choices are calendar, document, compass, parcel and people, with sky, sage or peach accents. A new interaction requires a separately scoped reusable renderer. Valid JSON is not proof of source accuracy. Neither skill runs in the browser or watches PRs automatically.
+Normal incorporation changes data and assets, not the frontend. Supported scenes are booking, approval, navigation and authored; artwork choices are calendar, document, compass, parcel and people, with sky, sage or peach accents. A new interaction requires a separately scoped reusable renderer. Valid JSON is not proof of source accuracy. Neither skill runs in the browser or watches PRs automatically.
 
 ## Run locally
 
@@ -39,7 +39,16 @@ Open `http://127.0.0.1:4176`. The launcher creates disposable storage with exact
 
 **Do not hand off the Playwright server as the owner's preview.** The e2e-server script and ATLAS_E2E_PORT are for isolated automated QA. Booking, logistics, and large synthetic projects are test datasets, never additional showcase projects.
 
-For a persistent private copy instead, migrate and start a separate storage directory and port, then run the seed command against that server. The seed uses the authenticated API and rejects an existing project without overwriting edits. These invented demo rules do not establish source-product behavior; Atlas explains saved cases rather than executing a publishing workflow.
+For a persistent private copy instead, migrate and start a separate storage directory and port, then run the seed command against that server:
+
+```sh
+ATLAS_DATA_DIR=.local/publishing-demo ATLAS_PORT=4318 npm run storage -- migrate
+ATLAS_DATA_DIR=.local/publishing-demo ATLAS_PORT=4318 npm start
+# In a second terminal, using the same .env credential:
+ATLAS_PORT=4318 npm run seed -- publishing-studio
+```
+
+The seed uses the authenticated API and rejects an existing project without overwriting edits. These invented demo rules do not establish source-product behavior; Atlas explains saved cases rather than executing a publishing workflow. The disposable showcase uses a separate generated credential, so the agent write example below targets this private copy instead.
 
 | Setting               | Default / requirement                                                                                                       |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -53,13 +62,14 @@ Keep `.env`, SQLite, journals, images and backups private. `.local/` is ignored 
 
 ## API for local agents
 
-[shared/contracts.ts](shared/contracts.ts) owns strict versioned schemas. Write bodies require `contractVersion: 1`; unknown fields fail. Current project responses carry the version. Limits: JSON 2 MiB; images 1 MiB; 100 features, 100 cases per feature, 200 relations and 200 assets per project. IDs use lowercase ASCII letters/digits/hyphens, at most 64 characters. Supported scenes are `booking`, `approval`, and `navigation`, all version 1.
+[shared/contracts.ts](shared/contracts.ts) owns strict versioned schemas. Current write bodies use `contractVersion: 2`; legacy v1 create/update bodies remain accepted. Unknown fields fail. Current project responses carry version 2. Request limits: JSON 2 MiB, images 1 MiB, 100 features, 100 cases per feature, 200 relations and 100 records per supporting collection per batch. Project limits: 500 features, 2,000 relations/evidence records, 1,000 records per other supporting collection and 200 assets; normalized documents fit 8 MiB, with a separate bounded legacy compatibility allowance. `GET /api/v1/capabilities` advertises the exact limits and supported shapes. IDs use lowercase ASCII letters/digits/hyphens, at most 64 characters. Supported scenes are `booking`, `approval`, `navigation`, and `authored`, all scene version 1.
 
 All routes below start with `/api/v1`:
 
 | Method / path                       | Behavior                                                                                               |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `GET /ready`                        | Database/schema/foreign-key readiness, no private details                                              |
+| `GET /capabilities`                 | Accepted contracts, scenes, records, visuals and limits                                                |
 | `GET /projects`                     | Up to 100 summaries (`id`, `title`, `revision`) ordered by ID; pass `?after=LAST_ID` for the next page |
 | `GET /projects/:id`                 | Coherent current document                                                                              |
 | `POST /projects`                    | Create at revision 1; [fixtures/booking.ts](fixtures/booking.ts) is the tested full example            |
@@ -69,7 +79,7 @@ All routes below start with `/api/v1`:
 
 Writes require `Authorization: Bearer <local credential>`. CLI callers may omit Origin; browser Origin/Host are restricted to configured loopback ports. Cross-site requests fail. No permissive CORS or frontend credential.
 
-After starting and seeding the separate Publishing Studio demo above, this changes its illustrative approval requirement to three independent approvals:
+After starting and seeding the persistent private Publishing Studio copy on port `4318` above, this changes its illustrative approval requirement to three independent approvals using the same `.env` credential:
 
 ```sh
 ATLAS_PORT=4318 node --env-file=.env --input-type=module <<'JS'
@@ -79,8 +89,11 @@ const read = await fetch(`${base}/projects/publishing-studio`)
 if (!read.ok) throw new Error(`Read failed: ${read.status}`)
 const project = await read.json()
 const feature = project.features.find(item => item.id === 'approve-article')
-const body = updateSchema.parse({ contractVersion: 1, expectedRevision: project.revision,
-  upsertFeatures: [{ ...feature, requiredApprovals: 3 }] })
+const rule = project.rules.find(item => item.id === 'two-approvals')
+const body = updateSchema.parse({ contractVersion: 2, expectedRevision: project.revision,
+  upsertFeatures: [{ ...feature, requiredApprovals: 3 }],
+  upsertRules: [{ ...rule, title: 'Three independent approvals',
+    statement: 'The pending request needs at least three independent approvals.' }] })
 const response = await fetch(`${base}/projects/${project.id}/changes`, {
   method: 'POST', headers: { 'content-type': 'application/json',
     authorization: `Bearer ${process.env.ATLAS_WRITE_TOKEN}` }, body: JSON.stringify(body),
@@ -95,7 +108,7 @@ Errors use `{ "error": { "code": "revision_conflict", "message": "..." } }`; sha
 
 ## Storage, upgrades and recovery
 
-Tracked SQL is in `migrations/`, currently schema 3. Every connection enables foreign keys. Current data and revisions commit together. Images are staged completely before registration; generated keys and symlink checks restrict serving.
+Tracked SQL is in `migrations/`, currently schema 4. Every connection enables foreign keys. Current data and revisions commit together. Images are staged completely before registration; generated keys and symlink checks restrict serving.
 
 Before upgrading, stop Atlas and back up using the **existing compatible version**. Backup locks out the app and uses SQLite's backup facility without applying migrations, plus registered assets and a database checksum manifest. Keep the manifest with the backup; restore verifies it before migrations. Startup/migrate applies migrations transactionally; future schema versions are rejected.
 
