@@ -15,6 +15,12 @@ test('saved knowledge validates without blocked script evaluation and uses the a
   await expect(
     page.getByRole('heading', { name: 'Start here', exact: true }),
   ).toBeVisible()
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
+    'href',
+    '/art/penpot/mountain.svg',
+  )
+  expect((await request.get('/art/penpot/mountain.svg')).status()).toBe(200)
+  await page.evaluate(() => document.fonts.ready)
   expect(
     await page.evaluate(
       () =>
@@ -22,9 +28,4 @@ test('saved knowledge validates without blocked script evaluation and uses the a
           .atlasPolicyViolations,
     ),
   ).toEqual([])
-  await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
-    'href',
-    '/art/penpot/mountain.svg',
-  )
-  expect((await request.get('/art/penpot/mountain.svg')).status()).toBe(200)
 })
