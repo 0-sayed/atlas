@@ -85,6 +85,15 @@
   border-radius: var(--atlas-radius-control);
   background: var(--atlas-paper);
 }
+.knowledge-case-details {
+  margin-top: 8px;
+}
+.knowledge-case-details summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 10px 0;
+  font-weight: 700;
+}
 .knowledge-empty {
   padding: 28px;
   margin-top: 24px;

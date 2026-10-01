@@ -145,6 +145,13 @@ test('scoped authoring changes refresh facts, evidence and registered art while 
   ).toBeVisible()
   await page.getByRole('link', { name: 'Back to Rules', exact: true }).click()
   await expect(page).toHaveURL(/rules\?item=complete$/)
+  await page
+    .locator('.knowledge-context')
+    .filter({
+      has: page.getByRole('link', { name: authoredFeature.title, exact: true }),
+    })
+    .locator('summary')
+    .click()
   await expect(
     page.getByRole('link', {
       name: 'Incomplete handoff · Allowed',
@@ -296,6 +303,7 @@ test('atomic removals invalidate old knowledge links without changing another pr
   await expect(
     page.getByRole('heading', { name: 'Checklist complete', exact: true }),
   ).toBeVisible()
+  await page.getByText('4 saved cases', { exact: true }).click()
   await page
     .getByRole('link', { name: 'Incomplete handoff · Blocked', exact: true })
     .click()

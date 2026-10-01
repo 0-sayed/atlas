@@ -12,6 +12,7 @@ import {
 } from '../components/FeatureMapCanvas'
 import { AtlasActivityIcon, AtlasIcon } from '../components/AtlasIcon'
 import { ClaimEvidence } from '../components/ClaimEvidence'
+import { useSearchInput } from '../components/useSearchInput'
 import { FixtureLabel } from './GuidePages'
 import { DecorativeIsland } from './DecorativeIsland'
 import './feature-map.css'
@@ -24,6 +25,7 @@ export function FeatureMapPage() {
     query = params.get('q') ?? '',
     selected = params.get('selected')
   const group = groups.find((g) => g.id === groupId)
+  const search = useSearchInput(query)
   const list = params.get('view') === 'list'
   const requestedPage = Number(params.get('page') ?? '1')
   const filtered = searchFeatures(project, query).filter(
@@ -99,7 +101,9 @@ export function FeatureMapPage() {
       <FixtureLabel />
       <h1 id="page-title">Feature Map</h1>
       <p className="intro">
-        {project.features.length} activities · {groups.length} groups
+        {project.features.length}{' '}
+        {project.features.length === 1 ? 'activity' : 'activities'} ·{' '}
+        {groups.length} {groups.length === 1 ? 'group' : 'groups'}
       </p>
       <div className="map-toolbar">
         <form
@@ -111,10 +115,11 @@ export function FeatureMapPage() {
           <div className="search-row">
             <AtlasIcon name="search" />
             <input
+              ref={search}
               id="map-search"
               type="search"
               placeholder="Find an activity, actor, condition or area"
-              value={query}
+              defaultValue={query}
               onChange={(e) =>
                 update({ q: e.target.value, page: null, selected: null }, true)
               }
@@ -211,35 +216,37 @@ export function FeatureMapPage() {
             </div>
           ) : (
             <>
-              <div className="map-page-controls">
-                <button
-                  className="atlas-button"
-                  aria-label="Previous map page"
-                  disabled={page === 1}
-                  onClick={() =>
-                    update({
-                      page: page === 2 ? null : String(page - 1),
-                      selected: null,
-                    })
-                  }
-                >
-                  Previous
-                </button>
-                <span>
-                  Page {page} of {pages} · {items.length}{' '}
-                  {overview ? 'groups' : 'activities'}
-                </span>
-                <button
-                  className="atlas-button"
-                  aria-label="Next map page"
-                  disabled={page === pages}
-                  onClick={() =>
-                    update({ page: String(page + 1), selected: null })
-                  }
-                >
-                  Next
-                </button>
-              </div>
+              {pages > 1 && (
+                <div className="map-page-controls">
+                  <button
+                    className="atlas-button"
+                    aria-label="Previous map page"
+                    disabled={page === 1}
+                    onClick={() =>
+                      update({
+                        page: page === 2 ? null : String(page - 1),
+                        selected: null,
+                      })
+                    }
+                  >
+                    Previous
+                  </button>
+                  <span>
+                    Page {page} of {pages} · {items.length}{' '}
+                    {overview ? 'groups' : 'activities'}
+                  </span>
+                  <button
+                    className="atlas-button"
+                    aria-label="Next map page"
+                    disabled={page === pages}
+                    onClick={() =>
+                      update({ page: String(page + 1), selected: null })
+                    }
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
               <FeatureMapCanvas
                 key={memoryKey + currentItems.map((i) => i.id).join('|')}
                 project={project}

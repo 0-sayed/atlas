@@ -1,4 +1,4 @@
-import { Link, NavLink } from 'react-router'
+import { NavLink } from 'react-router'
 import { destinations } from '../content/project'
 import { projectPath } from '../content/knowledge'
 import { AtlasIcon } from './AtlasIcon'
@@ -35,16 +35,18 @@ export function AtlasSidebar({
                 {item.label}
               </NavLink>
             ))}
-            <Link
+            <NavLink
               className="sidebar-link sidebar-search"
               to={`${base}/explore`}
+              end
+              state={{ focusSearch: true }}
               aria-label="Search activities"
             >
               <span className="sidebar-icon" aria-hidden="true">
                 <AtlasIcon name="search" />
               </span>
               Search activities
-            </Link>
+            </NavLink>
           </>
         )}
       </nav>
