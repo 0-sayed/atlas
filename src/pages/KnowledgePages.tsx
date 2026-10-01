@@ -223,7 +223,7 @@ export function KnowledgePage({
                                   {steps.map((s) => s.title).join(' · ')}
                                 </p>
                               )}
-                              {cases.length > 0 && (
+                              {cases.length > 0 ? (
                                 <details className="knowledge-case-details">
                                   <summary>
                                     {cases.length} saved{' '}
@@ -255,7 +255,9 @@ export function KnowledgePage({
                                     ))}
                                   </ul>
                                 </details>
-                              )}
+                              ) : isAuthoredFeature(feature) ? (
+                                <p>No saved cases reference this rule.</p>
+                              ) : null}
                             </div>
                           ),
                         )

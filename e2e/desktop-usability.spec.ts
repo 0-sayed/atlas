@@ -38,6 +38,8 @@ test('sidebar search starts typing immediately and stays marked as the current d
   await expect(search).toHaveValue('permission')
   await page.getByRole('button', { name: 'Clear search', exact: true }).click()
   await expect(search).toHaveValue('')
+  await page.locator('.activity-card').first().click()
+  await expect(searchLink).not.toHaveAttribute('aria-current', 'page')
 })
 
 test('map and supporting searches retain fast typing and restore the URL after Back', async ({
@@ -131,6 +133,45 @@ test('rule summaries keep cases optional, preserve case links and describe the f
     .click()
   await expect(page.locator('.knowledge-record')).toHaveCount(2)
   await expect(page).not.toHaveURL(/item=/)
+})
+
+test('empty authored rule cases are explicit without mislabelling specialized activities', async ({
+  page,
+  request,
+}, info) => {
+  const id = `usability-empty-cases-${info.retry}-${info.repeatEachIndex}`
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers: {
+          authorization: 'Bearer e2e-only-token-not-a-production-secret',
+        },
+        data: {
+          ...authoredSeed,
+          id,
+          features: authoredSeed.features.map((feature) => ({
+            ...feature,
+            cases: [],
+          })),
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.goto(`/#/projects/${id}/rules?item=complete`)
+  await expect(
+    page.getByText('No saved cases reference this rule.', { exact: true }),
+  ).toBeVisible()
+  await expect(page.locator('.knowledge-case-details')).toHaveCount(0)
+  await page.goto(`/#/projects/${showcaseId}/rules?item=two-approvals`)
+  await expect(
+    page.getByRole('link', {
+      name: 'Approve the article request',
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('No saved cases reference this rule.', { exact: true }),
+  ).toHaveCount(0)
 })
 
 test('a small desktop map needs no pagination and exposes its controls without scrolling', async ({

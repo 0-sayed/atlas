@@ -38,6 +38,7 @@ export function AtlasSidebar({
             <NavLink
               className="sidebar-link sidebar-search"
               to={`${base}/explore`}
+              end
               state={{ focusSearch: true }}
               aria-label="Search activities"
             >
