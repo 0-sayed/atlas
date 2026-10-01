@@ -4,6 +4,8 @@
 
 T008 is merged in [PR #11](https://github.com/0-sayed/atlas/pull/11) (`0681fef`), with owner two-screen visual acceptance recorded on 2026-09-30. T009 and T010 implementation merged together in [PR #13](https://github.com/0-sayed/atlas/pull/13) (`f7bc975`). **T011 is next:** verify same-build reuse with the required real-source coverage and broader desktop acceptance. T005 human evaluation remains open. Roadmap entries do not authorize future implementation.
 
+**T011 acceptance preparation:** the owner selected Atlas/demo-only continuation because no second repository is available. See the [current verification](../context/delivery-evidence.md#t011--acceptance-preparation-2026-10-01). Automated validation and same-build authoring/browser checks passed for one reviewed source plus two synthetic domains. The original second-real-source gate and broader owner visual acceptance remain outstanding; keep T011 unchecked.
+
 ## Design context for every frontend task
 
 Start with the [Penpot reference and dynamic-project boundary](../context/design-reference.md#dynamic-projects-illustrative-ecommerce-screens), then use its [task-to-design mapping](../context/design-reference.md#task-to-design-mapping) to find the exact boards and shared components. The ecommerce screens are illustrative: reuse Atlas tokens, controls, layouts and interaction patterns while reading domain names, activities, actors, rules and outcomes from reviewed project data. Do not hard-code Orders/Cart/Checkout or clone a separate UI for each project. Missing data stays explicit; unsupported behavior remains a renderer gap. T011 verifies reuse across distinct domains in one unchanged build.
