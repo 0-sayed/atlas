@@ -260,9 +260,9 @@ The retained reference guide is in [PROJECT.md](PROJECT.md#15-visual-reference-g
 
 ## 8. Next design checkpoint
 
-**Review verdict:** the original desktop Penpot reference was reviewed; its live current-state cleanup is complete; local revision 235 snapshot is verified. Its static compositions do not prove that arbitrary short, long or missing project content reflows in the application. T008’s running two-screen visual proof is merged (`0681fef`) and accepted by the owner. Six working destinations and the broader knowledge model remain T009–T011.
+**Review verdict:** the original desktop Penpot reference was reviewed; its live current-state cleanup is complete; local revision 235 snapshot is verified. Its static compositions do not prove that arbitrary short, long or missing project content reflows in the application. T008’s running two-screen visual proof is merged (`0681fef`) and accepted by the owner. T009/T010 delivered the six working destinations and broader knowledge model in PR #13 (`f7bc975`). T011 remains the cross-domain, real-source and broader desktop acceptance gate.
 
-GOV.UK's design guidance recommends prototypes before committing to a full build and identifies coded prototypes as useful for realistic interaction testing [R1]. For Atlas, the accepted T008 proof is **a running illustrated Start Here overview and one feature explanation using the existing API and SQLite path**, checked against the reviewed desktop design. The six destinations are the full-product direction; this proof does not mean all six views or their contracts are complete.
+GOV.UK's design guidance recommends prototypes before committing to a full build and identifies coded prototypes as useful for realistic interaction testing [R1]. For Atlas, the accepted T008 proof is **a running illustrated Start Here overview and one feature explanation using the existing API and SQLite path**, checked against the reviewed desktop design. That acceptance covers those two screens; the six destinations and their contracts were subsequently implemented by T009/T010. T011 must evaluate the broader result against reviewed source knowledge and the desktop design.
 
 ### Historical booking learning loop and current visual proof
 
@@ -270,7 +270,7 @@ The illustrative **Reschedule a booking** fixture above was the earlier end-to-e
 
 `Start Here → select a documented feature → inspect a case → open/close a reason → return`
 
-The booking loop remains a historical fixture test. T006 uses labelled Publishing Studio demo data for the overview and navigation-feature explanation. T008 evaluated these running screens against the reviewed desktop design and received owner acceptance. Additional destinations may have honest empty states until their authored data and views are implemented. No real booking or publishing action occurs in Atlas.
+The booking loop remains a historical fixture test. T006 uses labelled Publishing Studio demo data for the overview and navigation-feature explanation. T008 evaluated these running screens against the reviewed desktop design and received owner acceptance. T009/T010 implemented all six destinations; absent authored data still requires an honest empty state. The single Publishing Studio showcase now supplies illustrative content for each destination. No real booking or publishing action occurs in Atlas.
 
 The historical booking fixture demonstrated allowed, time-blocked, occupied-slot and ownership cases from section 1, plus one uncertain outcome. The explanation displays recorded examples, not computed booking outcomes. Empty, partial, no-result and unknown states must never imply a live source connection.
 

@@ -78,7 +78,7 @@ try {
     '/.local/atlas.sqlite',
     '/.env',
     '/server/main.ts',
-    '/planning/bootstrap.md',
+    '/planning/context/bootstrap.md',
   ])
     assert.equal((await fetch(`http://127.0.0.1:${port}${path}`)).status, 404)
   await stop()
