@@ -5,6 +5,115 @@ const headers = {
   authorization: 'Bearer e2e-only-token-not-a-production-secret',
 }
 
+test('Refresh guide reloads new and renamed switch targets without resetting the current case', async ({
+  page,
+  request,
+}) => {
+  const otherId = 'refreshed-switch-target'
+  const addedId = 'new-switch-target'
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: { ...approvalSeed, id: otherId, title: 'Old target title' },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.goto('/#/projects/booking-demo/explore/booking?case=at-limit')
+  const picker = page.getByRole('combobox', { name: /Choose project/ })
+  await expect(picker).toBeEnabled()
+  await expect(picker.locator(`option[value="${otherId}"]`)).toHaveText(
+    'Old target title',
+  )
+  const other = await (await request.get(`/api/v1/projects/${otherId}`)).json()
+  expect(
+    (
+      await request.post(`/api/v1/projects/${otherId}/changes`, {
+        headers,
+        data: {
+          contractVersion: 2,
+          expectedRevision: other.revision,
+          title: 'Renamed target title',
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: { ...approvalSeed, id: addedId, title: 'New target title' },
+      })
+    ).status(),
+  ).toBe(201)
+  await page.getByRole('button', { name: 'Refresh guide', exact: true }).click()
+  await expect(picker.locator(`option[value="${otherId}"]`)).toHaveText(
+    'Renamed target title',
+  )
+  await expect(picker.locator(`option[value="${addedId}"]`)).toHaveText(
+    'New target title',
+  )
+  await expect(page).toHaveURL(/booking-demo\/explore\/booking\?case=at-limit$/)
+  await expect(
+    page.getByRole('heading', { name: 'Booking moved' }),
+  ).toBeVisible()
+  await expect(picker).toBeEnabled()
+  await picker.selectOption(addedId)
+  await expect(page).toHaveURL(/#\/projects\/new-switch-target$/)
+})
+
+test('a failed later list page keeps fetched projects switchable and offers retry', async ({
+  page,
+  request,
+}) => {
+  expect(
+    (
+      await request.post('/api/v1/projects', {
+        headers,
+        data: {
+          ...approvalSeed,
+          id: 'partial-page-000',
+          title: 'Loaded project 0',
+        },
+      })
+    ).status(),
+  ).toBe(201)
+  const firstPage = [
+    { id: 'booking-demo', title: 'Illustrative booking guide', revision: 1 },
+    ...Array.from({ length: 99 }, (_, index) => ({
+      id: `partial-page-${String(index).padStart(3, '0')}`,
+      title: `Loaded project ${index}`,
+      revision: 1,
+    })),
+  ]
+  let failed = true
+  await page.route(/\/api\/v1\/projects(?:\?.*)?$/, (route) => {
+    const after = new URL(route.request().url()).searchParams.get('after')
+    return route.fulfill(
+      after && failed
+        ? { status: 503, json: {} }
+        : { json: after ? [] : firstPage },
+    )
+  })
+  await page.goto('/#/projects/booking-demo')
+  const picker = page.getByRole('combobox', { name: /Choose project/ })
+  await expect(page.getByRole('alert')).toContainText('Project list incomplete')
+  await expect(picker).toBeEnabled()
+  await expect(picker.getByRole('option')).toHaveCount(100)
+  failed = false
+  await page.getByRole('button', { name: 'Retry projects' }).click()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  await expect(picker).toBeEnabled()
+  await expect(picker.getByRole('option')).toHaveCount(100)
+  failed = true
+  await page.getByRole('button', { name: 'Refresh guide', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('Project list incomplete')
+  await expect(picker).toBeEnabled()
+  await picker.selectOption('partial-page-000')
+  await expect(page).toHaveURL(/#\/projects\/partial-page-000$/)
+  await expect(page.getByRole('heading', { name: 'Start here' })).toBeVisible()
+})
+
 test('refreshing a renamed project updates the picker label and current option', async ({
   page,
   request,

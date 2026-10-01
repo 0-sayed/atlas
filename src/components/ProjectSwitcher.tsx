@@ -24,12 +24,15 @@ export function ProjectSwitcher({
   useEffect(() => {
     const controller = new AbortController()
     async function load() {
+      setLoading(true)
+      setError(false)
       try {
         const saved: SavedProject[] = []
         let after = ''
         for (;;) {
           const page = await loadProjectPage(after, controller.signal)
           saved.push(...page)
+          if (!controller.signal.aborted) setProjects([...saved])
           if (page.length < 100) break
           after = page[page.length - 1].id
         }
@@ -45,7 +48,7 @@ export function ProjectSwitcher({
     }
     void load()
     return () => controller.abort()
-  }, [request])
+  }, [request, project])
 
   return (
     <div className="atlas-project-switcher">
@@ -55,7 +58,7 @@ export function ProjectSwitcher({
         aria-busy={loading}
         title={project?.title}
         value={project?.id ?? ''}
-        disabled={loading || error || projects.length === 0}
+        disabled={loading || projects.length === 0}
         onChange={(event) => navigate(projectPath(event.target.value))}
       >
         <button type="button" className="atlas-project-selection">
@@ -79,7 +82,11 @@ export function ProjectSwitcher({
       </select>
       {error && (
         <div className="atlas-project-error">
-          <p role="alert">Project list unavailable.</p>
+          <p role="alert">
+            {projects.length
+              ? 'Project list incomplete. Showing loaded projects.'
+              : 'Project list unavailable.'}
+          </p>
           <button
             className="atlas-button"
             type="button"
