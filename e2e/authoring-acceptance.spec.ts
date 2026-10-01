@@ -291,6 +291,7 @@ test('atomic removals invalidate old knowledge links without changing another pr
   await page.getByRole('link', { name: 'Projects', exact: true }).click()
   // Identical titles are expected: project identities, not labels, scope knowledge.
   await page.locator(`a[href="#/projects/${otherId}"]`).click()
+  await expect(page).toHaveURL(new RegExp(`/projects/${otherId}$`))
   await page.goto(`/#/projects/${otherId}/rules?item=complete`)
   await expect(
     page.getByRole('heading', { name: 'Checklist complete', exact: true }),
