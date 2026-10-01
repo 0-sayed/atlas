@@ -26,8 +26,14 @@ test('Publishing Studio explains a connected journey and its current approval ru
   }
   await page.evaluate(() => document.fonts.ready)
   await expect(
-    page.getByText('Publishing Studio · Demo', { exact: true }),
+    page.getByRole('combobox', {
+      name: 'Choose project: Publishing Studio · Demo',
+      exact: true,
+    }),
   ).toBeVisible()
+  await expect(
+    page.getByRole('combobox', { name: /Choose project/ }),
+  ).toHaveValue('publishing-studio')
   await page.screenshot({
     path: testInfo.outputPath('publishing-studio-desktop.png'),
     fullPage: true,

@@ -1,24 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { z } from 'zod'
-import { idSchema } from '../../shared/contracts'
 import { projectPath } from '../content/knowledge'
+import { loadProjectPage, type SavedProject } from '../content/projectList'
 import { AtlasIcon } from '../components/AtlasIcon'
 import { DecorativeIsland } from './DecorativeIsland'
 import './collection-states.css'
 
-const listSchema = z
-  .array(
-    z.strictObject({
-      id: idSchema,
-      title: z.string().min(1).max(160),
-      revision: z.number().int().positive(),
-    }),
-  )
-  .max(100)
-type Project = z.infer<typeof listSchema>[number]
 export function ProjectPicker() {
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<SavedProject[]>([])
   const [after, setAfter] = useState('')
   const [more, setMore] = useState(false)
   const [request, setRequest] = useState(0)
@@ -29,18 +18,7 @@ export function ProjectPicker() {
     const controller = new AbortController()
     async function load() {
       try {
-        const response = await fetch(
-          `/api/v1/projects${after ? `?after=${after}` : ''}`,
-          { signal: controller.signal },
-        )
-        if (!response.ok) throw new Error('Project list unavailable.')
-        const result = listSchema.parse(await response.json())
-        if (
-          result.some(
-            (p, index) => p.id <= (index ? result[index - 1].id : after),
-          )
-        )
-          throw new Error('Project list incompatible.')
+        const result = await loadProjectPage(after, controller.signal)
         if (!controller.signal.aborted) {
           setProjects((old) =>
             after ? [...old.filter((p) => p.id <= after), ...result] : result,

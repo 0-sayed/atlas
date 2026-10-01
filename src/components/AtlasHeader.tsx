@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { useContext } from 'react'
 import { AtlasIcon } from './AtlasIcon'
+import { ProjectSwitcher } from './ProjectSwitcher'
 import { RefreshContext } from '../content/knowledge'
 
 export function AtlasHeader({
@@ -17,15 +18,7 @@ export function AtlasHeader({
         </span>
         <span>Feature Atlas</span>
       </Link>
-      <Link
-        className="atlas-project-control"
-        to="/"
-        aria-label={`Choose project${project ? `: ${project.title}` : ''}`}
-        title={project?.title}
-      >
-        <span>{project?.title ?? 'Choose a project'}</span>
-        <span aria-hidden="true">⌄</span>
-      </Link>
+      <ProjectSwitcher project={project} />
       <p className="atlas-header-caption">
         Understand the product, one island at a time.
       </p>

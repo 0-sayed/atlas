@@ -179,12 +179,11 @@ test('source context stays within its project and fits long text at narrow width
     ),
   ).toBe(true)
   await page
-    .getByRole('link', {
+    .getByRole('combobox', {
       name: 'Choose project: Long source · synthetic QA',
       exact: true,
     })
-    .click()
-  await page.getByRole('link', { name: /No sources/ }).click()
+    .selectOption('sources-empty')
   await expect(page).toHaveURL(/projects\/sources-empty$/)
   await expect(page.locator('.project-sources')).toHaveCount(0)
   await expect(page.getByText('Long context', { exact: true })).toHaveCount(0)

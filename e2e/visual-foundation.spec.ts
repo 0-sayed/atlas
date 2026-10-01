@@ -41,7 +41,15 @@ test('two saved projects share navigation but retain distinct live illustration 
   await expect(
     page.getByRole('navigation', { name: 'Guide navigation' }),
   ).toBeVisible()
-  await expect(page.getByText('Sky project', { exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('combobox', {
+      name: 'Choose project: Sky project',
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('combobox', { name: /Choose project/ }),
+  ).toHaveValue(skyId)
   await expect(page.locator('.activity-art').first()).toHaveAttribute(
     'data-illustration',
     'compass',
@@ -78,7 +86,15 @@ test('two saved projects share navigation but retain distinct live illustration 
 
   await page.getByRole('link', { name: 'Projects', exact: true }).click()
   await page.getByRole('link', { name: 'Peach project', exact: true }).click()
-  await expect(page.getByText('Peach project', { exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('combobox', {
+      name: 'Choose project: Peach project',
+      exact: true,
+    }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('combobox', { name: /Choose project/ }),
+  ).toHaveValue(peachId)
   await expect(page.locator('.activity-art').first()).toHaveAttribute(
     'data-illustration',
     'parcel',
