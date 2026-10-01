@@ -19,6 +19,22 @@ For POST, send JSON with `Content-Type: application/json` and `Authorization: Be
 
 Error JSON is `{ "error": { "code": "...", "message": "...", "fields"?: [{"path":"...","code":"..."}] } }`. Relevant statuses: 400 invalid shape/reference or invalid image, 401 credential, 403 Host/Origin/cross-site, 404 missing, 409 existing project/asset ID or stale revision, 413 body too large, 415 wrong media type, 500 unexpected failure, 503 unavailable storage. Inspect the response and persisted state before acting again.
 
+## Browser verification after API writes
+
+Use the chosen Atlas base URL serving the frontend. Browser hash routes are separate from `/api/v1`; append the paths below to that base URL. These IDs match the illustrative navigation payload later in this reference; use actual IDs from the saved document for live verification.
+
+| View                | Browser path                                                         |
+| ------------------- | -------------------------------------------------------------------- |
+| Project Start Here  | `/#/projects/harbor-guide`                                           |
+| Activity list       | `/#/projects/harbor-guide/explore`                                   |
+| Feature explanation | `/#/projects/harbor-guide/explore/find-records`                      |
+| Selected saved case | `/#/projects/harbor-guide/explore/find-records?case=matching-record` |
+
+1. GET the project after the write and record its current Atlas revision and affected facts. In an already-open guide, click **Refresh guide** and wait for loading to finish. Moving between routes within the same project does not by itself reload its knowledge. If refresh fails, the guide retains the last-loaded revision and shows an error; report that verification failure.
+2. Open **Source and evidence** on a feature explanation to inspect its Atlas revision and cited support. Compare the displayed Atlas revision and affected rules, case selection, outcome/reason, evidence and artwork with the read-back. Explicitly removed records should be unavailable; missing facts must remain empty or unknown as recorded.
+3. Load the affected feature/case URL in a fresh tab to check independent loading. In a separate navigation check, open the activity list, follow the feature link, select the saved case and use the feature's **Back** control. Then use browser Back to check the previous route and selection. Keep any existing return/search parameters when checking a previously open link; **Refresh guide** should preserve that link's case and return context.
+4. Report actual browser results separately from API persistence. If browser verification could not run, report that gap rather than visual completion.
+
 ## Document and payload shapes
 
 IDs match `^[a-z0-9][a-z0-9-]{0,63}$`. Required text is trimmed, nonempty, at most 4000 characters; short text at most 160. Project/feature titles, actor, group, revisionLabel, and case label/action/result are short text; purpose, navigation start/reason/rules, and evidence source/scope/description use the 4000-character limit. Revision is an integer from 0 through `Number.MAX_SAFE_INTEGER - 1`. Strict objects reject unknown fields. Arrays and nested objects must have the specified types; no implicit defaults.
