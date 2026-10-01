@@ -1,15 +1,60 @@
 import { expect, it } from 'vitest'
 import {
   isApprovalFeature,
+  isAuthoredFeature,
   isNavigationFeature,
   validateDocument,
 } from '../shared/contracts.js'
 import { approvalOutcome } from '../shared/approval.js'
 import { publishingStudioSeed } from './publishing-studio.js'
+import { actorParticipation, ruleContext } from '../src/content/destinations.js'
+
+it('provides linked knowledge for every supporting destination in the single showcase', () => {
+  const project = validateDocument({
+    ...publishingStudioSeed,
+    revision: 1,
+    assets: [],
+  })
+  expect(project.purpose?.text).toMatch(/article/i)
+  expect(project.actors.map((actor) => actor.name)).toEqual([
+    'Writer',
+    'Reviewer',
+    'Editor',
+    'Reader',
+  ])
+  expect(
+    actorParticipation(project, 'writer').map(({ feature }) => feature.id),
+  ).toEqual(['prepare-article', 'request-review'])
+  expect(
+    ruleContext(project, 'reviewer-independent').flatMap(({ cases }) =>
+      cases.map((example) => example.outcome.status),
+    ),
+  ).toEqual(['allowed', 'blocked', 'unknown', 'conflicting'])
+  expect(project.journeys[0]?.steps.map((step) => step.featureId)).toEqual([
+    'prepare-article',
+    'request-review',
+    'approve-article',
+    'publish-article',
+    'find-published-article',
+  ])
+  expect(
+    project.glossary.find((term) => term.id === 'independent-review')?.ruleIds,
+  ).toContain('reviewer-independent')
+  expect(
+    project.features.every(
+      (feature) => feature.areaId && feature.evidenceIds?.length,
+    ),
+  ).toBe(true)
+  expect(
+    project.features
+      .find(isAuthoredFeature)
+      ?.cases.map((example) => example.outcome.status),
+  ).toEqual(['allowed', 'blocked', 'unknown', 'conflicting'])
+})
 
 it('is a complete, scoped, explicitly fictional editorial journey', () => {
   expect(publishingStudioSeed).toMatchObject({
-    contractVersion: 1,
+    contractVersion: 2,
     id: 'publishing-studio',
     title: 'Publishing Studio · Demo',
   })
@@ -74,7 +119,7 @@ it('links dependent activities to the prerequisite shown by the renderer', () =>
 
 it('offers available, unavailable, and unknown scenarios for each navigation activity', () => {
   const navigation = publishingStudioSeed.features.filter(isNavigationFeature)
-  expect(navigation).toHaveLength(4)
+  expect(navigation).toHaveLength(3)
   for (const feature of navigation) {
     expect(new Set(feature.cases.map((example) => example.outcome))).toEqual(
       new Set(['available', 'unavailable', 'unknown']),

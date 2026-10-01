@@ -32,6 +32,77 @@ test('Publishing Studio explains a connected journey and its current approval ru
     path: testInfo.outputPath('publishing-studio-desktop.png'),
     fullPage: true,
   })
+  for (const [route, heading, record] of [
+    ['journeys', 'User Journeys', 'From draft to reader'],
+    ['actors', 'Actors', 'Writer'],
+    ['rules', 'Rules', 'Independent reviewer assigned'],
+    ['glossary', 'Glossary', 'Independent review'],
+  ]) {
+    await page.goto(`${base}/${route}`)
+    await expect(
+      page.getByRole('heading', { name: heading, exact: true }),
+    ).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: record, exact: true }),
+    ).toBeVisible()
+    await expect(
+      page.getByText('No saved records yet.', { exact: true }),
+    ).toHaveCount(0)
+    await page.screenshot({
+      path: testInfo.outputPath(`publishing-${route}.png`),
+      fullPage: true,
+    })
+  }
+  await page.goto(`${base}/map`)
+  await expect(
+    page.getByRole('heading', { name: 'Feature Map', exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByText('5 activities · 2 groups', { exact: true }),
+  ).toBeVisible()
+  await page
+    .getByRole('combobox', { name: 'Area', exact: true })
+    .selectOption('area:editorial')
+  await page
+    .getByRole('button', { name: 'Request editorial review', exact: true })
+    .click()
+  await page.getByRole('link', { name: 'Open activity', exact: true }).click()
+  await expect(page.getByRole('status')).toContainText('Review request ready')
+  await page
+    .getByRole('link', { name: 'Back to Feature Map', exact: true })
+    .click()
+  await expect(page).toHaveURL(/group=area%3Aeditorial/)
+  await page.screenshot({
+    path: testInfo.outputPath('publishing-map.png'),
+    fullPage: true,
+  })
+  for (const [id, label, result] of [
+    ['review-requested', 'Allowed', 'Review request ready'],
+    ['draft-incomplete', 'Blocked', 'Review request blocked'],
+    ['reviewer-unassigned', 'Unknown', 'Reviewer handoff unclear'],
+    ['reviewer-conflict', 'Conflicting', 'Reviewer independence disputed'],
+  ]) {
+    await page.goto(`${base}/explore/request-review?case=${id}`)
+    await expect(page.getByRole('status')).toContainText(label)
+    await expect(page.getByRole('status')).toContainText(result)
+    await page.screenshot({
+      path: testInfo.outputPath(`publishing-${id}.png`),
+      fullPage: true,
+    })
+  }
+  await page.goto(`${base}/rules?item=reviewer-independent`)
+  await page
+    .getByRole('link', {
+      name: 'Reviewer records disagree · Conflicting',
+      exact: true,
+    })
+    .click()
+  await expect(page.getByRole('status')).toContainText(
+    'Reviewer independence disputed',
+  )
+  await page.getByRole('link', { name: 'Back to Rules', exact: true }).click()
+  await expect(page).toHaveURL(/rules\?item=reviewer-independent$/)
+  await page.goto(base)
   await page
     .getByRole('link', { name: 'Search activities', exact: true })
     .click()

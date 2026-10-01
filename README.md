@@ -29,18 +29,17 @@ npm start
 
 Open `http://127.0.0.1:4317`. Fresh storage shows an empty project shelf; startup never seeds. For development run `npm run dev:api` and `npm run dev` in separate terminals. Vite proxies `/api` to Nest. `npm run preview` serves frontend files only; `npm start` serves the complete production app.
 
-To explore **Publishing Studio**, run a separate demo server with its own storage and port. This single fictional project follows one article through preparation, review, approval, publication and discovery, with saved allowed/blocked/unknown cases, connected activities and varied artwork:
+For the owner's visual preview, use the **single Publishing Studio showcase**:
 
 ```sh
-ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm run storage -- migrate
-ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm start
-# In another terminal:
-ATLAS_DATA_DIR=.local/demo ATLAS_PORT=4318 npm run seed
+npm run showcase
 ```
 
-Open `http://127.0.0.1:4318/#/projects/publishing-studio`. The seed saves the current fictional approval rule and its recorded cases. These are invented demo rules, not Ghost behavior, and Atlas explains saved cases rather than executing a publishing workflow.
+Open `http://127.0.0.1:4176`. The launcher creates disposable storage with exactly one fictional project. It demonstrates all six guide destinations, a connected five-activity journey, participants, rules, glossary, and allowed/blocked/unknown/conflicting recorded cases. Stopping it removes its temporary storage; restarting begins a fresh demo. Normal storage remains empty unless knowledge is incorporated deliberately.
 
-The seed uses the authenticated API. Reseeding rejects an existing project and never overwrites edits. Keep normal storage separate. The smaller booking/approval fixtures remain for automated tests, not additional showcase projects.
+**Do not hand off the Playwright server as the owner's preview.** The e2e-server script and ATLAS_E2E_PORT are for isolated automated QA. Booking, logistics, and large synthetic projects are test datasets, never additional showcase projects.
+
+For a persistent private copy instead, migrate and start a separate storage directory and port, then run the seed command against that server. The seed uses the authenticated API and rejects an existing project without overwriting edits. These invented demo rules do not establish source-product behavior; Atlas explains saved cases rather than executing a publishing workflow.
 
 | Setting               | Default / requirement                                                                                                       |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |

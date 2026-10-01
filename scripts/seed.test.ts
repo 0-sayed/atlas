@@ -9,7 +9,7 @@ import { promisify } from 'node:util'
 import { afterEach, beforeEach, expect, it } from 'vitest'
 import { createApp } from '../server/app.js'
 import { publishingStudioSeed } from '../fixtures/publishing-studio.js'
-import { isApprovalFeature } from '../shared/contracts.js'
+import { isApprovalFeature, isAuthoredFeature } from '../shared/contracts.js'
 import { seedPublishingStudioApi } from './seed.js'
 
 const run = promisify(execFile)
@@ -67,6 +67,15 @@ it('creates one project with current review rules at revision 1', async () => {
     { id: saved.id, title: saved.title, revision: 1 },
   ])
   expect(saved.features.find(isApprovalFeature)?.requiredApprovals).toBe(2)
+  const loaded = await get(`/projects/${saved.id}`)
+  expect(loaded.actors).toHaveLength(4)
+  expect(loaded.journeys[0].steps).toHaveLength(5)
+  expect(loaded.glossary).toHaveLength(3)
+  expect(
+    saved.features
+      .find(isAuthoredFeature)
+      ?.cases.map((example) => example.outcome.status),
+  ).toEqual(['allowed', 'blocked', 'unknown', 'conflicting'])
   expect(saved.features).toEqual(
     [...publishingStudioSeed.features].sort((a, b) => a.id.localeCompare(b.id)),
   )
